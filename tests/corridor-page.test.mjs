@@ -13,7 +13,7 @@ test("corridor pages are bounded and carry validated cursors",async()=>{
   calls.push(String(url));
   return new Response(JSON.stringify(calls.length===1?
    {items:[fixture(cursor)],next_cursor:cursor}:
-   {items:[fixture(second)],next_cursor:null}),{status:200});
+   {items:[fixture(second)],next_cursor:null}),{status:200,headers:{"content-type":"application/json"}});
  }});
  const one=await api.corridorsPage({limit:1});
  assert.equal(one.next_cursor,cursor);
@@ -44,7 +44,7 @@ test("scanCorridors iterates only actual keyset data with finite page caps",asyn
    seen.push(String(url));
    return new Response(JSON.stringify(seen.length===1?
      {items:[fixture(cursor)],next_cursor:cursor}:
-     {items:[fixture(second)],next_cursor:null}));
+     {items:[fixture(second)],next_cursor:null}),{headers:{"content-type":"application/json"}});
   }});
  const ids=[];
  for await(const c of api.scanCorridors({pageSize:1,maxPages:3}))ids.push(c.id);
@@ -57,7 +57,7 @@ test("scanCorridors cannot silently scan unlimited pages",async()=>{
  fetchImpl:async ()=>{
    calls++;
    const id=(calls.toString(16).padStart(8,"0"))+"-1111-1111-1111-111111111111";
-   return new Response(JSON.stringify({items:[fixture(id)],next_cursor:id}));
+   return new Response(JSON.stringify({items:[fixture(id)],next_cursor:id}),{headers:{"content-type":"application/json"}});
  }});
  const items=[];
  for await(const c of api.scanCorridors({pageSize:1,maxPages:2}))items.push(c);
