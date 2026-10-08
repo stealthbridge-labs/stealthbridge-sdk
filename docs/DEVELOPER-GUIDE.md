@@ -104,3 +104,47 @@ The SDK now offers `scanCorridors({pageSize:25,maxPages:20,signal})`, an asynchr
 `contracts().public_interface` contains the read method names, argument shapes and explicitly separated administrator writes for both current Soroban registry sources. The authoritative snapshot lives at `stealthbridge-contracts/integrations/public-soroban-interface.v1.json`; the backend compares its mirrored copy in CI and serves it to SDK clients. The SDK validates the read names against the pinned source interface and rejects unknown read capabilities. This is a method inventory only: without a real deployed Contract ID and independent chain attestation, no Soroban invocation can run. No wallet seed or private proof is accepted here.
 
 **Strict address rule:** `getVerifiedContract()` intentionally refuses to resolve addresses from a manifest claim alone, even if `status=deployed` and `verified=true`. Real on-chain attestation of the contract ID, code hash, source version and Testnet passphrase must be implemented first. This avoids treating JSON metadata or syntactically valid-looking StrKeys as real deployed code.
+
+## 6. SDK package-version compatibility and release policy
+
+The SDK adheres to Semantic Versioning (SemVer 2.0.0):
+- **MAJOR**: Breaking API contract alterations or protocol version upgrades.
+- **MINOR**: Backward-compatible read-only endpoint additions, validator extensions, or client factories.
+- **PATCH**: Bug fixes, schema typing corrections, and documentation syncs.
+- **Prerelease (`-rc.N`)**: Tagged candidate releases for staging verification before distribution.
+
+### Automated version checks in CI
+CI automatically validates:
+1. `package.json` contains valid SemVer syntax.
+2. Git release tags (`refs/tags/v*`) match package metadata exactly (`v${npm_package_version}`).
+3. The exported `SDK_VERSION` matches package metadata.
+4. Packaging a tagged revision / release candidate builds, packs, and installs into clean Node.js ESM and Next.js App Router consumer fixtures.
+5. All builds and validation jobs execute independently of Vercel deployments and cloud dependencies.
+6. Financial execution remains strictly disabled across all release channels.
+
+## 7. Browser-safe same-origin proxy factory
+
+Frontend applications (such as Next.js) consume the Rust backend via a server-side proxy route (`/api/bridge/*`), preventing exposure of upstream RPC credentials, private network topologies, or secrets to the browser.
+
+The SDK exports `createBrowserBridgeClient()` (aliased as `createSameOriginBridgeClient` and `createBridgeClient`):
+
+```ts
+import { createBrowserBridgeClient } from "@stealthbridge/sdk";
+
+// Client Component or browser context
+const client = createBrowserBridgeClient({
+  basePath: "/api/bridge", // defaults to "/api/bridge"
+  timeoutMs: 10000,
+});
+
+const controller = new AbortController();
+const network = await client.network({ signal: controller.signal });
+const corridors = await client.corridors({ signal: controller.signal });
+```
+
+### Safety guarantees
+- **Zero embedded secrets**: Upstream endpoints and authorization tokens remain strictly server-side.
+- **No Node-only module leakage**: Browser bundles use standard `fetch`, `AbortSignal`, and `URL`, with zero references to `node:*` modules, `Buffer`, `process`, or CommonJS globals.
+- **Abort support**: Every read-only method accepts `{ signal: AbortSignal }` to cancel inflight requests immediately when components unmount.
+- **Read-only boundary**: No financial mutation methods (`send`, `sign`, `execute`, `withdraw`) exist in client builds.
+

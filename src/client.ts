@@ -12,6 +12,21 @@ export interface ClientConfig {
  /** Initial retry backoff in milliseconds; defaults to 100ms. */
  retryBackoffMs?:number;
 }
+export interface BrowserBridgeOptions {
+ /**
+  * Same-origin proxy base path.
+  * Defaults to "/api/bridge". Must be an absolute path starting with "/" on the same origin.
+  */
+ basePath?:string;
+ /** Custom fetch implementation; defaults to global fetch. */
+ fetchImpl?:typeof fetch;
+ /** Timeout for read-only API calls; defaults to 10s. */
+ timeoutMs?:number;
+ /** Maximum retry attempts for GET requests; defaults to 0 (no retries). */
+ maxRetries?:number;
+ /** Initial retry backoff in milliseconds; defaults to 100ms. */
+ retryBackoffMs?:number;
+}
 /** Read-only request controls. Retryable GETs are opt-in, never payment commands. */
 export interface RequestOptions {
  signal?:AbortSignal;
@@ -139,13 +154,20 @@ export class StealthBridgeClient {
 
  constructor(config:ClientConfig) {
   if(config.network!=="testnet")throw new Error("Only Stellar testnet is supported");
-  const url=new URL(config.apiBaseUrl);
-  if(!["https:","http:"].includes(url.protocol))throw new Error("Unsupported API URL protocol");
-  if(url.protocol!=="https:"&&!["localhost","127.0.0.1"].includes(url.hostname))
-   throw new Error("Non-local API connections must use HTTPS");
-  if(url.username||url.password||url.hash||url.search)
-   throw new Error("API URL must not contain credentials, fragments or query parameters");
-  this.base=url.toString().replace(/\/$/,"");
+  if(config.apiBaseUrl.startsWith("/")) {
+   if(config.apiBaseUrl.startsWith("//")||config.apiBaseUrl.includes("?")||
+      config.apiBaseUrl.includes("#")||config.apiBaseUrl.includes("@"))
+    throw new Error("Same-origin API base path must not contain protocol specifiers, query parameters, fragments or credentials");
+   this.base=config.apiBaseUrl.replace(/\/+$/,"");
+  } else {
+   const url=new URL(config.apiBaseUrl);
+   if(!["https:","http:"].includes(url.protocol))throw new Error("Unsupported API URL protocol");
+   if(url.protocol!=="https:"&&!["localhost","127.0.0.1"].includes(url.hostname))
+    throw new Error("Non-local API connections must use HTTPS");
+   if(url.username||url.password||url.hash||url.search)
+    throw new Error("API URL must not contain credentials, fragments or query parameters");
+   this.base=url.toString().replace(/\/$/,"");
+  }
   this.transport=config.fetchImpl??fetch;
   const timeout=config.timeoutMs??10000;
   if(!Number.isSafeInteger(timeout)||timeout<100||timeout>60000)
@@ -312,3 +334,29 @@ export class StealthBridgeClient {
   return this.read("/v1/transactions/"+hash.toLowerCase(),observation,options);
  }
 }
+
+/**
+ * Browser-safe factory for the same-origin `/api/bridge` proxy.
+ *
+ * Keeps all upstream credentials and endpoints server-only.
+ * Uses Stellar Testnet network configuration and read-only methods with abort support.
+ * Financial execution and signing capabilities remain strictly absent.
+ */
+export function createBrowserBridgeClient(options: BrowserBridgeOptions = {}): StealthBridgeClient {
+ const basePath = options.basePath ?? "/api/bridge";
+ if (!basePath.startsWith("/") || basePath.startsWith("//")) {
+  throw new Error("Same-origin API base path must start with a single '/'");
+ }
+ return new StealthBridgeClient({
+  apiBaseUrl: basePath,
+  network: "testnet",
+  fetchImpl: options.fetchImpl,
+  timeoutMs: options.timeoutMs,
+  maxRetries: options.maxRetries,
+  retryBackoffMs: options.retryBackoffMs,
+ });
+}
+
+export const createSameOriginBridgeClient = createBrowserBridgeClient;
+export const createBridgeClient = createBrowserBridgeClient;
+

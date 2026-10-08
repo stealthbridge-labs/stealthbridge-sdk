@@ -1,6 +1,10 @@
 import {
   ApiError,
   StealthBridgeClient,
+  createBrowserBridgeClient,
+  createSameOriginBridgeClient,
+  type BrowserBridgeOptions,
+  SDK_VERSION,
   type Capabilities,
   type ClientConfig,
   type Corridor,
@@ -24,7 +28,12 @@ const observation: Promise<TransactionObservation> = client.transaction("ab".rep
 const settlement = { id: "one", corridor_id: "two", state, privacy_rail: rail } satisfies SettlementSummary;
 const error: Error = new ApiError(503, "/v1/corridors");
 
-void [capabilities, corridors, status, observation, settlement, error];
+const browserOptions: BrowserBridgeOptions = { basePath: "/api/bridge", timeoutMs: 5000, maxRetries: 1 };
+const browserClient: StealthBridgeClient = createBrowserBridgeClient(browserOptions);
+const sameOriginClient: StealthBridgeClient = createSameOriginBridgeClient();
+const version: string = SDK_VERSION;
+
+void [capabilities, corridors, status, observation, settlement, error, browserClient, sameOriginClient, version];
 
 // The declaration must preserve the package's testnet-only constraint.
 // @ts-expect-error "public" is intentionally not part of Network.

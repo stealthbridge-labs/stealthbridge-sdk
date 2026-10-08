@@ -21,9 +21,10 @@
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "typecheck": "tsc -p tsconfig.json --noEmit",
+    "check:version": "node -e 'const fs=require(\"node:fs\");const pkg=JSON.parse(fs.readFileSync(\"package.json\",\"utf8\"));const semver=/^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-((?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?$/;if(!pkg.version||!semver.test(pkg.version)){console.error(`Invalid SemVer: ${pkg.version}`);process.exit(1);}if(process.env.GITHUB_REF&&process.env.GITHUB_REF.startsWith(\"refs/tags/v\")){const tag=process.env.GITHUB_REF.replace(/^refs\\/tags\\/v/,\"\");if(tag!==pkg.version){console.error(`Version mismatch: tag v${tag} !== package.json ${pkg.version}`);process.exit(1);}}console.log(`SDK version verified: ${pkg.name}@${pkg.version}`);'",
     "test": "npm run build && node --test --test-concurrency=1 tests/*.test.mjs",
     "test:package": "npm run build && node --test --test-concurrency=1 tests/package.test.mjs",
-    "verify": "npm run typecheck && npm test"
+    "verify": "npm run check:version && npm run typecheck && npm test"
   },
   "devDependencies": {
     "esbuild": "0.28.2",
