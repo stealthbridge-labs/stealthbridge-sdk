@@ -15,9 +15,14 @@ test("unavailable database is an explicit 503, never faked as ready",async()=>{
  await assert.rejects(api({status:"degraded",stellar_rpc:"connected",database:"unavailable",
   payments:"disabled"},503).readiness(),e=>e instanceof ApiError&&e.status===503);
 });
+test("an unconfigured database remains distinct from a failed configured database",async()=>{
+ await assert.rejects(api({status:"degraded",stellar_rpc:"connected",database:"not-configured",
+  payments:"disabled"},503).readiness(),e=>e instanceof ApiError&&e.status===503);
+});
 test("contradictory readiness cannot be misrepresented as healthy",async()=>{
  for(const body of [
   {status:"ready",stellar_rpc:"unavailable",database:"connected",payments:"disabled"},
+  {status:"ready",stellar_rpc:"connected",database:"not-configured",payments:"disabled"},
   {status:"ready",stellar_rpc:"connected",database:"connected",payments:"enabled"}
  ]){
   await assert.rejects(api(body).readiness(),e=>e instanceof ApiError&&e.status===502);

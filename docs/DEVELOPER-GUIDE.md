@@ -89,7 +89,7 @@ Corridor responses now reject malformed UUIDs, same-country pairs, unsupported p
 
 ## Service dependency readiness
 
-\`client.readiness()\` reads the backend's \`GET /ready\` route, and validates the relationship between \`status\`, \`stellar_rpc\`, \`database\`, and an explicitly **disabled payments** capability. A fully connected process can report \`ready\` for its observation dependencies while **payments remain disabled**. Absent/unavailable dependencies cause the backend's HTTP 503 and are not rewritten to success by the SDK.
+\`client.readiness()\` reads the backend's \`GET /ready\` route, and validates the relationship between \`status\`, \`stellar_rpc\`, \`database\`, and an explicitly **disabled payments** capability. Database status distinguishes \`not-configured\` from a configured but \`unavailable\` dependency. A fully connected process can report \`ready\` for its observation dependencies while **payments remain disabled**. Absent/unavailable dependencies cause the backend's HTTP 503 and are not rewritten to success by the SDK.
 
 ## Bounded streaming corridor scans
 
@@ -147,4 +147,3 @@ const corridors = await client.corridors({ signal: controller.signal });
 - **No Node-only module leakage**: Browser bundles use standard `fetch`, `AbortSignal`, and `URL`, with zero references to `node:*` modules, `Buffer`, `process`, or CommonJS globals.
 - **Abort support**: Every read-only method accepts `{ signal: AbortSignal }` to cancel inflight requests immediately when components unmount.
 - **Read-only boundary**: No financial mutation methods (`send`, `sign`, `execute`, `withdraw`) exist in client builds.
-

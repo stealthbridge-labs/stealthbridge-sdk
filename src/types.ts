@@ -64,7 +64,7 @@ export interface LedgerCheckpoint {
 export interface Readiness {
  status:"ready"|"degraded";
  stellar_rpc:"connected"|"unavailable";
- database:"connected"|"unavailable";
+ database:"connected"|"unavailable"|"not-configured";
  payments:"disabled";
 }
 

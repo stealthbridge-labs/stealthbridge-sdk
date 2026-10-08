@@ -110,4 +110,20 @@ test("source method inventory is validated and rejects invented signatures",asyn
  const forged=JSON.parse(JSON.stringify(response));
  forged.public_interface.contracts["corridor-registry"].reads.transfer_funds={args:["String"],returns:"bool"};
  await assert.rejects(client(forged).contracts(),e=>e instanceof ApiError&&e.status===502);
+ const wrongSource=JSON.parse(JSON.stringify(response));
+ wrongSource.public_interface.contracts["corridor-registry"].source="contracts/unknown/src/lib.rs";
+ await assert.rejects(client(wrongSource).contracts(),e=>e instanceof ApiError&&e.status===502);
+ const inventedWrite=JSON.parse(JSON.stringify(response));
+ inventedWrite.public_interface.contracts["policy-registry"].writes.push("transfer_funds");
+ await assert.rejects(client(inventedWrite).contracts(),e=>e instanceof ApiError&&e.status===502);
+});
+
+test("canonical discovery rejects a claimed deployed manifest without independent verification",async()=>{
+ const claimed={...response,manifest:{
+  schemaVersion:2,network:"testnet",networkPassphrase:"Test SDF Network ; September 2015",
+  status:"deployed",verified:true,protocolVersion:1,apiVersion:1,sourceRevision:"a".repeat(40),
+  contractAddresses:{registry:"C"+"A".repeat(55)},abiDigests:{registry:"b".repeat(64)},
+  wasmDigests:{registry:"c".repeat(64)},assetIssuers:{},txHashes:["d".repeat(64)]
+ }};
+ await assert.rejects(client(claimed).contracts(),e=>e instanceof ApiError&&e.status===502);
 });
