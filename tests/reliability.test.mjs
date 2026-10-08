@@ -46,7 +46,7 @@ test("opt-in retries 503 GETs only until a live response succeeds",async()=>{
   calls++;
   if(calls<3)return new Response("",{status:503});
   return new Response(JSON.stringify({payments_enabled:false,confidential_token_verified:false,
-   private_payments_verified:false,fiat_payouts_enabled:false}),{status:200});
+   private_payments_verified:false,fiat_payouts_enabled:false}),{status:200,headers:jsonHeaders});
  });
  const result=await api.capabilities({retries:2});
  assert.equal(calls,3);
