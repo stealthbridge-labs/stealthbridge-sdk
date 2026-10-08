@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import {StealthBridgeClient,ApiError} from "../dist/index.js";
 const api=(body,status=200)=>new StealthBridgeClient({
  network:"testnet",apiBaseUrl:"https://api.example",
- fetchImpl:async()=>new Response(JSON.stringify(body),{status})
+ fetchImpl:async()=>new Response(JSON.stringify(body),{status,headers:{"content-type":"application/json"}})
 });
 test("readiness is dependency status, and always states payments are disabled",async()=>{
  const result=await api({status:"ready",stellar_rpc:"connected",database:"connected",
