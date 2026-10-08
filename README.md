@@ -39,13 +39,13 @@ npm run verify
 
 `npm run verify` type-checks and builds the source, creates `artifacts/stealthbridge-sdk-0.2.0.tgz`, validates SHA-256 plus npm's SHA-1/SHA-512 integrity metadata and contents, then installs that tarball into isolated Node.js, TypeScript, esbuild, and Next.js fixtures. The Next.js fixture proves the installed `dist/index.js` entry resolves in both a Server Component and a `"use client"` Client Component. It does not need a backend, wallet, credentials, or deployment. The fixture's pinned dependencies require registry access on a cold cache.
 
-The measured baseline is approximately 4.4 KB packed / 10.5 KB unpacked, with a 1,189 B full minified browser ESM bundle, a 233 B `ApiError`-only bundle, and 1,452 B across the Next.js client chunks containing SDK code. CI ceilings allow deliberate headroom: 12,000 B packed, 30,000 B unpacked, 3,000 B full browser, 1,000 B tree-shaken, and 25,000 B for SDK-bearing Next.js client chunks. The Next.js fixture adds about 12.4 seconds locally on a warm dependency cache (6.0 seconds install and 6.4 seconds build). A size change that exceeds a ceiling requires review and an explicit budget update with fresh measurements.
+The current package-test baseline is approximately 18.1 KB packed / 61.7 KB unpacked, with a 10.47 KB full minified browser ESM bundle, a 286 B `ApiError`-only bundle and 11.3 KB across SDK-bearing Next.js client chunks. Package-test ceilings are 28 KB packed, 68 KB unpacked, 10.5 KB full browser, 1.6 KB tree-shaken, and 25 KB for SDK-bearing Next.js client chunks. A size change that exceeds a ceiling requires review and an explicit budget update with fresh measurements.
 
 ## Consumer errors
 
 - The constructor throws `Error` for a network other than `"testnet"`, a non-HTTP(S) URL, or non-local plaintext HTTP.
 - `transaction(hash)` throws `TypeError` before any request unless the hash is exactly 64 hexadecimal characters.
-- A completed non-2xx response throws `ApiError`; inspect its numeric `status` and requested `path`. A transaction 404 can also mean the RPC node no longer retains that transaction.
+- A completed non-2xx response throws `ApiError`; inspect its numeric `status`, requested `path`, stable `code` and optional `traceId`. Its message never copies raw upstream error details. A transaction 404 can also mean the RPC node no longer retains that transaction.
 - Native URL, fetch, CORS, DNS, and connection failures pass through unchanged. The client does not retry or replace unavailable data with examples.
 
 ## On-chain observation, without leaking contract events
@@ -75,7 +75,7 @@ This is a *pure amount utility*, not a conversion rate or transfer feature. It r
 
 ## Verified contract manifest parsing
 
-Use `parseDeploymentManifest(input)` and `getVerifiedContract(manifest,name)` to prevent accidental use of unconfirmed or non-Testnet contract identifiers. Current actual manifest is explicitly `not-deployed` and must **not** be represented as a functioning protocol. This parser checks format and required evidence fields; it does **not** independently prove an on-chain deployment or attest to a token issuer. See `src/manifest.ts`.
+Use `parseDeploymentManifest(input)` and `getVerifiedContract(manifest,name,{sourceRevision})` to prevent accidental use of unconfirmed or non-Testnet contract identifiers. The canonical contracts manifest is still schema v1 and explicitly `not-deployed`; it must **not** be represented as a functioning protocol. The parser accepts that empty manifest and a strict forward schema-v2 fixture requiring the Testnet passphrase, supported protocol/API versions, a pinned source revision, contract IDs, matching ABI/WASM digests and transaction evidence. `getVerifiedContract` can compare the manifest to a consumer-pinned source revision and versions. `contracts()` separately validates the canonical undeployed API response and exact public method inventory. These checks do **not** independently prove an on-chain deployment or attest to a token issuer. See `src/manifest.ts` and `specs/COMPATIBILITY.md`.
 
 ## Resilient read-only client
 
@@ -120,7 +120,7 @@ In particular, \`chain_finalized\` **cannot** advance directly to \`payout_compl
 
 ## Service dependency readiness
 
-\`client.readiness()\` reads the backend's \`GET /ready\` route, and validates the relationship between \`status\`, \`stellar_rpc\`, \`database\`, and an explicitly **disabled payments** capability. A fully connected process can report \`ready\` for its observation dependencies while **payments remain disabled**. Absent/unavailable dependencies cause the backend's HTTP 503 and are not rewritten to success by the SDK.
+\`client.readiness()\` reads the backend's \`GET /ready\` route, and validates the relationship between \`status\`, \`stellar_rpc\`, \`database\`, and an explicitly **disabled payments** capability. Database status distinguishes \`not-configured\` from a configured but \`unavailable\` dependency. A fully connected process can report \`ready\` for its observation dependencies while **payments remain disabled**. Absent/unavailable dependencies cause the backend's HTTP 503 and are not rewritten to success by the SDK.
 
 ## Bounded streaming corridor scans
 

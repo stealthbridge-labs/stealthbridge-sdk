@@ -24,7 +24,7 @@
 
 The deterministic package test builds the SDK, creates the npm tarball without publishing it, verifies SHA-256 plus its npm-reported SHA-1 and SHA-512 digests, checks the exact file allowlist, and installs the tarball—not the repository source—into isolated Node ESM, TypeScript, esbuild, and Next.js consumers. The pinned Next.js 16.4 App Router fixture asserts that resolution ends at the installed `node_modules/@stealthbridge/sdk/dist/index.js`, then runs a production build containing both a Server Component and a `"use client"` Client Component. Browser metadata and output are rejected if they reference Node built-ins, CommonJS runtime globals, or wallet-secret identifiers. An `ApiError`-only consumer must remove the client and endpoint strings, remain below half of the full bundle size, and satisfy its absolute byte ceiling.
 
-Current measured baselines are approximately 4.4 KB packed, 10.5 KB unpacked, 1,189 B for the full minified browser ESM bundle, 233 B for the tree-shaken `ApiError` bundle, and 1,452 B across SDK-bearing Next.js client chunks. Enforced ceilings are respectively 12,000 B, 30,000 B, 3,000 B, 1,000 B, and 25,000 B. The headroom avoids platform and framework chunking noise while making a material dependency or tree-shaking regression fail CI. The pinned Next.js fixture added about 12.4 seconds in the measured local run; a cold npm cache also incurs its dependency download time.
+Current package-test baselines are approximately 18.1 KB packed, 61.7 KB unpacked, 10.47 KB for the full minified browser ESM bundle, 286 B for the tree-shaken `ApiError` bundle, and 11.3 KB across SDK-bearing Next.js client chunks. Enforced ceilings are respectively 28,000 B, 68,000 B, 10,500 B, 1,600 B, and 25,000 B. The headroom avoids platform and framework chunking noise while making a material dependency or tree-shaking regression fail CI. The pinned Next.js fixture's cold-cache run requires registry access and may add several minutes.
 
 These checks establish packaging compatibility, not production readiness, backend availability, privacy, transfer correctness, settlement, or audit status.
 
@@ -36,7 +36,11 @@ The backend also includes a tenant-scoped internal intent journal (`src/store.rs
 
 ### Contract artifact resolution
 
-Only schema version 1 and `network=testnet` are recognized. The current contracts manifest declares `not-deployed`. Only explicitly verified, deployment-shaped manifests can resolve a contract name. This local validation is not independent network attestation; consumers must still verify contract IDs, code hashes and source provenance against Stellar.
+The live contracts repository currently publishes schema version 1 with `network=testnet`, `status=not-deployed`, no contract IDs and no transaction hashes. The SDK accepts that exact empty state and never turns it into an active contract.
+
+The SDK also parses the forward schema-v2 contract artifact shape for isolated compatibility fixtures. It requires the exact Testnet passphrase, supported protocol/API versions, a 40-character source revision, one ABI and WASM SHA-256 digest for every contract ID, and transaction evidence for a claimed deployment. Schema v1 cannot claim a deployment. A future canonical manifest must be generated from and pinned to a reviewed contracts release tag; the source revision must match that release's commit. A manifest alone is not independent chain attestation, so `getVerifiedContract` remains fail-closed until trusted RPC verification of network, contract ID and code hash is implemented.
+
+The SDK's `contracts()` endpoint decoder is stricter than the local parser: it accepts only the current canonical undeployed schema-v1 response and the pinned source-level public method inventory. Claimed deployment metadata, extra methods, changed source paths, wrong network values and enabled payment flags are rejected as upstream protocol errors.
 
 ### Read-only transport invariants
 

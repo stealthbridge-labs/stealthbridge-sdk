@@ -1,4 +1,3 @@
-import { parseDeploymentManifest } from "./manifest.js";
 import type {Capabilities,Corridor,Network,NetworkStatus,TransactionObservation,CorridorPage,LedgerCheckpoint,Readiness,ContractDiscovery,PublicSorobanInterface} from "./types.js";
 
 export interface ClientConfig {
@@ -38,7 +37,8 @@ export interface CorridorPageOptions extends RequestOptions { after?:string; lim
 export interface CorridorScanOptions extends RequestOptions { pageSize?:number; maxPages?:number; }
 
 export class ApiError extends Error {
- constructor(public readonly status:number,public readonly path:string) {
+ constructor(public readonly status:number,public readonly path:string,
+  public readonly code:string|null=null,public readonly traceId:string|null=null) {
   super("StealthBridge API returned HTTP "+status+" for "+path);this.name="ApiError";
  }
 }
@@ -48,18 +48,31 @@ function object(value:unknown):value is Record<string,unknown>{
 /** Do not interpret a method inventory as proof of an on-chain instance. */
 function sourceInterface(value:unknown):value is PublicSorobanInterface {
  if(!object(value)||value.schemaVersion!==1||value.network!=="testnet"||
-    value.status!=="source-interface-only"||!object(value.contracts))return false;
+    value.status!=="source-interface-only"||
+    value.disclaimer!=="Soroban source method inventory only; not proof of deployed contracts or private transfers"||
+    !object(value.contracts))return false;
  const expected={
-  "corridor-registry":["get_admin","pending_admin","is_paused","is_enabled"],
-  "policy-registry":["admin","pending_admin","is_paused","get_rule","is_effective"],
+  "corridor-registry":{
+   source:"contracts/corridor-registry/src/lib.rs",
+   reads:["get_admin","pending_admin","is_paused","is_enabled"],
+   writes:["propose_admin","cancel_admin_proposal","accept_admin","set_paused","set_enabled"],
+  },
+  "policy-registry":{
+   source:"contracts/policy-registry/src/lib.rs",
+   reads:["admin","pending_admin","is_paused","get_rule","is_effective"],
+   writes:["propose_admin","cancel_admin_proposal","accept_admin","set_paused","set_rule"],
+  },
  } as const;
- for(const [name,methods] of Object.entries(expected)){
+ if(Object.keys(value.contracts).sort().join(",")!==Object.keys(expected).sort().join(","))return false;
+ for(const [name,definition] of Object.entries(expected)){
   const row=value.contracts[name];
-  if(!object(row)||!object(row.reads)||!Array.isArray(row.writes)||
-     typeof row.source!=="string")return false;
-  if(Object.keys(row.reads).sort().join(",")!==[...methods].sort().join(","))
+  if(!object(row)||!object(row.reads)||!Array.isArray(row.writes)||row.source!==definition.source)
    return false;
-  for(const method of methods){
+  if(Object.keys(row.reads).sort().join(",")!==[...definition.reads].sort().join(",")||
+     row.writes.some((method:unknown)=>typeof method!=="string")||
+     [...row.writes].sort().join(",")!==[...definition.writes].sort().join(","))
+   return false;
+  for(const method of definition.reads){
    const item=row.reads[method];
    if(!object(item)||!Array.isArray(item.args)||
       !item.args.every((arg:unknown)=>typeof arg==="string")||
@@ -69,18 +82,22 @@ function sourceInterface(value:unknown):value is PublicSorobanInterface {
  return true;
 }
 /** Distinguishes upstream manifest claims from independently proven execution. */
+function canonicalUndeployedManifest(value:unknown):boolean{
+ if(!object(value)||value.schemaVersion!==1||value.network!=="testnet"||
+    value.status!=="not-deployed"||value.verified!==false||!object(value.contractAddresses)||
+    Object.keys(value.contractAddresses).length!==0||!object(value.assetIssuers)||
+    Object.keys(value.assetIssuers).length!==0||!Array.isArray(value.txHashes)||value.txHashes.length!==0||
+    (value.notes!==undefined&&typeof value.notes!=="string"))return false;
+ const required=["schemaVersion","network","status","verified","contractAddresses","assetIssuers","txHashes"];
+ return required.every(key=>Object.hasOwn(value,key))&&Object.keys(value).every(key=>[...required,"notes"].includes(key));
+}
 function contractDiscovery(value:unknown):value is ContractDiscovery{
  if(!object(value)||value.network!=="testnet" ||
     value.source!=="stealthbridge-contracts/deployments/testnet/manifest.json" ||
     value.on_chain_verified!==false || value.payment_execution_enabled!==false ||
     !sourceInterface(value.public_interface))
    return false;
- try{
-   const manifest=parseDeploymentManifest(value.manifest);
-   return manifest.status==="not-deployed" && manifest.verified===false &&
-     Object.keys(manifest.contractAddresses).length===0 &&
-     manifest.txHashes.length===0;
- }catch{return false;}
+ return canonicalUndeployedManifest(value.manifest);
 }
 function networkStatus(value:unknown):value is NetworkStatus{
  return object(value) && value.network==="testnet" &&
@@ -101,7 +118,7 @@ function ledgerCheckpoint(value:unknown):value is LedgerCheckpoint {
 function readiness(value:unknown):value is Readiness {
  return object(value)&&["ready","degraded"].includes(String(value.status)) &&
   ["connected","unavailable"].includes(String(value.stellar_rpc)) &&
-  ["connected","unavailable"].includes(String(value.database)) &&
+  ["connected","unavailable","not-configured"].includes(String(value.database)) &&
   value.payments==="disabled" &&
   (value.status==="ready") ===
    (value.stellar_rpc==="connected"&&value.database==="connected");
@@ -197,7 +214,14 @@ export class StealthBridgeClient {
     const response=await this.transport(this.base+path,{
      method:"GET",headers:{accept:"application/json"},cache:"no-store",signal,
     });
-    if(!response.ok)throw new ApiError(response.status,path);
+    if(!response.ok){
+     const rawCode=response.headers.get("x-error-code");
+     const rawTraceId=response.headers.get("x-request-id");
+     const code=rawCode&&/^[A-Z][A-Z0-9_]{0,63}$/.test(rawCode)?rawCode:null;
+     const traceId=rawTraceId&&/^[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}$/i.test(rawTraceId)?rawTraceId:null;
+     await response.body?.cancel().catch(()=>{});
+     throw new ApiError(response.status,path,code,traceId);
+    }
     // Reject HTML error pages masquerading as successful API responses.
     // Some test transports omit the header; when present it must be JSON.
     const contentType=response.headers.get("content-type");
@@ -358,4 +382,3 @@ export function createBrowserBridgeClient(options: BrowserBridgeOptions = {}): S
 
 export const createSameOriginBridgeClient = createBrowserBridgeClient;
 export const createBridgeClient = createBrowserBridgeClient;
-

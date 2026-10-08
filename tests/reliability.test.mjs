@@ -7,6 +7,16 @@ const jsonHeaders={"content-type":"application/json"};
 const client=(handler,opts={})=>new StealthBridgeClient({apiBaseUrl:"https://api.example",
  network:"testnet",fetchImpl:handler,...opts});
 
+test("preserves structured backend error codes and trace IDs without exposing error details",async()=>{
+ const traceId="123e4567-e89b-12d3-a456-426614174000";
+ const api=client(async()=>new Response(JSON.stringify({
+  error:{code:"UPSTREAM_UNAVAILABLE",message:"private upstream detail"},trace_id:traceId
+ }),{status:502,headers:{...jsonHeaders,"x-error-code":"UPSTREAM_UNAVAILABLE","x-request-id":traceId}}));
+ await assert.rejects(api.network(),error=>error instanceof ApiError&&error.status===502&&
+  error.code==="UPSTREAM_UNAVAILABLE"&&error.traceId===traceId&&
+  !error.message.includes("private upstream detail"));
+});
+
 test("rejects incorrect network returned by a compromised service",async()=>{
  const api=client(async()=>new Response(JSON.stringify({network:"public",passphrase:"Public Global Stellar Network ; September 2015",
  source:"stellar-rpc",protocol_version:27,ledger_sequence:1,ledger_hash:HASH,ledger_closed_at_unix:"1"}),{headers:jsonHeaders}));
