@@ -95,3 +95,25 @@ test("rejects impossible transaction ledger order and malformed timestamp",async
  })));
  await assert.rejects(api.transaction(HASH),e=>e instanceof ApiError&&e.status===502);
 });
+
+
+test("configured safe GET retries apply without per-call overrides",async()=>{
+ let calls=0;
+ const api=client(async()=>{
+  calls++;
+  if(calls===1)return new Response("",{status:503});
+  return new Response(JSON.stringify({payments_enabled:false,confidential_token_verified:false,
+   private_payments_verified:false,fiat_payouts_enabled:false}),{headers:jsonHeaders});
+ },{maxRetries:1,retryBackoffMs:0});
+ const flags=await api.capabilities();
+ assert.equal(calls,2);
+ assert.equal(flags.payments_enabled,false);
+});
+
+test("per-call retry override can disable configured retries",async()=>{
+ let calls=0;
+ const api=client(async()=>{calls++;return new Response("",{status:503});},
+  {maxRetries:2,retryBackoffMs:0});
+ await assert.rejects(api.capabilities({retries:0}),e=>e instanceof ApiError&&e.status===503);
+ assert.equal(calls,1);
+});
