@@ -347,14 +347,13 @@ export function createBrowserBridgeClient(options: BrowserBridgeOptions = {}): S
  if (!basePath.startsWith("/") || basePath.startsWith("//")) {
   throw new Error("Same-origin API base path must start with a single '/'");
  }
- return new StealthBridgeClient({
-  apiBaseUrl: basePath,
-  network: "testnet",
-  fetchImpl: options.fetchImpl,
-  timeoutMs: options.timeoutMs,
-  maxRetries: options.maxRetries,
-  retryBackoffMs: options.retryBackoffMs,
- });
+ const config: ClientConfig = { apiBaseUrl: basePath, network: "testnet" };
+ // With exactOptionalPropertyTypes, omit absent settings rather than passing undefined.
+ if (options.fetchImpl !== undefined) config.fetchImpl = options.fetchImpl;
+ if (options.timeoutMs !== undefined) config.timeoutMs = options.timeoutMs;
+ if (options.maxRetries !== undefined) config.maxRetries = options.maxRetries;
+ if (options.retryBackoffMs !== undefined) config.retryBackoffMs = options.retryBackoffMs;
+ return new StealthBridgeClient(config);
 }
 
 export const createSameOriginBridgeClient = createBrowserBridgeClient;
