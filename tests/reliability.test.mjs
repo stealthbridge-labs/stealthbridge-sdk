@@ -1,20 +1,27 @@
 import {test} from "node:test";
 import assert from "node:assert/strict";
 import {StealthBridgeClient,ApiError} from "../dist/index.js";
+
 const HASH="a".repeat(64);
+const jsonHeaders={"content-type":"application/json"};
 const client=(handler,opts={})=>new StealthBridgeClient({apiBaseUrl:"https://api.example",
  network:"testnet",fetchImpl:handler,...opts});
+
 test("rejects incorrect network returned by a compromised service",async()=>{
  const api=client(async()=>new Response(JSON.stringify({network:"public",passphrase:"Public Global Stellar Network ; September 2015",
- source:"stellar-rpc",protocol_version:27,ledger_sequence:1,ledger_hash:HASH,ledger_closed_at_unix:"1"})));
+ source:"stellar-rpc",protocol_version:27,ledger_sequence:1,ledger_hash:HASH,ledger_closed_at_unix:"1"}),{headers:jsonHeaders}));
  await assert.rejects(api.network(),e=>e instanceof ApiError&&e.status===502);
 });
-test("surfaces malformed, excessive, or unexpected JSON",async()=>{
+
+test("surfaces malformed, excessive, or unexpected JSON, or wrong content-type",async()=>{
  for(const body of ["broken json",JSON.stringify({payments_enabled:true}),"x".repeat(65537)]){
-  const api=client(async()=>new Response(body));
+  const api=client(async()=>new Response(body,{headers:jsonHeaders}));
   await assert.rejects(api.capabilities(),e=>e instanceof ApiError&&e.status===502);
  }
+ const apiWrongType=client(async()=>new Response(JSON.stringify({payments_enabled:true,confidential_token_verified:true,private_payments_verified:true,fiat_payouts_enabled:true}),{headers:{"content-type":"text/html"}}));
+ await assert.rejects(apiWrongType.capabilities(),e=>e instanceof ApiError&&e.status===502);
 });
+
 test("explicit abort is propagated without any fabricated response",async()=>{
  const controller=new AbortController();
  const api=client((_url,options)=>new Promise((_resolve,reject)=>{
@@ -24,8 +31,11 @@ test("explicit abort is propagated without any fabricated response",async()=>{
  controller.abort();
  await assert.rejects(pending);
 });
-test("rejects credentials in API endpoint and unreasonable timeouts",()=>{
+
+test("rejects credentials in API endpoint and unreasonable timeouts or retry parameters",()=>{
  assert.throws(()=>client(fetch,{timeoutMs:99}),/timeoutMs/);
+ assert.throws(()=>client(fetch,{maxRetries:6}),/maxRetries/);
+ assert.throws(()=>client(fetch,{retryBackoffMs:-1}),/retryBackoffMs/);
  assert.throws(()=>new StealthBridgeClient({apiBaseUrl:"https://user:password@api.example",
   network:"testnet"}),/credentials/);
 });

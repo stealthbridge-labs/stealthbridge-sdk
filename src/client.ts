@@ -7,6 +7,15 @@ export interface ClientConfig {
  fetchImpl?:typeof fetch;
  /** Timeout for read-only API calls; defaults to 10s. */
  timeoutMs?:number;
+ /** Maximum retry attempts for GET requests; defaults to 0 (no retries). */
+ maxRetries?:number;
+ /** Initial retry backoff in milliseconds; defaults to 100ms. */
+ retryBackoffMs?:number;
+}
+export interface RequestOptions {
+ signal?:AbortSignal;
+ maxRetries?:number;
+ retryBackoffMs?:number;
 }
 export interface RequestOptions {signal?:AbortSignal; /** GET-only retries after 429, 502 or 503. Default 0, maximum 2. */ retries?:0|1|2;}
 export interface CorridorPageOptions extends RequestOptions { after?:string; limit?:number; }
@@ -125,6 +134,9 @@ export class StealthBridgeClient {
  private readonly base:string;
  private readonly transport:typeof fetch;
  private readonly timeoutMs:number;
+ private readonly maxRetries:number;
+ private readonly retryBackoffMs:number;
+
  constructor(config:ClientConfig) {
   if(config.network!=="testnet")throw new Error("Only Stellar testnet is supported");
   const url=new URL(config.apiBaseUrl);
@@ -139,6 +151,16 @@ export class StealthBridgeClient {
   if(!Number.isSafeInteger(timeout)||timeout<100||timeout>60000)
    throw new Error("timeoutMs must be a whole number between 100 and 60000");
   this.timeoutMs=timeout;
+
+  const maxRetries=config.maxRetries??0;
+  if(!Number.isSafeInteger(maxRetries)||maxRetries<0||maxRetries>5)
+   throw new Error("maxRetries must be a whole number between 0 and 5");
+  this.maxRetries=maxRetries;
+
+  const retryBackoffMs=config.retryBackoffMs??100;
+  if(!Number.isSafeInteger(retryBackoffMs)||retryBackoffMs<0||retryBackoffMs>5000)
+   throw new Error("retryBackoffMs must be a whole number between 0 and 5000");
+  this.retryBackoffMs=retryBackoffMs;
  }
  private async read<T>(path:string,guard:(value:unknown)=>value is T,options:RequestOptions={}):Promise<T>{
   const attempts=options.retries??0;
@@ -279,11 +301,9 @@ export class StealthBridgeClient {
     throw new TypeError("Corridor ID must be a valid UUID");
   return this.read("/v1/corridors/"+id.toLowerCase(),corridor,options);
  }
- /** Hash lookup proves inclusion only, never fiat payout or private-transfer success. */
  transaction(hash:string,options?:RequestOptions):Promise<TransactionObservation>{
   if(!/^[a-f0-9]{64}$/i.test(hash))
     throw new TypeError("Transaction hash must be exactly 64 hexadecimal characters");
   return this.read("/v1/transactions/"+hash.toLowerCase(),observation,options);
  }
- /** No signing, quoting, settlement or wallet-key functions in this client. */
 }
