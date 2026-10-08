@@ -5,7 +5,7 @@ const head={ledger_sequence:100,ledger_hash:"a".repeat(64),
  ledger_closed_at_unix:"1760000000",source:"stellar-rpc"};
 test("reads only a persisted Testnet ledger cursor",async()=>{
  const api=new StealthBridgeClient({apiBaseUrl:"https://api.example",network:"testnet",
-  fetchImpl:async()=>new Response(JSON.stringify(head))});
+  fetchImpl:async()=>new Response(JSON.stringify(head),{headers:{"content-type":"application/json"}})});
  assert.deepEqual(await api.observerHead(),head);
 });
 test("does not treat a fabricated or malformed observation as a valid cursor",async()=>{
