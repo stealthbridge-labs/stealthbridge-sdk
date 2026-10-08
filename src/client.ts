@@ -176,6 +176,11 @@ export class StealthBridgeClient {
      method:"GET",headers:{accept:"application/json"},cache:"no-store",signal,
     });
     if(!response.ok)throw new ApiError(response.status,path);
+    // Reject HTML error pages masquerading as successful API responses.
+    // Some test transports omit the header; when present it must be JSON.
+    const contentType=response.headers.get("content-type");
+    if(contentType && !/^application\\/(?:[a-z0-9.+-]*\\+)?json(?:\\s*;|\\s*$)/i.test(contentType))
+     throw new ApiError(502,path);
     const declared=response.headers.get("content-length");
     if(declared!==null&&Number(declared)>MAX_JSON_BYTES)throw new ApiError(502,path);
     const raw=await this.readBoundedBody(response,signal,path);
