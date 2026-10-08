@@ -12,12 +12,12 @@ export interface ClientConfig {
  /** Initial retry backoff in milliseconds; defaults to 100ms. */
  retryBackoffMs?:number;
 }
+/** Read-only request controls. Retryable GETs are opt-in, never payment commands. */
 export interface RequestOptions {
  signal?:AbortSignal;
- maxRetries?:number;
- retryBackoffMs?:number;
+ /** Retries after HTTP 429, 502 or 503; zero by default, max two per request. */
+ retries?:0|1|2;
 }
-export interface RequestOptions {signal?:AbortSignal; /** GET-only retries after 429, 502 or 503. Default 0, maximum 2. */ retries?:0|1|2;}
 export interface CorridorPageOptions extends RequestOptions { after?:string; limit?:number; }
 /** Hard-capped iteration: protects UI services from unbounded catalog scans. */
 export interface CorridorScanOptions extends RequestOptions { pageSize?:number; maxPages?:number; }
@@ -163,7 +163,7 @@ export class StealthBridgeClient {
   this.retryBackoffMs=retryBackoffMs;
  }
  private async read<T>(path:string,guard:(value:unknown)=>value is T,options:RequestOptions={}):Promise<T>{
-  const attempts=options.retries??0;
+  const attempts=options.retries??Math.min(this.maxRetries,2);
   if(!Number.isInteger(attempts)||attempts<0||attempts>2)
    throw new RangeError("GET retries must be an integer from 0 to 2");
   // The budget includes all retries, backoff and response streaming.
@@ -188,7 +188,7 @@ export class StealthBridgeClient {
     // Automatic retry is opt-in and limited to safe, idempotent GET reads.
     const recoverable=error instanceof ApiError && [429,502,503].includes(error.status);
     if(!recoverable||attempt>=attempts)throw error;
-    await StealthBridgeClient.backoff(150*(2**attempt),signal);
+    await StealthBridgeClient.backoff(this.retryBackoffMs*(2**attempt),signal);
    }
   }
  }
