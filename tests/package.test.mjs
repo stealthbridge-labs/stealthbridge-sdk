@@ -295,4 +295,75 @@ describe("published package contract", { concurrency: false }, () => {
       `Next.js SDK client chunks: ${sdkChunks.length} file(s), ${combinedBytes} B combined`
     );
   });
+
+  test("SDK package metadata enforces valid SemVer and matches exported SDK_VERSION", async () => {
+    const packageJson = JSON.parse(await readFile(path.join(root, "package.json"), "utf8"));
+    const sdk = await import(path.join(root, "dist", "index.js"));
+    assert.equal(sdk.SDK_VERSION, packageJson.version);
+    assert.equal(packed.version, packageJson.version);
+    const semverPattern = /^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$/;
+    assert.match(packageJson.version, semverPattern, "package.json version must be valid SemVer");
+  });
+
+  test("packages and verifies a release candidate tagged revision for Node and Next.js fixtures", async (context) => {
+    const rcWorkspace = await mkdtemp(path.join(tmpdir(), "stealthbridge-rc-check-"));
+    try {
+      const rcVersion = `${packed.version}-rc.1`;
+      const rcPkgDir = path.join(rcWorkspace, "pkg");
+      await cp(root, rcPkgDir, {
+        recursive: true,
+        filter: (src) => !src.includes("node_modules") && !src.includes(".git") && !src.includes("artifacts")
+      });
+      const rcPkgJsonPath = path.join(rcPkgDir, "package.json");
+      const rcPkgJson = JSON.parse(await readFile(rcPkgJsonPath, "utf8"));
+      rcPkgJson.version = rcVersion;
+      await writeFile(rcPkgJsonPath, JSON.stringify(rcPkgJson, null, 2));
+
+      const rcPackOutput = run("npm", ["pack", "--json", "--ignore-scripts", "--pack-destination", rcWorkspace], rcPkgDir);
+      const [rcPacked] = JSON.parse(rcPackOutput);
+      assert.equal(rcPacked.version, rcVersion);
+      const rcTarball = path.join(rcWorkspace, rcPacked.filename);
+
+      // Verify release candidate installs in Node.js ESM fixture
+      const rcNodeConsumer = path.join(rcWorkspace, "node-esm");
+      await cp(path.join(fixtures, "node-esm"), rcNodeConsumer, { recursive: true });
+      run("npm", [
+        "install",
+        "--offline",
+        "--ignore-scripts",
+        "--no-audit",
+        "--no-fund",
+        "--no-package-lock",
+        "--no-save",
+        rcTarball
+      ], rcNodeConsumer);
+      const nodeOutput = run(process.execPath, ["index.mjs"], rcNodeConsumer);
+      assert.match(nodeOutput, /all read-only methods/);
+
+      // Verify release candidate installs in Next.js fixture
+      const rcNextConsumer = path.join(rcWorkspace, "next-app");
+      await cp(path.join(fixtures, "next-app"), rcNextConsumer, { recursive: true });
+      const vendor = path.join(rcNextConsumer, "vendor");
+      await mkdir(vendor, { recursive: true });
+      await cp(rcTarball, path.join(vendor, "stealthbridge-sdk.tgz"));
+      const lockPath = path.join(rcNextConsumer, "package-lock.json");
+      const lock = JSON.parse(await readFile(lockPath, "utf8"));
+      if (lock.packages && lock.packages["node_modules/@stealthbridge/sdk"]) {
+        lock.packages["node_modules/@stealthbridge/sdk"].integrity = rcPacked.integrity;
+        lock.packages["node_modules/@stealthbridge/sdk"].version = rcVersion;
+      }
+      if (lock.dependencies && lock.dependencies["@stealthbridge/sdk"]) {
+        lock.dependencies["@stealthbridge/sdk"].integrity = rcPacked.integrity;
+        lock.dependencies["@stealthbridge/sdk"].version = rcVersion;
+      }
+      await writeFile(lockPath, JSON.stringify(lock, null, 2));
+      run("npm", ["ci", "--no-audit", "--no-fund"], rcNextConsumer);
+      const resolution = run(process.execPath, ["verify-install.mjs"], rcNextConsumer);
+      assert.match(resolution, /Next\.js fixture resolved packed SDK entry/);
+
+      context.diagnostic(`Release candidate ${rcVersion} verified in Node.js and Next.js consumers`);
+    } finally {
+      await rm(rcWorkspace, { recursive: true, force: true });
+    }
+  });
 });

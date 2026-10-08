@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { StealthBridgeClient, ApiError } from "../dist/index.js";
+import { StealthBridgeClient, ApiError, createBrowserBridgeClient, createSameOriginBridgeClient } from "../dist/index.js";
 
 const HASH = "0123456789abcdef".repeat(4);
 test("rejects remote plaintext HTTP and non-testnet", () => {
@@ -34,3 +34,52 @@ test("circuits remain strictly read-only", () => {
   assert.equal("send" in api,false);
   assert.equal("sign" in api,false);
 });
+
+test("createBrowserBridgeClient targets same-origin /api/bridge with abort support", async () => {
+  const calls = [];
+  const client = createBrowserBridgeClient({
+    fetchImpl: async (url, options) => {
+      calls.push([url, options.method]);
+      return new Response(JSON.stringify({
+        network: "testnet",
+        passphrase: "Test SDF Network ; September 2015",
+        protocol_version: 23,
+        ledger_sequence: 123,
+        ledger_closed_at_unix: "1760000000",
+        ledger_hash: "ab".repeat(32),
+        source: "stellar-rpc"
+      }), { status: 200, headers: { "content-type": "application/json" } });
+    }
+  });
+  assert.ok(client instanceof StealthBridgeClient);
+  const status = await client.network();
+  assert.equal(status.network, "testnet");
+  assert.deepEqual(calls, [["/api/bridge/v1/network", "GET"]]);
+  assert.equal("send" in client, false);
+  assert.equal("sign" in client, false);
+});
+
+test("createBrowserBridgeClient propagates caller abort signal", async () => {
+  const controller = new AbortController();
+  const client = createBrowserBridgeClient({
+    fetchImpl: async (url, options) => {
+      options.signal.throwIfAborted();
+      return new Response(JSON.stringify({ service: "stealthbridge", status: "ok" }), {
+        status: 200,
+        headers: { "content-type": "application/json" }
+      });
+    }
+  });
+  controller.abort(new Error("caller cancelled request"));
+  await assert.rejects(
+    client.health({ signal: controller.signal }),
+    /caller cancelled request/
+  );
+});
+
+test("createBrowserBridgeClient rejects malformed base paths", () => {
+  assert.throws(() => createBrowserBridgeClient({ basePath: "http://external.api" }), /Same-origin API base path/);
+  assert.throws(() => createBrowserBridgeClient({ basePath: "//relative-protocol" }), /Same-origin API base path/);
+  assert.throws(() => createBrowserBridgeClient({ basePath: "/api/bridge?token=secret" }), /Same-origin API base path/);
+});
+

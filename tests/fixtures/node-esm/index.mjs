@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { ApiError, StealthBridgeClient, AssetAmount, AmountError, assertAsset, ManifestError, parseDeploymentManifest, getVerifiedContract, canTransitionSettlement, assertSettlementTransition, isSettlementState, isTerminalSettlementState, allowedSettlementTransitions, SettlementTransitionError } from "@stealthbridge/sdk";
+import { ApiError, StealthBridgeClient, createBrowserBridgeClient, createSameOriginBridgeClient, createBridgeClient, SDK_VERSION, AssetAmount, AmountError, assertAsset, ManifestError, parseDeploymentManifest, getVerifiedContract, canTransitionSettlement, assertSettlementTransition, isSettlementState, isTerminalSettlementState, allowedSettlementTransitions, SettlementTransitionError } from "@stealthbridge/sdk";
 
 const hash = "0123456789abcdef".repeat(4);
 const responses = {
@@ -51,17 +51,40 @@ assert.deepEqual(await client.corridors(), []);
 assert.equal((await client.transaction(hash)).status, "SUCCESS");
 assert.deepEqual(requested.map(([path]) => path), Object.keys(responses));
 assert.equal(new ApiError(503, "/health").status, 503);
+
+const browserCalls = [];
+const browserClient = createBrowserBridgeClient({
+  fetchImpl: async (url, options) => {
+    browserCalls.push([url, options.method]);
+    return new Response(JSON.stringify(responses["/health"]), {
+      status: 200,
+      headers: { "content-type": "application/json" }
+    });
+  }
+});
+assert.ok(browserClient instanceof StealthBridgeClient);
+assert.equal((await browserClient.health()).status, "ok");
+assert.deepEqual(browserCalls, [["/api/bridge/health", "GET"]]);
+assert.equal("send" in browserClient, false);
+assert.equal("sign" in browserClient, false);
+
+assert.match(SDK_VERSION, /^0\.[0-9]+(\.[0-9]+)?(-[0-9A-Za-z.-]+)?$/);
+
 assert.deepEqual(Object.keys(await import("@stealthbridge/sdk")).sort(), [
   "AmountError",
   "ApiError",
   "AssetAmount",
   "ManifestError",
+  "SDK_VERSION",
   "SettlementTransitionError",
   "StealthBridgeClient",
   "allowedSettlementTransitions",
   "assertAsset",
   "assertSettlementTransition",
   "canTransitionSettlement",
+  "createBridgeClient",
+  "createBrowserBridgeClient",
+  "createSameOriginBridgeClient",
   "getVerifiedContract",
   "isSettlementState",
   "isTerminalSettlementState",
