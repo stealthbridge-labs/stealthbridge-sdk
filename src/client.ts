@@ -32,6 +32,8 @@ export interface RequestOptions {
  /** Retries after HTTP 429, 502 or 503; zero by default, max two per request. */
  retries?:0|1|2;
 }
+/** Optional freshness threshold for a verified Stellar Testnet RPC observation. */
+export interface FreshNetworkOptions extends RequestOptions { maxAgeSeconds?:number; }
 export interface CorridorPageOptions extends RequestOptions { after?:string; limit?:number; }
 /** Hard-capped iteration: protects UI services from unbounded catalog scans. */
 export interface CorridorScanOptions extends RequestOptions { pageSize?:number; maxPages?:number; }
@@ -291,6 +293,18 @@ export class StealthBridgeClient {
  }
  network(options?:RequestOptions):Promise<NetworkStatus>{
   return this.read("/v1/network",networkStatus,options);
+ }
+ /** Require a live, recent Stellar ledger rather than merely valid JSON. */
+ async liveNetwork(options:FreshNetworkOptions={}):Promise<NetworkStatus>{
+  const maxAgeSeconds=options.maxAgeSeconds??180;
+  if(!Number.isSafeInteger(maxAgeSeconds)||maxAgeSeconds<1||maxAgeSeconds>3600)
+   throw new RangeError("maxAgeSeconds must be an integer from 1 to 3600");
+  const status=await this.network(options);
+  const closedAt=Number(status.ledger_closed_at_unix);
+  const age=Math.floor(Date.now()/1000)-closedAt;
+  if(!Number.isSafeInteger(closedAt)||age>maxAgeSeconds||age< -30)
+   throw new ApiError(503,"/v1/network","STALE_LEDGER");
+  return status;
  }
  capabilities(options?:RequestOptions):Promise<Capabilities>{
   return this.read("/v1/capabilities",capabilities,options);
