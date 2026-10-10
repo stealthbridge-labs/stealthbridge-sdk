@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { ApiError, StealthBridgeClient, createBrowserBridgeClient, createSameOriginBridgeClient, createBridgeClient, SDK_VERSION, AssetAmount, AmountError, assertAsset, ManifestError, parseDeploymentManifest, getVerifiedContract, canTransitionSettlement, assertSettlementTransition, isSettlementState, isTerminalSettlementState, allowedSettlementTransitions, SettlementTransitionError } from "@stealthbridge/sdk";
+import { ApiError, StealthBridgeClient, createBrowserBridgeClient, createSameOriginBridgeClient, createBridgeClient, SDK_VERSION, AssetAmount, AmountError, assertAsset, ManifestError, parseDeploymentManifest, getVerifiedContract, canTransitionSettlement, canonicalStellarAccountAddress, assertSettlementTransition, isSettlementState, isTerminalSettlementState, allowedSettlementTransitions, SettlementTransitionError } from "@stealthbridge/sdk";
 
 const hash = "0123456789abcdef".repeat(4);
 const responses = {
@@ -82,6 +82,7 @@ assert.deepEqual(Object.keys(await import("@stealthbridge/sdk")).sort(), [
   "assertAsset",
   "assertSettlementTransition",
   "canTransitionSettlement",
+  "canonicalStellarAccountAddress",
   "createBridgeClient",
   "createBrowserBridgeClient",
   "createSameOriginBridgeClient",
@@ -91,4 +92,5 @@ assert.deepEqual(Object.keys(await import("@stealthbridge/sdk")).sort(), [
   "parseDeploymentManifest"
 ]);
 
+assert.equal(canonicalStellarAccountAddress("GAAACAQDAQCQMBYIBEFAWDANBYHRAEISCMKBKFQXDAMRUGY4DUPB7JZX")?.startsWith("G"), true);
 console.log("Node ESM consumer imported and exercised all read-only methods");
