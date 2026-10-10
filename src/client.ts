@@ -125,7 +125,7 @@ function readiness(value:unknown):value is Readiness {
 }
 function capabilities(value:unknown):value is Capabilities{
  return object(value) && ["payments_enabled","confidential_token_verified",
-  "private_payments_verified","fiat_payouts_enabled"].every(k=>typeof value[k]==="boolean");
+  "private_payments_verified","fiat_payouts_enabled"].every(k=>value[k]===false);
 }
 function corridor(value:unknown):value is Corridor {
  return object(value)&&typeof value.id==="string"&&
