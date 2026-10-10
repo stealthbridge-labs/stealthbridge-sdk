@@ -126,5 +126,5 @@ test("liveNetwork rejects stale and future-dated ledgers without claiming paymen
   observation.ledger_closed_at_unix = String(now + 90);
   await assert.rejects(api.liveNetwork(), e => e instanceof ApiError &&
     e.status === 503 && e.code === "STALE_LEDGER");
-  assert.rejects(api.liveNetwork({maxAgeSeconds:0}), /maxAgeSeconds/);
+  await assert.rejects(api.liveNetwork({maxAgeSeconds:0}), /maxAgeSeconds/);
 });
