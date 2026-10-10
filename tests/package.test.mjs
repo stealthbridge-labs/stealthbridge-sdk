@@ -31,10 +31,8 @@ const expectedPackageFiles = [
 ];
 const budgets = {
   packedBytes: 28_000,
-  // Reviewed growth: strict three-contract commitment and batch ABI validation.
-  // CI measured 68,069 unpacked / 11,326 browser bytes after this change.
-  unpackedBytes: 69_000,
-  fullBrowserBytes: 11_600,
+  unpackedBytes: 68_000,
+  fullBrowserBytes: 10_800,
   treeShakenBrowserBytes: 1_600,
   nextClientSdkChunksBytes: 25_000
 };
