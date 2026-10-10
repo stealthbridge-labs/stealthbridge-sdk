@@ -42,6 +42,9 @@ test("source method inventory is validated and rejects invented signatures",asyn
  const wrongSource=JSON.parse(JSON.stringify(response));
  wrongSource.public_interface.contracts["corridor-registry"].source="contracts/unknown/src/lib.rs";
  await assert.rejects(client(wrongSource).contracts(),e=>e instanceof ApiError&&e.status===502);
+ const badGate=JSON.parse(JSON.stringify(response));
+ badGate.public_interface.contracts["governance-gate"].reads.public_flags_allow.args=["String"];
+ await assert.rejects(client(badGate).contracts(),e=>e instanceof ApiError&&e.status===502);
  const inventedWrite=JSON.parse(JSON.stringify(response));
  inventedWrite.public_interface.contracts["policy-registry"].writes.push("transfer_funds");
  await assert.rejects(client(inventedWrite).contracts(),e=>e instanceof ApiError&&e.status===502);
