@@ -83,3 +83,25 @@ test("createBrowserBridgeClient rejects malformed base paths", () => {
   assert.throws(() => createBrowserBridgeClient({ basePath: "/api/bridge?token=secret" }), /Same-origin API base path/);
 });
 
+
+test("capabilities fail closed when upstream advertises unverified money movement", async () => {
+  const flags = {
+    payments_enabled: false,
+    confidential_token_verified: false,
+    private_payments_verified: false,
+    fiat_payouts_enabled: false,
+  };
+  const client = new StealthBridgeClient({
+    apiBaseUrl: "https://api.example",
+    network: "testnet",
+    fetchImpl: async () => new Response(JSON.stringify(flags), {
+      status: 200, headers: { "content-type": "application/json" },
+    }),
+  });
+  assert.deepEqual(await client.capabilities(), flags);
+  for (const key of Object.keys(flags)) {
+    flags[key] = true;
+    await assert.rejects(client.capabilities(), error => error instanceof ApiError && error.status === 502);
+    flags[key] = false;
+  }
+});
