@@ -4,6 +4,23 @@
 
 **Cross-repository contract:** [Frontend](https://github.com/stealthbridge-labs/stealthbridge-frontend/blob/main/ROADMAP.md) · [Backend](https://github.com/stealthbridge-labs/stealthbridge-backend/blob/main/ROADMAP.md) · [Contracts](https://github.com/stealthbridge-labs/stealthbridge-contracts/blob/main/ROADMAP.md) · [SDK](https://github.com/stealthbridge-labs/stealthbridge-sdk/blob/main/ROADMAP.md)
 
+## October 2026 implementation checkpoint and next delivery slices
+
+The [SDK architecture and delivery plan](docs/ARCHITECTURE-AND-DELIVERY.md) records current exports, consumption rules, failure states, contract source pinning and future signer boundaries.
+
+**Verified code/CI baseline:** a private, unpublished ESM package with typed read-only Testnet client, freshness checks, exact asset value operations, validated public G-addresses, corridor paging, transaction observation, strict capability checks and three-contract source-interface validation. The packed package passes Node/browser/Next.js consumer tests, not a live transfer test.
+
+| Order | SDK workstream | Done only when |
+| --- | --- | --- |
+| S1 | Generate types from pinned backend OpenAPI | Versioned schema and runtime validation parity; negative response fixtures |
+| S2 | Unified frontend consumption | No duplicated unsafe parser, ESM/bundle size and browser error tests |
+| S3 | Independent Testnet contract readers | Three verified deployed instances, bytecode/source ABI/admin attestations, wrong-network and wrong-method rejection |
+| S4 | Wallet signing interfaces, isolated from read client | Explicit human approval, signer revocation, scoped authorization, no secrets in SDK or logs |
+| S5 | Cryptographic privacy and settlement adapters | Pinned upstream protocols, test vectors, recovery/metadata reviews, audit and real Testnet evidence |
+| S6 | Publish and support | Maintainer license approval, signed artifact provenance, changelog and compatibility matrix |
+
+**Do not equate a package release with protocol deployment.** Production npm publishing, contract address binding, and enabling payment-writing methods require separate decisions.
+
 ## Mission
 
 Make StealthBridge usable by institutional developers, wallet builders and application teams through predictable typed interfaces, safely versioned contract clients, network-pinned transaction observation and explicit capability discovery. SDKs are not custodians: they must not collect wallet seeds, private note secrets, ZK witnesses or unconsented financial data. The SDK must never hide different cryptographic trust models behind one vague "private payment" method.
