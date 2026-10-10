@@ -22,3 +22,4 @@ export type { AssetIdentity } from "./amount.js";
 export { ManifestError, parseDeploymentManifest, getVerifiedContract } from "./manifest.js";
 export type { DeploymentManifest,ManifestCompatibility } from "./manifest.js";
 export { allowedSettlementTransitions, SettlementTransitionError, isSettlementState, canTransitionSettlement, assertSettlementTransition, isTerminalSettlementState } from "./settlement.js";
+export { canonicalStellarAccountAddress } from "./wallet.js";
