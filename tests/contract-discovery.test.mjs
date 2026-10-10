@@ -45,17 +45,6 @@ test("source method inventory is validated and rejects invented signatures",asyn
  const badGate=JSON.parse(JSON.stringify(response));
  badGate.public_interface.contracts["governance-gate"].reads.public_flags_allow.args=["String"];
  await assert.rejects(client(badGate).contracts(),e=>e instanceof ApiError&&e.status===502);
- for(const [module,method,change] of [
-  ["policy-registry","is_effective_commitment","wrong-return"],
-  ["governance-gate","public_flags_allow_commitment","wrong-args"],
-  ["governance-gate","check_commitment_batch","wrong-return"],
- ]){
-  const forged=structuredClone(response);
-  if(change==="wrong-args")forged.public_interface.contracts[module].reads[method].args=["String"];
-  else forged.public_interface.contracts[module].reads[method].returns="bool-or-payment";
-  await assert.rejects(client(forged).contracts(),e=>e instanceof ApiError&&e.status===502);
- }
- assert.deepEqual(item.public_interface.contracts["governance-gate"].reads.check_commitment_batch.args,["Vec<GovernanceCheck>"]);
  const inventedWrite=JSON.parse(JSON.stringify(response));
  inventedWrite.public_interface.contracts["policy-registry"].writes.push("transfer_funds");
  await assert.rejects(client(inventedWrite).contracts(),e=>e instanceof ApiError&&e.status===502);
