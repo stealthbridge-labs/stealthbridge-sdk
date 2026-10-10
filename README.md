@@ -21,6 +21,24 @@ No payment submission, signing, wallet custody, encrypted note management, ZK pr
 
 See [compatibility matrix](specs/COMPATIBILITY.md), the [backend API](https://github.com/stealthbridge-labs/stealthbridge-backend/blob/main/api/openapi.yaml), [frontend](https://github.com/stealthbridge-labs/stealthbridge-frontend), and [contracts](https://github.com/stealthbridge-labs/stealthbridge-contracts).
 
+## Require a recent real Testnet ledger
+
+The SDK has a separate strict network method when consumers need a **live**
+network observation rather than any syntactically valid RPC response:
+
+```ts
+const network = await client.liveNetwork({ maxAgeSeconds: 180 });
+console.log(network.ledger_sequence);
+```
+
+`liveNetwork` validates the Testnet passphrase, protocol and hash through the
+standard read-only client, then checks that the ledger close time is within
+the requested age threshold (with at most 30 seconds of future clock skew).
+It throws `ApiError` (HTTP-equivalent 503, code `STALE_LEDGER`) when the
+observation is stale. This is network freshness only, **not evidence of
+confidential transfers, provider liquidity, or fiat payout**. Default API
+reads remain backward compatible.
+
 ## Runtime and package compatibility
 
 The only public package entry point is `@stealthbridge/sdk`. It is native ESM and exports the runtime values `StealthBridgeClient` and `ApiError`, plus the TypeScript types `ClientConfig`, `Network`, `PrivacyRail`, `SettlementState`, `Capabilities`, `NetworkStatus`, `Corridor`, `SettlementSummary`, and `TransactionObservation`. Internal `dist/*` paths are not public exports.
