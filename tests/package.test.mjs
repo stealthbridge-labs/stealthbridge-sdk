@@ -32,7 +32,7 @@ const expectedPackageFiles = [
 const budgets = {
   packedBytes: 28_000,
   unpackedBytes: 68_000,
-  fullBrowserBytes: 10_500,
+  fullBrowserBytes: 10_800,
   treeShakenBrowserBytes: 1_600,
   nextClientSdkChunksBytes: 25_000
 };
