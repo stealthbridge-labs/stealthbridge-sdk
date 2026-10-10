@@ -59,6 +59,11 @@ function sourceInterface(value:unknown):value is PublicSorobanInterface {
    reads:["get_admin","pending_admin","is_paused","is_enabled"],
    writes:["propose_admin","cancel_admin_proposal","accept_admin","set_paused","set_enabled"],
   },
+  "governance-gate":{
+   source:"contracts/governance-gate/src/lib.rs",
+   reads:["get_admin","corridor_registry","policy_registry","public_flags_allow"],
+   writes:[],
+  },
   "policy-registry":{
    source:"contracts/policy-registry/src/lib.rs",
    reads:["admin","pending_admin","is_paused","get_rule","is_effective"],
