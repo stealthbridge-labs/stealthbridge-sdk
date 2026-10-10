@@ -25,6 +25,8 @@ const expectedPackageFiles = [
   "dist/settlement.js",
   "dist/types.d.ts",
   "dist/types.js",
+  "dist/wallet.d.ts",
+  "dist/wallet.js",
   "package.json"
 ];
 const budgets = {
