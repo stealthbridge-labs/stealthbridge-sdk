@@ -4,6 +4,30 @@
 
 **Engineering roadmap:** [View the repository-specific plan](ROADMAP.md).
 
+## Platform architecture and SDK expansion
+
+**Full engineering guide:** [SDK architecture, versioning, compatibility and release gates](docs/ARCHITECTURE-AND-DELIVERY.md).
+
+```text
+Next.js / browser ──┐
+Node ESM services ──┼──► @stealthbridge/sdk (typed Testnet reads)
+                    │       ├─ validated Rust API responses
+                    │       ├─ real corridor paging / network freshness
+                    │       ├─ source-only Soroban three-contract ABI
+                    │       ├─ exact-value asset utilities
+                    │       └─ local Stellar public-account validation
+                    └─ no signer / no payment send / no private witness handling
+Future: attested contract reads → reviewed wallet adapter → audited proof adapter
+```
+
+**Current source of truth:** the backend OpenAPI defines HTTP operations, the Soroban repository defines the **corridor, policy, and governance-gate** source interface, and the SDK protects consumers from incompatible responses and falsely enabled capabilities. A signed contract manifest is **not** available yet; no SDK method performs an on-chain contract invocation, private transfer, or fiat payout.
+
+**What comes next:** publish a versioned package only after license/maintainer approval, generate types from a reviewed OpenAPI revision, enforce backend/API and Soroban contract compatibility across CI, and make browser/Node adapter boundaries explicit. Add independently attested Testnet contract reads before considering any wallet-signing interface.
+
+**Later SDK direction:** separate opt-in signer sessions from watching a public wallet address; require human confirmation of network, function, assets, fees and authorization footprint; integrate only independently audited and version-pinned confidential token/private-payment primitives; protect note encryption and recovery without uploading private witnesses to the API. Build real examples that **fail closed** when a partner, issuer, pool or rail is unverified.
+
+**Release test:** `npm run verify` exercises packed tarball integrity, declaration exports, Node ESM and browser/Next.js consumers. Package compatibility tests are not evidence of live payment capability. The SDK is a library, not a Vercel website deployment target.
+
 An initial **read-only TypeScript SDK** for live StealthBridge network and corridor metadata.
 
 ```ts
@@ -57,7 +81,7 @@ npm run verify
 
 `npm run verify` type-checks and builds the source, creates `artifacts/stealthbridge-sdk-0.2.0.tgz`, validates SHA-256 plus npm's SHA-1/SHA-512 integrity metadata and contents, then installs that tarball into isolated Node.js, TypeScript, esbuild, and Next.js fixtures. The Next.js fixture proves the installed `dist/index.js` entry resolves in both a Server Component and a `"use client"` Client Component. It does not need a backend, wallet, credentials, or deployment. The fixture's pinned dependencies require registry access on a cold cache.
 
-The current package-test baseline is approximately 18.1 KB packed / 61.7 KB unpacked, with a 10.47 KB full minified browser ESM bundle, a 286 B `ApiError`-only bundle and 11.3 KB across SDK-bearing Next.js client chunks. Package-test ceilings are 28 KB packed, 68 KB unpacked, 10.5 KB full browser, 1.6 KB tree-shaken, and 25 KB for SDK-bearing Next.js client chunks. A size change that exceeds a ceiling requires review and an explicit budget update with fresh measurements.
+Package size and browser chunk ceilings are enforced by `tests/package.test.mjs`; see CI for **current measured output** rather than relying on a historic size snapshot. Changes beyond the checked-in budgets require explicit review and measurements.
 
 ## Consumer errors
 
@@ -150,4 +174,4 @@ The SDK now offers `scanCorridors({pageSize:25,maxPages:20,signal})`, an asynchr
 
 ### Source-level registry ABI inventory
 
-`contracts().public_interface` contains the read method names, argument shapes and explicitly separated administrator writes for both current Soroban registry sources. The authoritative snapshot lives at `stealthbridge-contracts/integrations/public-soroban-interface.v1.json`; the backend compares its mirrored copy in CI and serves it to SDK clients. The SDK validates the read names against the pinned source interface and rejects unknown read capabilities. This is a method inventory only: without a real deployed Contract ID and independent chain attestation, no Soroban invocation can run. No wallet seed or private proof is accepted here.
+`contracts().public_interface` contains the read method names, argument shapes and explicitly separated administrator writes for all three current Soroban governance contract sources. The authoritative snapshot lives at `stealthbridge-contracts/integrations/public-soroban-interface.v1.json`; the backend compares its mirrored copy in CI and serves it to SDK clients. The SDK validates the read names against the pinned source interface and rejects unknown read capabilities. This is a method inventory only: without a real deployed Contract ID and independent chain attestation, no Soroban invocation can run. No wallet seed or private proof is accepted here.
