@@ -85,6 +85,12 @@ function sourceInterface(value:unknown):value is PublicSorobanInterface {
       !item.args.every((arg:unknown)=>typeof arg==="string")||
       typeof item.returns!=="string")return false;
   }
+  if(name==="governance-gate"){
+   const guard=row.reads.public_flags_allow;
+   if(!object(guard)||!Array.isArray(guard.args)||
+      guard.args.length!==2||guard.args[0]!=="String"||
+      guard.args[1]!=="String"||guard.returns!=="bool")return false;
+  }
  }
  return true;
 }
