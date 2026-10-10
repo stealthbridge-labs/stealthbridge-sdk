@@ -105,3 +105,26 @@ test("capabilities fail closed when upstream advertises unverified money movemen
     flags[key] = false;
   }
 });
+
+test("liveNetwork rejects stale and future-dated ledgers without claiming payments work", async () => {
+  const now = Math.floor(Date.now()/1000);
+  const observation = {
+    network: "testnet", passphrase: "Test SDF Network ; September 2015",
+    protocol_version: 23, ledger_sequence: 123, ledger_hash: "ab".repeat(32),
+    ledger_closed_at_unix: String(now - 5), source: "stellar-rpc",
+  };
+  const api = new StealthBridgeClient({
+    apiBaseUrl: "https://api.example", network: "testnet",
+    fetchImpl: async () => new Response(JSON.stringify(observation), {
+      status: 200, headers: { "content-type": "application/json" },
+    }),
+  });
+  assert.equal((await api.liveNetwork()).ledger_sequence, 123);
+  observation.ledger_closed_at_unix = String(now - 400);
+  await assert.rejects(api.liveNetwork(), e => e instanceof ApiError &&
+    e.status === 503 && e.code === "STALE_LEDGER");
+  observation.ledger_closed_at_unix = String(now + 90);
+  await assert.rejects(api.liveNetwork(), e => e instanceof ApiError &&
+    e.status === 503 && e.code === "STALE_LEDGER");
+  assert.rejects(api.liveNetwork({maxAgeSeconds:0}), /maxAgeSeconds/);
+});
