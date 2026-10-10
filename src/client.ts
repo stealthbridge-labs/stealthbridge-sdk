@@ -61,12 +61,12 @@ function sourceInterface(value:unknown):value is PublicSorobanInterface {
   },
   "governance-gate":{
    source:"contracts/governance-gate/src/lib.rs",
-   reads:["get_admin","corridor_registry","policy_registry","public_flags_allow"],
+   reads:["get_admin","corridor_registry","policy_registry","public_flags_allow","public_flags_allow_commitment","check_commitment_batch"],
    writes:[],
   },
   "policy-registry":{
    source:"contracts/policy-registry/src/lib.rs",
-   reads:["admin","pending_admin","is_paused","get_rule","is_effective"],
+   reads:["admin","pending_admin","is_paused","get_rule","is_effective","is_effective_commitment"],
    writes:["propose_admin","cancel_admin_proposal","accept_admin","set_paused","set_rule"],
   },
  } as const;
@@ -85,11 +85,25 @@ function sourceInterface(value:unknown):value is PublicSorobanInterface {
       !item.args.every((arg:unknown)=>typeof arg==="string")||
       typeof item.returns!=="string")return false;
   }
+  if(name==="policy-registry"){
+   const committed=row.reads.is_effective_commitment;
+   if(!object(committed)||!Array.isArray(committed.args)||
+      committed.args.join(",")!=="String,u32,BytesN<32>"||
+      committed.returns!=="bool")return false;
+  }
   if(name==="governance-gate"){
    const guard=row.reads.public_flags_allow;
    if(!object(guard)||!Array.isArray(guard.args)||
       guard.args.length!==2||guard.args[0]!=="String"||
       guard.args[1]!=="String"||guard.returns!=="bool")return false;
+   const committedGate=row.reads.public_flags_allow_commitment;
+   if(!object(committedGate)||!Array.isArray(committedGate.args)||
+      committedGate.args.join(",")!=="String,String,u32,BytesN<32>"||
+      committedGate.returns!=="bool")return false;
+   const batch=row.reads.check_commitment_batch;
+   if(!object(batch)||!Array.isArray(batch.args)||
+      batch.args.join(",")!=="Vec<GovernanceCheck>"||
+      batch.returns!=="Result<Vec<bool>,GateError>")return false;
   }
  }
  return true;
