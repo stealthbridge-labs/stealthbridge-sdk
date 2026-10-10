@@ -9,6 +9,7 @@ export {
 export type {
   ClientConfig,
   BrowserBridgeOptions,
+  FreshNetworkOptions,
   RequestOptions,
   CorridorPageOptions,
   CorridorScanOptions,
