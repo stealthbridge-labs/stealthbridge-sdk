@@ -31,8 +31,10 @@ const expectedPackageFiles = [
 ];
 const budgets = {
   packedBytes: 28_000,
-  unpackedBytes: 68_000,
-  fullBrowserBytes: 10_800,
+  // Reviewed addition: three bounded, validated backend corridor filters.
+  // Measured 68,869 unpacked and 11,693 minified browser bytes in CI.
+  unpackedBytes: 70_000,
+  fullBrowserBytes: 12_000,
   treeShakenBrowserBytes: 1_600,
   nextClientSdkChunksBytes: 25_000
 };
