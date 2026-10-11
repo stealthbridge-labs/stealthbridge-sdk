@@ -148,6 +148,31 @@ if(first.next_cursor){
 }
 \`\`\`
 
+Optional **server-side catalog filters** are available without fetching every
+page into the browser:
+
+```ts
+const page = await client.corridorsPage({
+  limit: 25,
+  originCountry: "NG",
+  destinationCountry: "GH",
+  privacyRail: "confidential-token",
+});
+
+for await (const corridor of client.scanCorridors({
+  maxPages: 5, originCountry: "NG", destinationCountry: "GH",
+  privacyRail: "confidential-token",
+})) {
+  console.log(corridor.id); // Public operator configuration only
+}
+```
+
+The SDK validates uppercase ISO-style country metadata and both supported
+privacy-rail labels **before networking**, forwards exact URL query keys
+through the read-only backend endpoint, and rejects returned records that
+do not match the requested filters. A filter is not a compliance decision,
+FX quote, proof of issuer authority, or payout confirmation.
+
 This method is separate from the backwards-compatible \`corridors()\` listing; it never creates quote, payment or partner relationships.
 
 ## Opt-in ledger observer support
