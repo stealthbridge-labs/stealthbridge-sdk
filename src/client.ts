@@ -34,9 +34,15 @@ export interface RequestOptions {
 }
 /** Optional freshness threshold for a verified Stellar Testnet RPC observation. */
 export interface FreshNetworkOptions extends RequestOptions { maxAgeSeconds?:number; }
-export interface CorridorPageOptions extends RequestOptions { after?:string; limit?:number; }
+/** Optional public catalog filters: metadata only, not settlement eligibility. */
+export interface CorridorFilterOptions {
+ originCountry?:string;
+ destinationCountry?:string;
+ privacyRail?:"confidential-token"|"private-payments";
+}
+export interface CorridorPageOptions extends RequestOptions, CorridorFilterOptions { after?:string; limit?:number; }
 /** Hard-capped iteration: protects UI services from unbounded catalog scans. */
-export interface CorridorScanOptions extends RequestOptions { pageSize?:number; maxPages?:number; }
+export interface CorridorScanOptions extends RequestOptions, CorridorFilterOptions { pageSize?:number; maxPages?:number; }
 
 export class ApiError extends Error {
  constructor(public readonly status:number,public readonly path:string,
@@ -161,7 +167,7 @@ function observation(value:unknown):value is TransactionObservation {
 }
 
 /** Narrow the untrusted backend payload before ordering/cursor checks. */
-function corridorPageValid(value:unknown,limit:number,after?:string):value is CorridorPage{
+function corridorPageValid(value:unknown,limit:number,after?:string,filters:CorridorFilterOptions={}):value is CorridorPage{
  if(!object(value)||!Array.isArray(value.items)||value.items.length>limit ||
     !value.items.every(corridor))return false;
  const items:Corridor[]=value.items;
@@ -172,7 +178,10 @@ function corridorPageValid(value:unknown,limit:number,after?:string):value is Co
    cursor.toLowerCase()!==items[items.length-1].id.toLowerCase()))return false;
  return items.every((item,index)=> (index===0 ||
    items[index-1].id.toLowerCase()<item.id.toLowerCase()) &&
-   (after===undefined||item.id.toLowerCase()>after.toLowerCase()));
+   (after===undefined||item.id.toLowerCase()>after.toLowerCase()) &&
+   (filters.originCountry===undefined||item.origin_country===filters.originCountry) &&
+   (filters.destinationCountry===undefined||item.destination_country===filters.destinationCountry) &&
+   (filters.privacyRail===undefined||item.privacy_rail===filters.privacyRail));
 }
 const MAX_JSON_BYTES=65536;
 export class StealthBridgeClient {
@@ -332,10 +341,20 @@ export class StealthBridgeClient {
   const after=options.after;
   if(after!==undefined&&!/^[a-f0-9]{8}-(?:[a-f0-9]{4}-){3}[a-f0-9]{12}$/i.test(after))
    throw new TypeError("Cursor must be a UUID returned by the corridor API");
+  for(const country of [options.originCountry,options.destinationCountry]){
+   if(country!==undefined&&!/^[A-Z]{2}$/.test(country))
+    throw new TypeError("Corridor country filters must be uppercase two-letter codes");
+  }
+  if(options.privacyRail!==undefined&&
+     !["confidential-token","private-payments"].includes(options.privacyRail))
+   throw new TypeError("Unsupported corridor privacy-rail metadata filter");
   const params=new URLSearchParams({limit:String(limit)});
   if(after)params.set("after",after.toLowerCase());
+  if(options.originCountry!==undefined)params.set("origin_country",options.originCountry);
+  if(options.destinationCountry!==undefined)params.set("destination_country",options.destinationCountry);
+  if(options.privacyRail!==undefined)params.set("privacy_rail",options.privacyRail);
   return this.read("/v1/corridors/page?"+params.toString(),
-   (value):value is CorridorPage=>corridorPageValid(value,limit,after),options);
+   (value):value is CorridorPage=>corridorPageValid(value,limit,after,options),options);
  }
 
  /**
@@ -355,6 +374,9 @@ export class StealthBridgeClient {
   for(let pageNumber=0;pageNumber<maxPages;pageNumber++){
    options.signal?.throwIfAborted();
    const pageOptions:CorridorPageOptions={limit:pageSize};
+   if(options.originCountry!==undefined)pageOptions.originCountry=options.originCountry;
+   if(options.destinationCountry!==undefined)pageOptions.destinationCountry=options.destinationCountry;
+   if(options.privacyRail!==undefined)pageOptions.privacyRail=options.privacyRail;
    if(after!==undefined)pageOptions.after=after;
    if(options.signal!==undefined)pageOptions.signal=options.signal;
    if(options.retries!==undefined)pageOptions.retries=options.retries;
