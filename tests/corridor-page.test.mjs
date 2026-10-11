@@ -70,3 +70,57 @@ test("rejects cursor mismatches instead of reusing a forged page",async()=>{
   fetchImpl:async()=>new Response(JSON.stringify({items:[fixture(cursor)],next_cursor:second}))});
  await assert.rejects(api.corridorsPage(),e=>e instanceof ApiError&&e.status===502);
 });
+
+test("validated corridor filters are forwarded and mismatched responses fail closed",async()=>{
+ const seen=[];
+ const client=new StealthBridgeClient({network:"testnet",apiBaseUrl:"https://api.example",
+  fetchImpl:async url=>{
+   seen.push(String(url));
+   return new Response(JSON.stringify({items:[fixture(cursor)],next_cursor:null}),
+    {headers:{"content-type":"application/json"}});
+  }});
+ const matching=await client.corridorsPage({
+  limit:4,originCountry:"NG",destinationCountry:"KE",privacyRail:"confidential-token"
+ });
+ assert.equal(matching.items.length,1);
+ assert.equal(seen[0],"https://api.example/v1/corridors/page?limit=4&origin_country=NG&destination_country=KE&privacy_rail=confidential-token");
+ for(const filter of [
+  {originCountry:"US"},{destinationCountry:"GH"},{privacyRail:"private-payments"}
+ ]){
+  await assert.rejects(client.corridorsPage(filter),e=>e instanceof ApiError&&e.status===502);
+ }
+});
+test("corridor query filters reject malformed values without transport access",()=>{
+ let calls=0;
+ const client=new StealthBridgeClient({network:"testnet",apiBaseUrl:"https://api.example",
+  fetchImpl:async()=>{calls++;throw new Error("unexpected request");}});
+ for(const options of [
+  {originCountry:"ng"},{originCountry:"NGA"},{originCountry:"NG%00"},
+  {destinationCountry:"U1"},{destinationCountry:"N G"},
+  {privacyRail:"live-payout"},
+ ]) assert.throws(()=>client.corridorsPage(options),TypeError);
+ assert.equal(calls,0);
+});
+test("scanCorridors preserves server metadata filters on every page",async()=>{
+ const seen=[];
+ const client=new StealthBridgeClient({network:"testnet",apiBaseUrl:"https://api.example",
+  fetchImpl:async url=>{
+   seen.push(String(url));
+   return new Response(JSON.stringify(seen.length===1?
+    {items:[fixture(cursor)],next_cursor:cursor}:
+    {items:[fixture(second)],next_cursor:null}),
+    {headers:{"content-type":"application/json"}});
+  }});
+ const ids=[];
+ for await(const item of client.scanCorridors({
+  pageSize:1,maxPages:3,originCountry:"NG",destinationCountry:"KE",privacyRail:"confidential-token"
+ }))ids.push(item.id);
+ assert.deepEqual(ids,[cursor,second]);
+ assert.equal(seen.length,2);
+ for(const url of seen){
+  const params=new URL(url).searchParams;
+  assert.equal(params.get("origin_country"),"NG");
+  assert.equal(params.get("destination_country"),"KE");
+  assert.equal(params.get("privacy_rail"),"confidential-token");
+ }
+});
