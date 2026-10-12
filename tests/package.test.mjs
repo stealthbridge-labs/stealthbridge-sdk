@@ -7,6 +7,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { spawnSync } from "node:child_process";
 import { build as bundle } from "esbuild";
+import { prepareNextConsumer } from "../scripts/prepare-next-consumer.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const fixtures = path.join(root, "tests", "fixtures");
@@ -88,19 +89,10 @@ async function installFixture(name) {
 
 async function installNextFixture() {
   const destination = path.join(workspace, "next-app");
-  await cp(path.join(fixtures, "next-app"), destination, { recursive: true });
-  const vendor = path.join(destination, "vendor");
-  await mkdir(vendor, { recursive: true });
-  await cp(tarball, path.join(vendor, "stealthbridge-sdk.tgz"));
-  const lockPath = path.join(destination, "package-lock.json");
-  const lock = JSON.parse(await readFile(lockPath, "utf8"));
-  if (lock.packages && lock.packages["node_modules/@stealthbridge/sdk"]) {
-    lock.packages["node_modules/@stealthbridge/sdk"].integrity = packed.integrity;
-  }
-  if (lock.dependencies && lock.dependencies["@stealthbridge/sdk"]) {
-    lock.dependencies["@stealthbridge/sdk"].integrity = packed.integrity;
-  }
-  await writeFile(lockPath, JSON.stringify(lock, null, 2));
+  await prepareNextConsumer({
+    source: path.join(fixtures, "next-app"),
+    destination, tarball, integrity: packed.integrity
+  });
   const startedAt = performance.now();
   run("npm", ["ci", "--no-audit", "--no-fund"], destination);
   nextInstallMilliseconds = Math.round(performance.now() - startedAt);
