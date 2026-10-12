@@ -12,7 +12,7 @@ export interface ApiCapabilities {
 
 export interface ApiContractDiscovery {
   network: "testnet";
-  source: "stealthbridge-contracts";
+  source: "stealthbridge-contracts/deployments/testnet/manifest.json";
   manifest: Record<string, unknown>;
   public_interface: Record<string, unknown>;
   on_chain_verified: false;
