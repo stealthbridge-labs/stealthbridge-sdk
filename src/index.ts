@@ -25,3 +25,8 @@ export { allowedSettlementTransitions, SettlementTransitionError, isSettlementSt
 export { canonicalStellarAccountAddress } from "./wallet.js";
 
 export type { ApiNetworkStatus, ApiCapabilities, ApiCorridor, ApiCorridorPage, ApiReadiness, ApiContractDiscovery, ApiErrorEnvelope } from "./generated/api-wire.js";
+
+export type { TransferRail, TransferEvidence, TransferAssessment,
+  DeviceOwnedPrivacyState, ConfidentialTokenAdapterDesign,
+  PrivatePaymentsAdapterDesign, WalletOwnedAdapterDesign
+} from "./transfer-capability.js";
