@@ -18,6 +18,8 @@ const expectedPackageFiles = [
   "dist/amount.js",
   "dist/client.d.ts",
   "dist/client.js",
+  "dist/generated/api-wire.d.ts",
+  "dist/generated/api-wire.js",
   "dist/index.d.ts",
   "dist/index.js",
   "dist/manifest.d.ts",
@@ -35,8 +37,8 @@ const expectedPackageFiles = [
 const budgets = {
   packedBytes: 28_000,
   // Reviewed addition: three bounded, validated backend corridor filters.
-  // The fail-closed capability module increases measured unpacked size to 70,910 B; maintain a 72 KB ceiling.
-  unpackedBytes: 72_000,
+  // Source-generated API declarations add ~2 KB of reviewed schema types; maintain a strict 76 KB ceiling.
+  unpackedBytes: 76_000,
   fullBrowserBytes: 12_000,
   treeShakenBrowserBytes: 1_600,
   nextClientSdkChunksBytes: 25_000
