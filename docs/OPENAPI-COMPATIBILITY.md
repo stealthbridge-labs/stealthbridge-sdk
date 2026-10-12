@@ -1,6 +1,6 @@
 # API 0.3 OpenAPI → SDK compatibility (read-only)
 
-Source: `stealthbridge-labs/stealthbridge-backend` commit `91ffaf7fd3ee5b4c218874e21cd7cd8b94df106b`, path `api/openapi.yaml`. Snapshot: `specs/backend-openapi.v0.3.yaml`. This revision documents a disabled settlement POST returning **501**, not a callable SDK operation.
+Source: `stealthbridge-labs/stealthbridge-backend` commit `acad5777f2217917421469e9722fbfbf6222ff7a`, path `api/openapi.yaml`. Snapshot: `specs/backend-openapi.v0.3.yaml`. This revision documents a disabled settlement POST returning **501**, not a callable SDK operation.
 
 ## Reproducible regeneration
 

@@ -17,7 +17,7 @@ test("regeneration is byte-for-byte deterministic and source-pinned",async()=>{
  assert.equal(run("--stdout"),actual);
  assert.equal(run("--stdout"),actual);
  assert.match(run("--check"),/PASS: generated SDK types/);
- assert.match(actual,/Backend source commit: 91ffaf7fd3ee5b4c218874e21cd7cd8b94df106b/);
+ assert.match(actual,/Backend source commit: acad5777f2217917421469e9722fbfbf6222ff7a/);
  assert.doesNotMatch(actual,/\bany\b/);
 });
 test("API 0.3 wire models preserve precise Testnet safety literals",async()=>{
