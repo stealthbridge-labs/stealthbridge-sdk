@@ -29,7 +29,7 @@ function wireType(lines) {
  if(array)return "string | null";
  const enumeration=description.match(/enum:\s*\[([^\]]+)\]/);
  if(enumeration)return enumeration[1].split(",").map(x=>JSON.stringify(x.trim().replace(/^["']|["']$/g,""))).join(" | ");
- const literal=description.match(/const:\s*([A-Za-z0-9_-]+)/);
+ const literal=description.match(/const:\s*([^,}\s]+)/);
  if(literal)return /^(?:true|false)$/.test(literal[1])?literal[1]:JSON.stringify(literal[1]);
  if(typeIs("integer")||typeIs("number"))return "number";
  if(typeIs("boolean"))return "boolean";
