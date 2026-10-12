@@ -23,6 +23,8 @@ const expectedPackageFiles = [
   "dist/manifest.js",
   "dist/settlement.d.ts",
   "dist/settlement.js",
+  "dist/transfer-capability.d.ts",
+  "dist/transfer-capability.js",
   "dist/types.d.ts",
   "dist/types.js",
   "dist/wallet.d.ts",
