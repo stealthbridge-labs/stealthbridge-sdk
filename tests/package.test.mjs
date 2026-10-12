@@ -34,8 +34,8 @@ const expectedPackageFiles = [
 const budgets = {
   packedBytes: 28_000,
   // Reviewed addition: three bounded, validated backend corridor filters.
-  // Measured 68,869 unpacked and 11,693 minified browser bytes in CI.
-  unpackedBytes: 70_000,
+  // The fail-closed capability module increases measured unpacked size to 70,910 B; maintain a 72 KB ceiling.
+  unpackedBytes: 72_000,
   fullBrowserBytes: 12_000,
   treeShakenBrowserBytes: 1_600,
   nextClientSdkChunksBytes: 25_000
