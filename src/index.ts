@@ -45,3 +45,6 @@ export type { PlatformCatalog, PlatformModule, PlatformModuleId, PlatformAudienc
 
 export { assessDeveloperReadiness } from "./developer-readiness.js";
 export type { DeveloperCheckId, DeveloperCheckState, DeveloperCheck, DeveloperReadiness, DeveloperObservation } from "./developer-readiness.js";
+
+export { assessBusinessReview, BusinessReviewError } from "./business-review.js";
+export type { BusinessReviewRole, BusinessReviewPolicy, BusinessReviewRecord, BusinessReviewResult, BusinessReviewErrorCode } from "./business-review.js";
