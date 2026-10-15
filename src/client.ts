@@ -313,7 +313,8 @@ export class StealthBridgeClient {
   const params=new URLSearchParams({limit:String(limit)});
   if(options.contractId)params.set("contract_id",options.contractId);
   if(options.before)params.set("before",options.before);
-  const filters:ActivityFilters={limit,contractId:options.contractId,before:options.before};
+  const filters:ActivityFilters={limit,...(options.contractId?{contractId:options.contractId}:{}),
+   ...(options.before?{before:options.before}:{})};
   return this.read("/v1/observer/activity?"+params,
     (value):value is PublicActivityPage=>validateActivityPage(value,filters),options);
  }
