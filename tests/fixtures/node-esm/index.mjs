@@ -79,8 +79,10 @@ assert.deepEqual(Object.keys(await import("@stealthbridge/sdk")).sort(), [
   "SettlementTransitionError",
   "StealthBridgeClient",
   "allowedSettlementTransitions",
+  "appendPublicEvidence",
   "assertAsset",
   "assertSettlementTransition",
+  "assessPublicObservations",
   "canTransitionSettlement",
   "canonicalStellarAccountAddress",
   "createBridgeClient",
@@ -90,6 +92,7 @@ assert.deepEqual(Object.keys(await import("@stealthbridge/sdk")).sort(), [
   "isSettlementState",
   "isTerminalSettlementState",
   "parseDeploymentManifest",
+  "publicEvidenceReceipt",
   "readIntegrationSnapshot"
 ]);
 
