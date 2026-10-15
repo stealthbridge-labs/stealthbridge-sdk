@@ -72,6 +72,8 @@ test("rejects payment readiness, unknown contracts, bad receipt shape and privat
   page([{...fixture(TWO,"b"),ledger_sequence:0}]),
   page([{...fixture(TWO,"b"),contract_id:"C"+"A".repeat(55)}]),
   page([{...fixture(TWO,"b"),observed_at_unix:"not-utc"}]),
+  page([{...fixture(TWO,"b"),topic:"PRIVATE_XDR"}]),
+  {...page(),private_amount:"123"},
  ]){
   await assert.rejects(api(invalid).observerActivity(),e=>e instanceof ApiError&&e.status===502);
  }
