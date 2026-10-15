@@ -18,6 +18,8 @@ const expectedPackageFiles = [
   "dist/amount.js",
   "dist/client.d.ts",
   "dist/client.js",
+  "dist/developer-readiness.d.ts",
+  "dist/developer-readiness.js",
   "dist/generated/api-wire.d.ts",
   "dist/generated/api-wire.js",
   "dist/index.d.ts",
@@ -45,11 +47,11 @@ const expectedPackageFiles = [
 const budgets = {
   // Account for one bounded, dependency-free snapshot module. Still fail
   // changes adding large packages, Node-only builtins or hidden code.
-  packedBytes: 32_000,
+  packedBytes: 38_000,
   // Reviewed observation-health .js and .d.ts add 2,841 bytes over v0.2.
   // Additional typed platform capability validators remain dependency-free.
   // Preserve a bounded size budget with reviewed headroom.
-  unpackedBytes: 101_000,
+  unpackedBytes: 115_000,
   fullBrowserBytes: 16_000,
   treeShakenBrowserBytes: 1_600,
   nextClientSdkChunksBytes: 25_000
