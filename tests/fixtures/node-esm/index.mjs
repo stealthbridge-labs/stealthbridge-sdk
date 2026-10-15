@@ -75,12 +75,14 @@ assert.deepEqual(Object.keys(await import("@stealthbridge/sdk")).sort(), [
   "ApiError",
   "AssetAmount",
   "ManifestError",
+  "ProductCapabilityError",
   "SDK_VERSION",
   "SettlementTransitionError",
   "StealthBridgeClient",
   "allowedSettlementTransitions",
   "appendPublicEvidence",
   "assertAsset",
+  "assertModuleAvailable",
   "assertSettlementTransition",
   "assessPublicObservations",
   "canTransitionSettlement",
@@ -91,9 +93,11 @@ assert.deepEqual(Object.keys(await import("@stealthbridge/sdk")).sort(), [
   "getVerifiedContract",
   "isSettlementState",
   "isTerminalSettlementState",
+  "listAvailableModules",
   "parseDeploymentManifest",
   "publicEvidenceReceipt",
-  "readIntegrationSnapshot"
+  "readIntegrationSnapshot",
+  "validPlatformCatalog"
 ]);
 
 assert.equal(canonicalStellarAccountAddress("GAAACAQDAQCQMBYIBEFAWDANBYHRAEISCMKBKFQXDAMRUGY4DUPB7JZX")?.startsWith("G"), true);
