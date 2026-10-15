@@ -42,7 +42,9 @@ const budgets = {
   // Account for one bounded, dependency-free snapshot module. Still fail
   // changes adding large packages, Node-only builtins or hidden code.
   packedBytes: 32_000,
-  // Reviewed new pure observation-health .js + .d.ts add 2,841 bytes over v0.2.\n  // Keep a small absolute headroom, not an unbounded package size exemption.\n  unpackedBytes: 93_000,
+  // Reviewed observation-health .js and .d.ts add 2,841 bytes over v0.2.
+  // Preserve bounded budget with small reviewable headroom.
+  unpackedBytes: 93_000,
   fullBrowserBytes: 12_000,
   treeShakenBrowserBytes: 1_600,
   nextClientSdkChunksBytes: 25_000
