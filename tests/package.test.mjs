@@ -28,6 +28,10 @@ const expectedPackageFiles = [
   "dist/manifest.js",
   "dist/observation-health.d.ts",
   "dist/observation-health.js",
+  "dist/platform.d.ts",
+  "dist/platform.js",
+  "dist/product-capabilities.d.ts",
+  "dist/product-capabilities.js",
   "dist/settlement.d.ts",
   "dist/settlement.js",
   "dist/transfer-capability.d.ts",
@@ -45,7 +49,7 @@ const budgets = {
   // Reviewed observation-health .js and .d.ts add 2,841 bytes over v0.2.
   // Preserve bounded budget with small reviewable headroom.
   unpackedBytes: 93_000,
-  fullBrowserBytes: 12_000,
+  fullBrowserBytes: 16_000,
   treeShakenBrowserBytes: 1_600,
   nextClientSdkChunksBytes: 25_000
 };
