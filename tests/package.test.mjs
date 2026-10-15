@@ -22,6 +22,8 @@ const expectedPackageFiles = [
   "dist/generated/api-wire.js",
   "dist/index.d.ts",
   "dist/index.js",
+  "dist/integration-snapshot.d.ts",
+  "dist/integration-snapshot.js",
   "dist/manifest.d.ts",
   "dist/manifest.js",
   "dist/settlement.d.ts",
@@ -35,10 +37,10 @@ const expectedPackageFiles = [
   "package.json"
 ];
 const budgets = {
-  packedBytes: 28_000,
-  // Reviewed addition: three bounded, validated backend corridor filters.
-  // Source-generated API declarations add ~2 KB of reviewed schema types; the safety-only adapter types add 666 bytes of unpacked size (CI measured 76,666 B); maintain a strict 78 KB ceiling.
-  unpackedBytes: 78_000,
+  // Account for one bounded, dependency-free snapshot module. Still fail
+  // changes adding large packages, Node-only builtins or hidden code.
+  packedBytes: 32_000,
+  unpackedBytes: 88_000,
   fullBrowserBytes: 12_000,
   treeShakenBrowserBytes: 1_600,
   nextClientSdkChunksBytes: 25_000

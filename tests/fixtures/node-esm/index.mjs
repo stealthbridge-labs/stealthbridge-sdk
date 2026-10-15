@@ -89,7 +89,8 @@ assert.deepEqual(Object.keys(await import("@stealthbridge/sdk")).sort(), [
   "getVerifiedContract",
   "isSettlementState",
   "isTerminalSettlementState",
-  "parseDeploymentManifest"
+  "parseDeploymentManifest",
+  "readIntegrationSnapshot"
 ]);
 
 assert.equal(canonicalStellarAccountAddress("GAAACAQDAQCQMBYIBEFAWDANBYHRAEISCMKBKFQXDAMRUGY4DUPB7JZX")?.startsWith("G"), true);

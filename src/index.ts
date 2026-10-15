@@ -30,3 +30,6 @@ export type { TransferRail, TransferEvidence, TransferAssessment,
   DeviceOwnedPrivacyState, ConfidentialTokenAdapterDesign,
   PrivatePaymentsAdapterDesign, WalletOwnedAdapterDesign
 } from "./transfer-capability.js";
+
+export {readIntegrationSnapshot} from "./integration-snapshot.js";
+export type {IntegrationSnapshot,Observation} from "./integration-snapshot.js";
