@@ -16,6 +16,8 @@ const expectedPackageFiles = [
   "README.md",
   "dist/amount.d.ts",
   "dist/amount.js",
+  "dist/business-envelope.d.ts",
+  "dist/business-envelope.js",
   "dist/business-review.d.ts",
   "dist/business-review.js",
   "dist/client.d.ts",
@@ -49,11 +51,11 @@ const expectedPackageFiles = [
 const budgets = {
   // Account for one bounded, dependency-free snapshot module. Still fail
   // changes adding large packages, Node-only builtins or hidden code.
-  packedBytes: 42_000,
+  packedBytes: 45_000,
   // Reviewed observation-health .js and .d.ts add 2,841 bytes over v0.2.
   // Additional typed platform capability validators remain dependency-free.
   // Preserve a bounded size budget with reviewed headroom.
-  unpackedBytes: 128_000,
+  unpackedBytes: 137_000,
   fullBrowserBytes: 16_000,
   treeShakenBrowserBytes: 1_600,
   nextClientSdkChunksBytes: 25_000
