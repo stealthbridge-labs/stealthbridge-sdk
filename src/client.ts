@@ -1,3 +1,4 @@
+import {validPlatformCatalog, type PlatformCatalog} from "./platform.js";
 import type {Capabilities,Corridor,Network,NetworkStatus,TransactionObservation,CorridorPage,LedgerCheckpoint,Readiness,ContractDiscovery,PublicSorobanInterface} from "./types.js";
 
 export interface ClientConfig {
@@ -294,6 +295,10 @@ export class StealthBridgeClient {
    const timer=setTimeout(()=>{cleanup();resolve();},ms);
    signal.addEventListener("abort",abort,{once:true});
   });
+ }
+ /** Query product scope without acquiring payment authority. */
+ platformModules(options?:RequestOptions):Promise<PlatformCatalog>{
+  return this.read("/v1/platform/modules",validPlatformCatalog,options);
  }
  /** Read the authoritative *undeployed* contract snapshot, never a claimed payout. */
  contracts(options?:RequestOptions):Promise<ContractDiscovery>{
