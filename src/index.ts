@@ -33,3 +33,6 @@ export type { TransferRail, TransferEvidence, TransferAssessment,
 
 export {readIntegrationSnapshot} from "./integration-snapshot.js";
 export type {IntegrationSnapshot,Observation} from "./integration-snapshot.js";
+
+export {assessPublicObservations,appendPublicEvidence,publicEvidenceReceipt} from "./observation-health.js";
+export type {PublicObservationInput,PublicNetworkEvidence,PersistedObserverEvidence,PublicReadinessEvidence,PublicCapabilityEvidence,PublicContractEvidence,PublicEvidenceAssessment,PublicEvidenceRecord,ObserverComparison,EvidenceVerdict} from "./observation-health.js";
