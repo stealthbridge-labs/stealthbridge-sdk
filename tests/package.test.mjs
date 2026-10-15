@@ -38,11 +38,9 @@ const expectedPackageFiles = [
 ];
 const budgets = {
   packedBytes: 28_000,
-  // Reviewed addition: three bounded, validated backend corridor filters.
-  // Source-generated API declarations add ~2 KB of reviewed schema types; the safety-only adapter types add 666 bytes of unpacked size (CI measured 76,666 B); maintain a strict 78 KB ceiling.
-  // CI measured 85,037 B with the new strict on-chain StrKey and public activity guards.\n  // Bounded reviewed increase; retain a 90 KB hard unpacked package ceiling.\n  unpackedBytes: 90_000,
-  // Measured CI: 15,053 B after checksum-valid StrKey + fail-closed public activity guards.
-  // Keep a modest explicit 16 KB max for the complete browser client.
+  // CI measurement: 85,037 B includes reviewed Testnet observer validators.
+  // Require a hard 90 KB unpacked archive ceiling and 16 KB full-browser cap.
+  unpackedBytes: 90_000,
   fullBrowserBytes: 16_000,
   treeShakenBrowserBytes: 1_600,
   nextClientSdkChunksBytes: 25_000
