@@ -39,3 +39,6 @@ export type {PublicObservationInput,PublicNetworkEvidence,PersistedObserverEvide
 
 export { assertModuleAvailable, listAvailableModules, ProductCapabilityError } from "./product-capabilities.js";
 export type { ProductAudience, ProductModule, ReleaseStage, PrivacyMode, ModuleAvailability } from "./product-capabilities.js";
+
+export { validPlatformCatalog } from "./platform.js";
+export type { PlatformCatalog, PlatformModule, PlatformModuleId, PlatformAudience, PlatformAvailability } from "./platform.js";
