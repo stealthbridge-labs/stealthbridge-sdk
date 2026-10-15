@@ -31,6 +31,10 @@ const DECIMAL=/^[0-9]{1,20}$/;
 function obj(value:unknown):value is Record<string,unknown>{
  return value!==null&&typeof value==="object"&&!Array.isArray(value);
 }
+function exactKeys(value:Record<string,unknown>,keys:string[]):boolean{
+ return Object.keys(value).length===keys.length&&
+  keys.every(key=>Object.hasOwn(value,key));
+}
 /** Check the actual StrKey C-address version + CRC16-XModem, not only its alphabet. */
 export function isContractStrKey(value:string):boolean{
  if(typeof value!=="string"||!/^C[A-Z2-7]{55}$/.test(value))return false;
@@ -57,14 +61,16 @@ export function isContractStrKey(value:string):boolean{
  return crc===decoded[33]+(decoded[34]<<8);
 }
 function validEvent(value:unknown):value is ActivityEvent{
- return obj(value)&&typeof value.id==="string"&&EVENT_ID.test(value.id)&&
+ return obj(value)&&exactKeys(value,["id","contract_id","tx_hash","ledger_sequence","observed_at_unix"])&&
+  typeof value.id==="string"&&EVENT_ID.test(value.id)&&
   typeof value.contract_id==="string"&&isContractStrKey(value.contract_id)&&
   typeof value.tx_hash==="string"&&HASH.test(value.tx_hash)&&
   typeof value.ledger_sequence==="number"&&Number.isSafeInteger(value.ledger_sequence)&&value.ledger_sequence>0&&
   typeof value.observed_at_unix==="string"&&DECIMAL.test(value.observed_at_unix)&&Number(value.observed_at_unix)>0;
 }
 function validContract(value:unknown):value is ActivityContract{
- return obj(value)&&typeof value.contract_id==="string"&&isContractStrKey(value.contract_id)&&
+ return obj(value)&&exactKeys(value,["contract_id","next_start_ledger","observed_at_unix"])&&
+  typeof value.contract_id==="string"&&isContractStrKey(value.contract_id)&&
   typeof value.next_start_ledger==="number"&&Number.isSafeInteger(value.next_start_ledger)&&value.next_start_ledger>0&&
   typeof value.observed_at_unix==="string"&&DECIMAL.test(value.observed_at_unix)&&Number(value.observed_at_unix)>0;
 }
@@ -91,7 +97,8 @@ export function validateActivityPage(
 ):value is PublicActivityPage{
  let limit:number;
  try{limit=assertActivityFilters(filters);}catch{return false;}
- if(!obj(value)||value.network!=="testnet"||value.source!=="stored-public-testnet-metadata"||
+ if(!obj(value)||!exactKeys(value,["network","source","observation_status","payment_execution_enabled","contracts","items","next_cursor"])||
+    value.network!=="testnet"||value.source!=="stored-public-testnet-metadata"||
     value.payment_execution_enabled!==false||
     !["no-checkpoint","checkpoint-present"].includes(String(value.observation_status))||
     !Array.isArray(value.contracts)||value.contracts.length>5||
