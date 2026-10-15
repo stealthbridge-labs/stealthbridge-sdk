@@ -42,3 +42,6 @@ export type { ProductAudience, ProductModule, ReleaseStage, PrivacyMode, ModuleA
 
 export { validPlatformCatalog } from "./platform.js";
 export type { PlatformCatalog, PlatformModule, PlatformModuleId, PlatformAudience, PlatformAvailability } from "./platform.js";
+
+export { assessDeveloperReadiness } from "./developer-readiness.js";
+export type { DeveloperCheckId, DeveloperCheckState, DeveloperCheck, DeveloperReadiness, DeveloperObservation } from "./developer-readiness.js";
