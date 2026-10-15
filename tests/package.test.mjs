@@ -47,8 +47,9 @@ const budgets = {
   // changes adding large packages, Node-only builtins or hidden code.
   packedBytes: 32_000,
   // Reviewed observation-health .js and .d.ts add 2,841 bytes over v0.2.
-  // Preserve bounded budget with small reviewable headroom.
-  unpackedBytes: 93_000,
+  // Additional typed platform capability validators remain dependency-free.
+  // Preserve a bounded size budget with reviewed headroom.
+  unpackedBytes: 101_000,
   fullBrowserBytes: 16_000,
   treeShakenBrowserBytes: 1_600,
   nextClientSdkChunksBytes: 25_000
