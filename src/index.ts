@@ -30,3 +30,6 @@ export type { TransferRail, TransferEvidence, TransferAssessment,
   DeviceOwnedPrivacyState, ConfidentialTokenAdapterDesign,
   PrivatePaymentsAdapterDesign, WalletOwnedAdapterDesign
 } from "./transfer-capability.js";
+
+export {isContractStrKey,isActivityCursor,assertActivityFilters,validateActivityPage} from "./observer-activity.js";
+export type {ActivityContract,ActivityEvent,PublicActivityPage,ActivityFilters} from "./observer-activity.js";

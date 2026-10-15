@@ -24,6 +24,8 @@ const expectedPackageFiles = [
   "dist/index.js",
   "dist/manifest.d.ts",
   "dist/manifest.js",
+  "dist/observer-activity.d.ts",
+  "dist/observer-activity.js",
   "dist/settlement.d.ts",
   "dist/settlement.js",
   "dist/transfer-capability.d.ts",
@@ -36,10 +38,10 @@ const expectedPackageFiles = [
 ];
 const budgets = {
   packedBytes: 28_000,
-  // Reviewed addition: three bounded, validated backend corridor filters.
-  // Source-generated API declarations add ~2 KB of reviewed schema types; the safety-only adapter types add 666 bytes of unpacked size (CI measured 76,666 B); maintain a strict 78 KB ceiling.
-  unpackedBytes: 78_000,
-  fullBrowserBytes: 12_000,
+  // CI measurement: 85,037 B includes reviewed Testnet observer validators.
+  // Require a hard 90 KB unpacked archive ceiling and 16 KB full-browser cap.
+  unpackedBytes: 90_000,
+  fullBrowserBytes: 16_000,
   treeShakenBrowserBytes: 1_600,
   nextClientSdkChunksBytes: 25_000
 };

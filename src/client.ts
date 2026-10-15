@@ -1,4 +1,6 @@
 import type {Capabilities,Corridor,Network,NetworkStatus,TransactionObservation,CorridorPage,LedgerCheckpoint,Readiness,ContractDiscovery,PublicSorobanInterface} from "./types.js";
+import {assertActivityFilters,validateActivityPage} from "./observer-activity.js";
+import type {ActivityFilters,PublicActivityPage} from "./observer-activity.js";
 
 export interface ClientConfig {
  apiBaseUrl:string;
@@ -302,6 +304,19 @@ export class StealthBridgeClient {
  /** Last persisted opt-in observer head. 404 means no checkpoint, not a fictional ledger. */
  observerHead(options?:RequestOptions):Promise<LedgerCheckpoint>{
   return this.read("/v1/observer",ledgerCheckpoint,options);
+ }
+ /** Bounded, historical PUBLIC Soroban event identifiers from the read-only journal.
+  * Never treats an event as a verified private transfer, payout or proof.
+  */
+ observerActivity(options:ActivityFilters&RequestOptions={}):Promise<PublicActivityPage>{
+  const limit=assertActivityFilters(options);
+  const params=new URLSearchParams({limit:String(limit)});
+  if(options.contractId)params.set("contract_id",options.contractId);
+  if(options.before)params.set("before",options.before);
+  const filters:ActivityFilters={limit,...(options.contractId?{contractId:options.contractId}:{}),
+   ...(options.before?{before:options.before}:{})};
+  return this.read("/v1/observer/activity?"+params,
+    (value):value is PublicActivityPage=>validateActivityPage(value,filters),options);
  }
  /** Read dependency health, explicitly not evidence of live payment capability. */
  readiness(options?:RequestOptions):Promise<Readiness>{
