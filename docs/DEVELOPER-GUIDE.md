@@ -147,3 +147,24 @@ const corridors = await client.corridors({ signal: controller.signal });
 - **No Node-only module leakage**: Browser bundles use standard `fetch`, `AbortSignal`, and `URL`, with zero references to `node:*` modules, `Buffer`, `process`, or CommonJS globals.
 - **Abort support**: Every read-only method accepts `{ signal: AbortSignal }` to cancel inflight requests immediately when components unmount.
 - **Read-only boundary**: No financial mutation methods (`send`, `sign`, `execute`, `withdraw`) exist in client builds.
+
+
+## Integrated Testnet observation snapshot
+
+Use the exported `readIntegrationSnapshot` helper when a user interface needs an honest multi-service health view rather than a collection of optimistic boolean flags.
+
+```ts
+import {createBrowserBridgeClient,readIntegrationSnapshot} from "@stealthbridge/sdk";
+
+const controller=new AbortController();
+const client=createBrowserBridgeClient();
+const snapshot=await readIntegrationSnapshot(client,{signal:controller.signal,maxAgeSeconds:180});
+// snapshot.network_status.state, snapshot.observer_checkpoint.state,
+// snapshot.readiness.state, snapshot.capabilities.state, snapshot.contracts.state
+// are independently available/unavailable. Never treat a 404 observer as live.
+// On client navigation: controller.abort()
+```
+
+The helper runs exactly five **GET** requests (network, persisted ledger, dependency readiness, capability flags, undeployed manifest), each through the SDK's existing runtime validator. It never masks invalid data as a successful record, never falls back to local fixture data, and never equates a recent *persisted* checkpoint with a fresh *live* RPC ledger. `ledger_freshness` is derived only from the live network response with a configurable threshold (default 180 seconds, max 3600). Failed requests expose only bounded status and reason labels; raw error content, wallet accounts and RPC payloads are not returned. The mandatory `payment_execution_enabled` output is always `false`.
+
+This is additive to SDK v0.2's API surface. It is not a published, executable transfer adapter or a cryptographic audit. The frontend may reuse the type mirrors and direct same-origin reads until the SDK is delivered as a reproducibly installed package.
