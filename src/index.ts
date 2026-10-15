@@ -48,3 +48,6 @@ export type { DeveloperCheckId, DeveloperCheckState, DeveloperCheck, DeveloperRe
 
 export { assessBusinessReview, BusinessReviewError } from "./business-review.js";
 export type { BusinessReviewRole, BusinessReviewPolicy, BusinessReviewRecord, BusinessReviewResult, BusinessReviewErrorCode } from "./business-review.js";
+
+export { canonicalBusinessEnvelope, digestBusinessEnvelope } from "./business-envelope.js";
+export type { ReviewOperation, BusinessEnvelopeInput, BusinessEnvelopeDigest } from "./business-envelope.js";
