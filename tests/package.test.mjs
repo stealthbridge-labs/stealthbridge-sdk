@@ -26,6 +26,8 @@ const expectedPackageFiles = [
   "dist/integration-snapshot.js",
   "dist/manifest.d.ts",
   "dist/manifest.js",
+  "dist/observation-health.d.ts",
+  "dist/observation-health.js",
   "dist/settlement.d.ts",
   "dist/settlement.js",
   "dist/transfer-capability.d.ts",
