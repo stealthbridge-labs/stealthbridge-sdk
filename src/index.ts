@@ -57,3 +57,6 @@ export type { BusinessReviewStatus, ReviewReadOptions } from "./business-reader.
 
 export { assessRegistryUpgrade } from "./upgrade-review.js";
 export type { UpgradeableRegistry, UpgradeWindowState, PublicUpgradeProposal, RegistryUpgradeObservation, RegistryUpgradeAssessment } from "./upgrade-review.js";
+// Explicit Testnet fee *quotes* only; charging/transfers remain disabled.
+export { quotePlatformFee, PlatformFeeError, DEFAULT_PLATFORM_FEE_BPS, MAX_PLATFORM_FEE_BPS } from "./platform-fees.js";
+export type { PlatformFeePolicy, PlatformFeeQuote } from "./platform-fees.js";
