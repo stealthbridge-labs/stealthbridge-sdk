@@ -52,8 +52,10 @@ export function validGovernanceRelease(value:unknown,nowUnix=Math.floor(Date.now
     value.contracts.length!==RELEASE.length)return false;
  const closed=Number(value.observed_ledger_closed_at_unix);
  if(!Number.isSafeInteger(closed)||nowUnix-closed>180||nowUnix-closed< -30)return false;
+ const contracts:unknown=value.contracts;
+ if(!Array.isArray(contracts))return false;
  return RELEASE.every(([name,id,wasm,tx,ledger],i)=>{
-  const entry:unknown=value.contracts[i];
+  const entry:unknown=contracts[i];
   return object(entry)&&entry.name===name&&entry.contract_id===id&&
    entry.wasm_sha256_at_release===wasm&&entry.deployment_tx===tx&&
    entry.deployment_ledger===ledger&&entry.deployment_transaction_confirmed===true;
