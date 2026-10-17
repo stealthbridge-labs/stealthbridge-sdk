@@ -63,3 +63,6 @@ export type { PlatformFeePolicy, PlatformFeeQuote } from "./platform-fees.js";
 
 export { validGovernanceRelease } from "./governance-release.js";
 export type { GovernanceRelease, GovernanceContractReceipt } from "./governance-release.js";
+
+export { validGovernanceCode } from "./governance-code.js";
+export type { GovernanceCodeObservation, GovernanceExecutable } from "./governance-code.js";
