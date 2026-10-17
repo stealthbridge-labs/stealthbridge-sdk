@@ -1,4 +1,5 @@
 import {validPlatformCatalog, type PlatformCatalog} from "./platform.js";
+import {validGovernanceRelease, type GovernanceRelease} from "./governance-release.js";
 import type {Capabilities,Corridor,Network,NetworkStatus,TransactionObservation,CorridorPage,LedgerCheckpoint,Readiness,ContractDiscovery,PublicSorobanInterface} from "./types.js";
 
 export interface ClientConfig {
@@ -303,6 +304,10 @@ export class StealthBridgeClient {
  /** Read the authoritative *undeployed* contract snapshot, never a claimed payout. */
  contracts(options?:RequestOptions):Promise<ContractDiscovery>{
   return this.read("/v1/contracts",contractDiscovery,options);
+ }
+ /** Public Testnet deployment receipts; explicitly not fresh WASM or signing authority. */
+ governanceRelease(options?:RequestOptions):Promise<GovernanceRelease>{
+  return this.read("/v1/governance/release",validGovernanceRelease,options);
  }
  /** Last persisted opt-in observer head. 404 means no checkpoint, not a fictional ledger. */
  observerHead(options?:RequestOptions):Promise<LedgerCheckpoint>{

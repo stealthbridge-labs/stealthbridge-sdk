@@ -26,6 +26,8 @@ const expectedPackageFiles = [
   "dist/client.js",
   "dist/developer-readiness.d.ts",
   "dist/developer-readiness.js",
+  "dist/governance-release.d.ts",
+  "dist/governance-release.js",
   "dist/generated/api-wire.d.ts",
   "dist/generated/api-wire.js",
   "dist/index.d.ts",
