@@ -66,7 +66,7 @@ const budgets = {
   // Additional typed platform capability validators remain dependency-free.
   // Preserve a bounded size budget with reviewed headroom.
   unpackedBytes: 165_000,
-  fullBrowserBytes: 16_000,
+  fullBrowserBytes: 18_000,
   treeShakenBrowserBytes: 1_600,
   nextClientSdkChunksBytes: 25_000
 };

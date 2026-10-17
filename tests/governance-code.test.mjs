@@ -40,13 +40,13 @@ test("cannot forge current WASM match, admin claim, or payment readiness",()=>{
 test("SDK uses read-only path and rejects malicious current-code payload",async()=>{
  let calls=[];
  const client=new StealthBridgeClient({network:"testnet",apiBaseUrl:"https://api.example",fetchImpl:async(u,o)=>{
-  calls.push([u,o.method]);return new Response(JSON.stringify(golden),{status:200});
+  calls.push([u,o.method]);return new Response(JSON.stringify(golden),{status:200,headers:{"content-type":"application/json"}});
  }});
  assert.equal((await client.governanceCode()).all_executable_hashes_match_release,true);
  assert.deepEqual(calls,[["https://api.example/v1/governance/code","GET"]]);
  assert.equal("sign" in client,false);
  assert.equal("claimFees" in client,false);
  const bad=new StealthBridgeClient({network:"testnet",apiBaseUrl:"https://api.example",fetchImpl:async()=>
-  new Response(JSON.stringify({...golden,fee_collection_enabled:true}),{status:200})});
+  new Response(JSON.stringify({...golden,fee_collection_enabled:true}),{status:200,headers:{"content-type":"application/json"}})});
  await assert.rejects(bad.governanceCode(),e=>e instanceof ApiError&&e.status===502);
 });
