@@ -54,3 +54,6 @@ export type { ReviewOperation, BusinessEnvelopeInput, BusinessEnvelopeDigest } f
 
 export { readBusinessReviewStatus, validBusinessReviewStatus } from "./business-reader.js";
 export type { BusinessReviewStatus, ReviewReadOptions } from "./business-reader.js";
+
+export { assessRegistryUpgrade } from "./upgrade-review.js";
+export type { UpgradeableRegistry, UpgradeWindowState, PublicUpgradeProposal, RegistryUpgradeObservation, RegistryUpgradeAssessment } from "./upgrade-review.js";
