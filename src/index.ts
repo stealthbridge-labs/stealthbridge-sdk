@@ -51,3 +51,6 @@ export type { BusinessReviewRole, BusinessReviewPolicy, BusinessReviewRecord, Bu
 
 export { canonicalBusinessEnvelope, digestBusinessEnvelope } from "./business-envelope.js";
 export type { ReviewOperation, BusinessEnvelopeInput, BusinessEnvelopeDigest } from "./business-envelope.js";
+
+export { readBusinessReviewStatus, validBusinessReviewStatus } from "./business-reader.js";
+export type { BusinessReviewStatus, ReviewReadOptions } from "./business-reader.js";
