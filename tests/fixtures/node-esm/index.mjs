@@ -101,7 +101,9 @@ assert.deepEqual(Object.keys(await import("@stealthbridge/sdk")).sort(), [
   "listAvailableModules",
   "parseDeploymentManifest",
   "publicEvidenceReceipt",
+  "readBusinessReviewStatus",
   "readIntegrationSnapshot",
+  "validBusinessReviewStatus",
   "validPlatformCatalog"
 ]);
 
