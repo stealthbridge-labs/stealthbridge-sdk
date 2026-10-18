@@ -31,5 +31,47 @@ export type { TransferRail, TransferEvidence, TransferAssessment,
   PrivatePaymentsAdapterDesign, WalletOwnedAdapterDesign
 } from "./transfer-capability.js";
 
+export {readIntegrationSnapshot} from "./integration-snapshot.js";
+export type {IntegrationSnapshot,Observation} from "./integration-snapshot.js";
+
+export {assessPublicObservations,appendPublicEvidence,publicEvidenceReceipt} from "./observation-health.js";
+export type {PublicObservationInput,PublicNetworkEvidence,PersistedObserverEvidence,PublicReadinessEvidence,PublicCapabilityEvidence,PublicContractEvidence,PublicEvidenceAssessment,PublicEvidenceRecord,ObserverComparison,EvidenceVerdict} from "./observation-health.js";
+
+export { assertModuleAvailable, listAvailableModules, ProductCapabilityError } from "./product-capabilities.js";
+export type { ProductAudience, ProductModule, ReleaseStage, PrivacyMode, ModuleAvailability } from "./product-capabilities.js";
+
+export { validPlatformCatalog } from "./platform.js";
+export type { PlatformCatalog, PlatformModule, PlatformModuleId, PlatformAudience, PlatformAvailability } from "./platform.js";
+
+export { assessDeveloperReadiness } from "./developer-readiness.js";
+export type { DeveloperCheckId, DeveloperCheckState, DeveloperCheck, DeveloperReadiness, DeveloperObservation } from "./developer-readiness.js";
+
+export { assessBusinessReview, BusinessReviewError } from "./business-review.js";
+export type { BusinessReviewRole, BusinessReviewPolicy, BusinessReviewRecord, BusinessReviewResult, BusinessReviewErrorCode } from "./business-review.js";
+
+export { canonicalBusinessEnvelope, digestBusinessEnvelope } from "./business-envelope.js";
+export type { ReviewOperation, BusinessEnvelopeInput, BusinessEnvelopeDigest } from "./business-envelope.js";
+
+export { readBusinessReviewStatus, validBusinessReviewStatus } from "./business-reader.js";
+export type { BusinessReviewStatus, ReviewReadOptions } from "./business-reader.js";
+
+export { assessRegistryUpgrade } from "./upgrade-review.js";
+export type { UpgradeableRegistry, UpgradeWindowState, PublicUpgradeProposal, RegistryUpgradeObservation, RegistryUpgradeAssessment } from "./upgrade-review.js";
+// Explicit Testnet fee *quotes* only; charging/transfers remain disabled.
+export { quotePlatformFee, PlatformFeeError, DEFAULT_PLATFORM_FEE_BPS, MAX_PLATFORM_FEE_BPS } from "./platform-fees.js";
+export type { PlatformFeePolicy, PlatformFeeQuote } from "./platform-fees.js";
+
+export { validGovernanceRelease } from "./governance-release.js";
+export type { GovernanceRelease, GovernanceContractReceipt } from "./governance-release.js";
+
+export { validGovernanceCode } from "./governance-code.js";
+export type { GovernanceCodeObservation, GovernanceExecutable } from "./governance-code.js";
+
+export {validGovernanceAdministrator} from "./governance-administrator.js";
+export type {GovernanceAdministratorRecord,GovernanceAdministratorObservation} from "./governance-administrator.js";
+
+export { assessGovernanceObservations } from "./governance-assessment.js";
+export type { GovernanceAssessment } from "./governance-assessment.js";
+
 export {isContractStrKey,isActivityCursor,assertActivityFilters,validateActivityPage} from "./observer-activity.js";
 export type {ActivityContract,ActivityEvent,PublicActivityPage,ActivityFilters} from "./observer-activity.js";

@@ -4,6 +4,42 @@
 
 **Engineering roadmap:** [View the repository-specific plan](ROADMAP.md).
 
+## New: opt-in Testnet platform fee quotes (no fee collection)
+
+`quotePlatformFee` computes an **illustrative transparent fee** using
+`AssetAmount`'s exact bigint minor-unit arithmetic, not floating-point
+currency rounding. The default proposed rate is **10 bps (0.10%)**, with
+a **50 bps (0.50%) maximum**. Fees are included in the gross amount,
+rounded *down*, and may be zero for dust amounts. This quote is **not**
+a transfer, deduction, settlement, or approved Mainnet business rate.
+
+```ts
+import { AssetAmount, quotePlatformFee } from "@stealthbridge/sdk";
+
+const gross = AssetAmount.parse({
+  network: "testnet", kind: "stellar-classic", identifier: "XLM", decimals: 7,
+}, "100");
+
+const quote = quotePlatformFee(gross);
+// quote.platformFee.format()  -> "0.1"
+// quote.recipientAmount.format() -> "99.9"
+// quote.collectionEnabled -> false (always)
+```
+
+Read the [fee quote boundaries and future collector proposal](docs/PLATFORM-FEE-QUOTES.md).
+
+## Stellar Testnet governance deployments
+
+Three reviewed governance contracts were **deployed on Stellar Testnet on
+17 October 2026**. Their [verified C-addresses and on-chain receipts are published
+in the Contracts repository](https://github.com/stealthbridge-labs/stealthbridge-contracts/blob/main/deployments/testnet/VERIFIED-GOVERNANCE-RELEASE-2026-10-17.md).
+**The SDK's existing canonical v1 manifest is still a fail-closed legacy
+integration record**, and the SDK does **not** yet treat a static C-address as
+authorized for on-chain contract calls. A reviewed three-contract canonical v2
+migration and RPC-backed verification are required before enabling new read
+adapters. No payment, fee charge or privacy capability is implied.
+
+
 ## Platform architecture and SDK expansion
 
 **Full engineering guide:** [SDK architecture, versioning, compatibility and release gates](docs/ARCHITECTURE-AND-DELIVERY.md).

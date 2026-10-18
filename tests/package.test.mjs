@@ -16,32 +16,63 @@ const expectedPackageFiles = [
   "README.md",
   "dist/amount.d.ts",
   "dist/amount.js",
+  "dist/business-envelope.d.ts",
+  "dist/business-envelope.js",
+  "dist/business-reader.d.ts",
+  "dist/business-reader.js",
+  "dist/business-review.d.ts",
+  "dist/business-review.js",
   "dist/client.d.ts",
   "dist/client.js",
+  "dist/developer-readiness.d.ts",
+  "dist/developer-readiness.js",
   "dist/generated/api-wire.d.ts",
   "dist/generated/api-wire.js",
+  "dist/governance-administrator.d.ts",
+  "dist/governance-administrator.js",
+  "dist/governance-assessment.d.ts",
+  "dist/governance-assessment.js",
+  "dist/governance-code.d.ts",
+  "dist/governance-code.js",
+  "dist/governance-release.d.ts",
+  "dist/governance-release.js",
   "dist/index.d.ts",
   "dist/index.js",
+  "dist/integration-snapshot.d.ts",
+  "dist/integration-snapshot.js",
   "dist/manifest.d.ts",
   "dist/manifest.js",
   "dist/observer-activity.d.ts",
   "dist/observer-activity.js",
+  "dist/observation-health.d.ts",
+  "dist/observation-health.js",
+  "dist/platform-fees.d.ts",
+  "dist/platform-fees.js",
+  "dist/platform.d.ts",
+  "dist/platform.js",
+  "dist/product-capabilities.d.ts",
+  "dist/product-capabilities.js",
   "dist/settlement.d.ts",
   "dist/settlement.js",
   "dist/transfer-capability.d.ts",
   "dist/transfer-capability.js",
   "dist/types.d.ts",
   "dist/types.js",
+  "dist/upgrade-review.d.ts",
+  "dist/upgrade-review.js",
   "dist/wallet.d.ts",
   "dist/wallet.js",
   "package.json"
 ];
 const budgets = {
-  packedBytes: 28_000,
-  // CI measurement: 85,037 B includes reviewed Testnet observer validators.
-  // Require a hard 90 KB unpacked archive ceiling and 16 KB full-browser cap.
-  unpackedBytes: 90_000,
-  fullBrowserBytes: 16_000,
+  // Account for one bounded, dependency-free snapshot module. Still fail
+  // changes adding large packages, Node-only builtins or hidden code.
+  packedBytes: 57_000,
+  // Reviewed observation-health .js and .d.ts add 2,841 bytes over v0.2.
+  // Additional typed platform capability validators remain dependency-free.
+  // Preserve a bounded size budget with reviewed headroom.
+  unpackedBytes: 165_000,
+  fullBrowserBytes: 20_000,
   treeShakenBrowserBytes: 1_600,
   nextClientSdkChunksBytes: 25_000
 };
