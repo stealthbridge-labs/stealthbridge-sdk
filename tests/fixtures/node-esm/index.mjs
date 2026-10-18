@@ -90,6 +90,7 @@ assert.deepEqual(Object.keys(await import("@stealthbridge/sdk")).sort(), [
   "assertSettlementTransition",
   "assessBusinessReview",
   "assessDeveloperReadiness",
+  "assessGovernanceObservations",
   "assessPublicObservations",
   "assessRegistryUpgrade",
   "canTransitionSettlement",
