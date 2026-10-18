@@ -69,3 +69,6 @@ export type { GovernanceCodeObservation, GovernanceExecutable } from "./governan
 
 export {validGovernanceAdministrator} from "./governance-administrator.js";
 export type {GovernanceAdministratorRecord,GovernanceAdministratorObservation} from "./governance-administrator.js";
+
+export { assessGovernanceObservations } from "./governance-assessment.js";
+export type { GovernanceAssessment } from "./governance-assessment.js";
