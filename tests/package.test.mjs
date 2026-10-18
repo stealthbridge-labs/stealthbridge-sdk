@@ -72,7 +72,9 @@ const budgets = {
   // Additional typed platform capability validators remain dependency-free.
   // Preserve a bounded size budget with reviewed headroom.
   unpackedBytes: 165_000,
-  fullBrowserBytes: 20_000,
+  // Reviewed 22,718-byte full bundle after restoring read-only governance and platform clients.
+  // Allow bounded headroom, not a blanket removal of browser-size limits.
+  fullBrowserBytes: 24_000,
   treeShakenBrowserBytes: 1_600,
   nextClientSdkChunksBytes: 25_000
 };
