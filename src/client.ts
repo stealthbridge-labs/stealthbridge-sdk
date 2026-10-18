@@ -1,6 +1,7 @@
 import {validPlatformCatalog, type PlatformCatalog} from "./platform.js";
 import {validGovernanceRelease, type GovernanceRelease} from "./governance-release.js";
 import {validGovernanceCode, type GovernanceCodeObservation} from "./governance-code.js";
+import {validGovernanceAdministrator, type GovernanceAdministratorObservation} from "./governance-administrator.js";
 import type {Capabilities,Corridor,Network,NetworkStatus,TransactionObservation,CorridorPage,LedgerCheckpoint,Readiness,ContractDiscovery,PublicSorobanInterface} from "./types.js";
 
 export interface ClientConfig {
@@ -305,6 +306,10 @@ export class StealthBridgeClient {
  /** Read the authoritative *undeployed* contract snapshot, never a claimed payout. */
  contracts(options?:RequestOptions):Promise<ContractDiscovery>{
   return this.read("/v1/contracts",contractDiscovery,options);
+ }
+ /** Observe stored current administrators; never imply signer control or custody. */
+ governanceAdministrator(options?:RequestOptions):Promise<GovernanceAdministratorObservation>{
+  return this.read("/v1/governance/admin",validGovernanceAdministrator,options);
  }
  /** Read the current TESTNET contract instance executable hashes, not user funds. */
  governanceCode(options?:RequestOptions):Promise<GovernanceCodeObservation>{

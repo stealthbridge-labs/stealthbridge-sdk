@@ -28,6 +28,8 @@ const expectedPackageFiles = [
   "dist/developer-readiness.js",
   "dist/generated/api-wire.d.ts",
   "dist/generated/api-wire.js",
+  "dist/governance-administrator.d.ts",
+  "dist/governance-administrator.js",
   "dist/governance-code.d.ts",
   "dist/governance-code.js",
   "dist/governance-release.d.ts",
@@ -66,7 +68,7 @@ const budgets = {
   // Additional typed platform capability validators remain dependency-free.
   // Preserve a bounded size budget with reviewed headroom.
   unpackedBytes: 165_000,
-  fullBrowserBytes: 18_000,
+  fullBrowserBytes: 20_000,
   treeShakenBrowserBytes: 1_600,
   nextClientSdkChunksBytes: 25_000
 };

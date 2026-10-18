@@ -66,3 +66,6 @@ export type { GovernanceRelease, GovernanceContractReceipt } from "./governance-
 
 export { validGovernanceCode } from "./governance-code.js";
 export type { GovernanceCodeObservation, GovernanceExecutable } from "./governance-code.js";
+
+export {validGovernanceAdministrator} from "./governance-administrator.js";
+export type {GovernanceAdministratorRecord,GovernanceAdministratorObservation} from "./governance-administrator.js";
