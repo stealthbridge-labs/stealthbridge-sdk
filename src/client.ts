@@ -1,8 +1,6 @@
-import {validPlatformCatalog, type PlatformCatalog} from "./platform.js";
-import {validGovernanceRelease, type GovernanceRelease} from "./governance-release.js";
-import {validGovernanceCode, type GovernanceCodeObservation} from "./governance-code.js";
-import {validGovernanceAdministrator, type GovernanceAdministratorObservation} from "./governance-administrator.js";
 import type {Capabilities,Corridor,Network,NetworkStatus,TransactionObservation,CorridorPage,LedgerCheckpoint,Readiness,ContractDiscovery,PublicSorobanInterface} from "./types.js";
+import {assertActivityFilters,validateActivityPage} from "./observer-activity.js";
+import type {ActivityFilters,PublicActivityPage} from "./observer-activity.js";
 
 export interface ClientConfig {
  apiBaseUrl:string;
@@ -299,29 +297,26 @@ export class StealthBridgeClient {
    signal.addEventListener("abort",abort,{once:true});
   });
  }
- /** Query product scope without acquiring payment authority. */
- platformModules(options?:RequestOptions):Promise<PlatformCatalog>{
-  return this.read("/v1/platform/modules",validPlatformCatalog,options);
- }
  /** Read the authoritative *undeployed* contract snapshot, never a claimed payout. */
  contracts(options?:RequestOptions):Promise<ContractDiscovery>{
   return this.read("/v1/contracts",contractDiscovery,options);
  }
- /** Observe stored current administrators; never imply signer control or custody. */
- governanceAdministrator(options?:RequestOptions):Promise<GovernanceAdministratorObservation>{
-  return this.read("/v1/governance/admin",validGovernanceAdministrator,options);
- }
- /** Read the current TESTNET contract instance executable hashes, not user funds. */
- governanceCode(options?:RequestOptions):Promise<GovernanceCodeObservation>{
-  return this.read("/v1/governance/code",validGovernanceCode,options);
- }
- /** Public Testnet deployment receipts; explicitly not fresh WASM or signing authority. */
- governanceRelease(options?:RequestOptions):Promise<GovernanceRelease>{
-  return this.read("/v1/governance/release",validGovernanceRelease,options);
- }
  /** Last persisted opt-in observer head. 404 means no checkpoint, not a fictional ledger. */
  observerHead(options?:RequestOptions):Promise<LedgerCheckpoint>{
   return this.read("/v1/observer",ledgerCheckpoint,options);
+ }
+ /** Bounded, historical PUBLIC Soroban event identifiers from the read-only journal.
+  * Never treats an event as a verified private transfer, payout or proof.
+  */
+ observerActivity(options:ActivityFilters&RequestOptions={}):Promise<PublicActivityPage>{
+  const limit=assertActivityFilters(options);
+  const params=new URLSearchParams({limit:String(limit)});
+  if(options.contractId)params.set("contract_id",options.contractId);
+  if(options.before)params.set("before",options.before);
+  const filters:ActivityFilters={limit,...(options.contractId?{contractId:options.contractId}:{}),
+   ...(options.before?{before:options.before}:{})};
+  return this.read("/v1/observer/activity?"+params,
+    (value):value is PublicActivityPage=>validateActivityPage(value,filters),options);
  }
  /** Read dependency health, explicitly not evidence of live payment capability. */
  readiness(options?:RequestOptions):Promise<Readiness>{

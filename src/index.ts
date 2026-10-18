@@ -72,3 +72,6 @@ export type {GovernanceAdministratorRecord,GovernanceAdministratorObservation} f
 
 export { assessGovernanceObservations } from "./governance-assessment.js";
 export type { GovernanceAssessment } from "./governance-assessment.js";
+
+export {isContractStrKey,isActivityCursor,assertActivityFilters,validateActivityPage} from "./observer-activity.js";
+export type {ActivityContract,ActivityEvent,PublicActivityPage,ActivityFilters} from "./observer-activity.js";
