@@ -30,6 +30,8 @@ const expectedPackageFiles = [
   "dist/generated/api-wire.js",
   "dist/governance-administrator.d.ts",
   "dist/governance-administrator.js",
+  "dist/governance-assessment.d.ts",
+  "dist/governance-assessment.js",
   "dist/governance-code.d.ts",
   "dist/governance-code.js",
   "dist/governance-release.d.ts",
