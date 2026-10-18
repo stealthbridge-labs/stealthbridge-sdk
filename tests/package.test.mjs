@@ -36,6 +36,8 @@ const expectedPackageFiles = [
   "dist/governance-code.js",
   "dist/governance-release.d.ts",
   "dist/governance-release.js",
+  "dist/governance-snapshot.d.ts",
+  "dist/governance-snapshot.js",
   "dist/index.d.ts",
   "dist/index.js",
   "dist/integration-snapshot.d.ts",
