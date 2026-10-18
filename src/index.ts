@@ -75,3 +75,6 @@ export type { GovernanceAssessment } from "./governance-assessment.js";
 
 export {isContractStrKey,isActivityCursor,assertActivityFilters,validateActivityPage} from "./observer-activity.js";
 export type {ActivityContract,ActivityEvent,PublicActivityPage,ActivityFilters} from "./observer-activity.js";
+
+export {validGovernanceSnapshot} from "./governance-snapshot.js";
+export type {GovernanceSnapshot} from "./governance-snapshot.js";

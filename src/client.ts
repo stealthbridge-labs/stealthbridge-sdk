@@ -2,6 +2,7 @@ import {validPlatformCatalog, type PlatformCatalog} from "./platform.js";
 import {validGovernanceRelease, type GovernanceRelease} from "./governance-release.js";
 import {validGovernanceCode, type GovernanceCodeObservation} from "./governance-code.js";
 import {validGovernanceAdministrator, type GovernanceAdministratorObservation} from "./governance-administrator.js";
+import {validGovernanceSnapshot,type GovernanceSnapshot} from "./governance-snapshot.js";
 import type {Capabilities,Corridor,Network,NetworkStatus,TransactionObservation,CorridorPage,LedgerCheckpoint,Readiness,ContractDiscovery,PublicSorobanInterface} from "./types.js";
 import {assertActivityFilters,validateActivityPage} from "./observer-activity.js";
 import type {ActivityFilters,PublicActivityPage} from "./observer-activity.js";
@@ -320,6 +321,10 @@ export class StealthBridgeClient {
  /** Public Testnet deployment receipts; explicitly not fresh WASM or signing authority. */
  governanceRelease(options?:RequestOptions):Promise<GovernanceRelease>{
   return this.read("/v1/governance/release",validGovernanceRelease,options);
+ }
+ /** Single-ledger public governance observations. Never permits payment execution. */
+ governanceSnapshot(options?:RequestOptions):Promise<GovernanceSnapshot>{
+  return this.read("/v1/governance/snapshot",validGovernanceSnapshot,options);
  }
  /** Last persisted opt-in observer head. 404 means no checkpoint, not a fictional ledger. */
  observerHead(options?:RequestOptions):Promise<LedgerCheckpoint>{

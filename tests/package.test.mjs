@@ -36,6 +36,8 @@ const expectedPackageFiles = [
   "dist/governance-code.js",
   "dist/governance-release.d.ts",
   "dist/governance-release.js",
+  "dist/governance-snapshot.d.ts",
+  "dist/governance-snapshot.js",
   "dist/index.d.ts",
   "dist/index.js",
   "dist/integration-snapshot.d.ts",
@@ -74,9 +76,11 @@ const budgets = {
   unpackedBytes: 165_000,
   // Reviewed 22,718-byte full bundle after restoring read-only governance and platform clients.
   // Allow bounded headroom, not a blanket removal of browser-size limits.
-  fullBrowserBytes: 24_000,
+  // 25,755 measured after adding strictly validated, dependency-free governance snapshot.
+  fullBrowserBytes: 28_000,
   treeShakenBrowserBytes: 1_600,
-  nextClientSdkChunksBytes: 25_000
+  // 26,458 measured for the pinned Next.js consumer; retain a narrow regression cap.
+  nextClientSdkChunksBytes: 28_000
 };
 const forbiddenModulePattern = /^(?:node:|fs(?:\/|$)|crypto(?:\/|$)|path(?:\/|$)|child_process(?:\/|$)|worker_threads(?:\/|$)|net(?:\/|$)|tls(?:\/|$))/;
 const secretMaterialPattern = /\b(?:privateKey|secretKey|mnemonic|seedPhrase|recoveryPhrase|walletSecret)\b/i;
