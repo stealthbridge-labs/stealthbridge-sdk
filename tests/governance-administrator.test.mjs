@@ -12,6 +12,7 @@ const golden={
  schema_version:1,network:"testnet",
  source:"stellar-rpc/getLedgerEntries/contract-instance-storage",
  observed_ledger_sequence:5300000,
+ observed_ledger_closed_at_unix:String(Math.floor(Date.now()/1000)),
  reviewed_release_executable_hashes_confirmed:true,
  administrator_entries_read_from_current_storage:true,
  same_administrator_for_all_contracts:true,
@@ -27,6 +28,17 @@ const golden={
 };
 test("strictly validates current Testnet stored governance admin observations",()=>{
  assert.equal(validGovernanceAdministrator(golden),true);
+});
+test("untrusted or replayed administrator ownership checks cannot bypass fresh Testnet time",()=>{
+ const current=Math.floor(Date.now()/1000);
+ for(const [v,ok] of [
+   [String(current-181),false],[String(current+31),false],
+   ["0",false],["not-a-number",false],["999999999999999999999",false],
+   [String(current-10),true]
+ ]){
+  assert.equal(validGovernanceAdministrator({...golden,observed_ledger_closed_at_unix:v}),ok,
+    "reject stale/future/noncanonical close time "+v);
+ }
 });
 test("authorized administrator migration and staged recovery are visible without custody",()=>{
  const records=structuredClone(golden.contracts);
