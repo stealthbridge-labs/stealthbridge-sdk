@@ -2,6 +2,12 @@
 
 # StealthBridge SDK
 
+## Cross-repository integration and governance status
+
+Three Rust/Soroban **public governance contracts are deployed on Stellar Testnet**, with real contract IDs, deployment transactions and executable hashes recorded in the [Contracts release report](https://github.com/stealthbridge-labs/stealthbridge-contracts/blob/main/deployments/testnet/VERIFIED-GOVERNANCE-RELEASE-2026-10-17.md). The backend observes the network, deployment receipts, current code and administrator state through read-only public ledger operations; the frontend uses the server-side same-origin proxy for those reads. The SDK publishes **typed validation for the backend's governance release, code and administrator observations** and a fail-closed cross-observation assessment, alongside network, corridor and historical public activity readers. See the [organization integration topology](https://github.com/stealthbridge-labs/.github/blob/main/docs/INTEGRATION-TOPOLOGY.md).
+
+The SDK's validators check shape/consistency; they do **not** authenticate an independently signed canonical manifest or enable wallet-controlled on-chain invocations. The legacy canonical manifest v1 is `not-deployed` despite actual governance deployment and still needs a reviewed three-contract replacement. Signing, confidential asset transfers, fee collection and payout methods are unavailable. The package is **not** itself the deployed API service.
+
 **Engineering roadmap:** [View the repository-specific plan](ROADMAP.md).
 
 ## New: opt-in Testnet platform fee quotes (no fee collection)
