@@ -4,7 +4,8 @@ import {validGovernanceCode, type GovernanceCodeObservation} from "./governance-
 import {validGovernanceAdministrator, type GovernanceAdministratorObservation} from "./governance-administrator.js";
 import {validGovernanceSnapshot,type GovernanceSnapshot} from "./governance-snapshot.js";
 import type {Capabilities,Corridor,Network,NetworkStatus,TransactionObservation,CorridorPage,LedgerCheckpoint,Readiness,ContractDiscovery,PublicSorobanInterface} from "./types.js";
-import {assertActivityFilters,validateActivityPage} from "./observer-activity.js";
+import {assertActivityFilters,validateActivityPage,isContractStrKey} from "./observer-activity.js";
+import {validContractObservation,type ContractObservation} from "./contract-observation.js";
 import {validObserverSchema,type ObserverSchema} from "./observer-schema.js";
 import type {ActivityFilters,PublicActivityPage} from "./observer-activity.js";
 
@@ -330,6 +331,12 @@ export class StealthBridgeClient {
  /** Read-only SQLx schema diagnostic; never evidence of a running worker. */
  observerSchema(options?:RequestOptions):Promise<ObserverSchema>{
   return this.read("/v1/observer/schema",validObserverSchema,options);
+ }
+ /** Consent-based Testnet C-address inspection. Contract presence is NOT smart-wallet custody. */
+ contractObservation(address:string,options?:RequestOptions):Promise<ContractObservation>{
+  if(!isContractStrKey(address))throw new TypeError("Use a checksummed Stellar C-address.");
+  return this.read("/v1/wallet/contracts/"+address,
+   (value):value is ContractObservation=>validContractObservation(value,address),options);
  }
  /** Last persisted opt-in observer head. 404 means no checkpoint, not a fictional ledger. */
  observerHead(options?:RequestOptions):Promise<LedgerCheckpoint>{
