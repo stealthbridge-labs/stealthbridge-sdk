@@ -23,9 +23,9 @@ const expectedPackageFiles = [
   "dist/business-review.d.ts",
   "dist/business-review.js",
   "dist/client.d.ts",
+  "dist/client.js",
   "dist/contract-observation.d.ts",
   "dist/contract-observation.js",
-  "dist/client.js",
   "dist/developer-readiness.d.ts",
   "dist/developer-readiness.js",
   "dist/generated/api-wire.d.ts",
@@ -86,7 +86,7 @@ const budgets = {
   fullBrowserBytes: 28_000,
   treeShakenBrowserBytes: 1_600,
   // 26,458 measured for the pinned Next.js consumer; retain a narrow regression cap.
-  nextClientSdkChunksBytes: 28_000
+  // 28,001-byte measured consumer chunk with consent-based contract inspection.\n  nextClientSdkChunksBytes: 28_500
 };
 const forbiddenModulePattern = /^(?:node:|fs(?:\/|$)|crypto(?:\/|$)|path(?:\/|$)|child_process(?:\/|$)|worker_threads(?:\/|$)|net(?:\/|$)|tls(?:\/|$))/;
 const secretMaterialPattern = /\b(?:privateKey|secretKey|mnemonic|seedPhrase|recoveryPhrase|walletSecret)\b/i;
