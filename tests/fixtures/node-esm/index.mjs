@@ -117,6 +117,7 @@ assert.deepEqual(Object.keys(await import("@stealthbridge/sdk")).sort(), [
   "validGovernanceCode",
   "validGovernanceRelease",
   "validGovernanceSnapshot",
+  "validObserverSchema",
   "validPlatformCatalog",
   "validateActivityPage"
 ]);

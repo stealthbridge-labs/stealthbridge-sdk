@@ -78,3 +78,6 @@ export type {ActivityContract,ActivityEvent,PublicActivityPage,ActivityFilters} 
 
 export {validGovernanceSnapshot} from "./governance-snapshot.js";
 export type {GovernanceSnapshot} from "./governance-snapshot.js";
+
+export {validObserverSchema} from "./observer-schema.js";
+export type {ObserverSchema} from "./observer-schema.js";

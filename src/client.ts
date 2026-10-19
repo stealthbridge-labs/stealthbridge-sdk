@@ -5,6 +5,7 @@ import {validGovernanceAdministrator, type GovernanceAdministratorObservation} f
 import {validGovernanceSnapshot,type GovernanceSnapshot} from "./governance-snapshot.js";
 import type {Capabilities,Corridor,Network,NetworkStatus,TransactionObservation,CorridorPage,LedgerCheckpoint,Readiness,ContractDiscovery,PublicSorobanInterface} from "./types.js";
 import {assertActivityFilters,validateActivityPage} from "./observer-activity.js";
+import {validObserverSchema,type ObserverSchema} from "./observer-schema.js";
 import type {ActivityFilters,PublicActivityPage} from "./observer-activity.js";
 
 export interface ClientConfig {
@@ -325,6 +326,10 @@ export class StealthBridgeClient {
  /** Single-ledger public governance observations. Never permits payment execution. */
  governanceSnapshot(options?:RequestOptions):Promise<GovernanceSnapshot>{
   return this.read("/v1/governance/snapshot",validGovernanceSnapshot,options);
+ }
+ /** Read-only SQLx schema diagnostic; never evidence of a running worker. */
+ observerSchema(options?:RequestOptions):Promise<ObserverSchema>{
+  return this.read("/v1/observer/schema",validObserverSchema,options);
  }
  /** Last persisted opt-in observer head. 404 means no checkpoint, not a fictional ledger. */
  observerHead(options?:RequestOptions):Promise<LedgerCheckpoint>{
