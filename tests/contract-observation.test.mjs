@@ -19,7 +19,7 @@ test("contract presence never proves smart-account control or private-payment au
   assert.equal(validContractObservation(changed,C),false);
  }
  assert.equal(validContractObservation({...v,contract_address:"not-matching"},C),false);
- assert.equal(validContractObservation({...v,contract_instance_found:false,executable_wasm_hash:null},C),true);
+ assert.equal(validContractObservation({...v,contract_instance_found:false,executable_wasm_hash:null,live_until_ledger:null},C),true);
 });
 test("SDK contract inspection is a single validated GET only",async()=>{
  const calls=[];
