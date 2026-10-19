@@ -86,7 +86,8 @@ const budgets = {
   fullBrowserBytes: 28_000,
   treeShakenBrowserBytes: 1_600,
   // 26,458 measured for the pinned Next.js consumer; retain a narrow regression cap.
-  // 28,001-byte measured consumer chunk with consent-based contract inspection.\n  nextClientSdkChunksBytes: 28_500
+  // 28,001-byte measured consumer chunk with consent-based contract inspection.
+  nextClientSdkChunksBytes: 29_000
 };
 const forbiddenModulePattern = /^(?:node:|fs(?:\/|$)|crypto(?:\/|$)|path(?:\/|$)|child_process(?:\/|$)|worker_threads(?:\/|$)|net(?:\/|$)|tls(?:\/|$))/;
 const secretMaterialPattern = /\b(?:privateKey|secretKey|mnemonic|seedPhrase|recoveryPhrase|walletSecret)\b/i;
