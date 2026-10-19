@@ -23,6 +23,8 @@ const expectedPackageFiles = [
   "dist/business-review.d.ts",
   "dist/business-review.js",
   "dist/client.d.ts",
+  "dist/contract-observation.d.ts",
+  "dist/contract-observation.js",
   "dist/client.js",
   "dist/developer-readiness.d.ts",
   "dist/developer-readiness.js",
