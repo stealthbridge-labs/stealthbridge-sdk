@@ -54,6 +54,8 @@ const expectedPackageFiles = [
   "dist/platform-fees.js",
   "dist/platform.d.ts",
   "dist/platform.js",
+  "dist/private-transfer.d.ts",
+  "dist/private-transfer.js",
   "dist/product-capabilities.d.ts",
   "dist/product-capabilities.js",
   "dist/settlement.d.ts",

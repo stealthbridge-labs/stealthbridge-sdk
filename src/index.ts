@@ -81,3 +81,6 @@ export type {GovernanceSnapshot} from "./governance-snapshot.js";
 
 export {validObserverSchema} from "./observer-schema.js";
 export type {ObserverSchema} from "./observer-schema.js";
+
+export {classifyPublicStellarAddress,preparePrivateTransfer} from "./private-transfer.js";
+export type {PublicAddressIdentity,PrivacyRail,PaymentPreparation} from "./private-transfer.js";
