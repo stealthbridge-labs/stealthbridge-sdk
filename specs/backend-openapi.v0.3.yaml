@@ -45,6 +45,45 @@ paths:
               schema: {$ref: "#/components/schemas/LedgerCheckpoint"}
         "404": {$ref: "#/components/responses/ApiError"}
         "503": {$ref: "#/components/responses/ApiError"}
+  /v1/wallet/contracts/{address}:
+    get:
+      operationId: publicContractInstance
+      summary: Consent-based public Testnet contract-instance read, not smart-wallet authorization
+      parameters:
+        - in: path
+          name: address
+          required: true
+          schema: {type: string, pattern: '^C[A-Z2-7]{55}$'}
+      responses:
+        "200":
+          description: Active contract instance or explicit absence; signer and financial flags false
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                required: [schema_version, network, source, contract_address, contract_instance_found,
+                  observed_ledger_sequence, executable_wasm_hash, live_until_ledger,
+                  smart_account_verified, signer_authority_verified, privacy_verified,
+                  payment_execution_enabled, fee_collection_enabled]
+                properties:
+                  schema_version: {type: integer, const: 1}
+                  network: {type: string, const: testnet}
+                  source: {type: string, const: stellar-rpc/getLedgerEntries}
+                  contract_address: {type: string, pattern: '^C[A-Z2-7]{55}$'}
+                  contract_instance_found: {type: boolean}
+                  observed_ledger_sequence: {type: integer, minimum: 1}
+                  executable_wasm_hash: {type: [string, 'null']}
+                  live_until_ledger: {type: [integer, 'null']}
+                  smart_account_verified: {type: boolean, const: false}
+                  signer_authority_verified: {type: boolean, const: false}
+                  privacy_verified: {type: boolean, const: false}
+                  payment_execution_enabled: {type: boolean, const: false}
+                  fee_collection_enabled: {type: boolean, const: false}
+        "400": {$ref: "#/components/responses/ApiError"}
+        "429": {$ref: "#/components/responses/ApiError"}
+        "502": {$ref: "#/components/responses/ApiError"}
+        "503": {$ref: "#/components/responses/ApiError"}
   /v1/network:
     get:
       operationId: network
