@@ -40,5 +40,6 @@ test("contract recipient presence is address-bound and never grants transfer aut
  assert.equal(activePublicContractAtAddress({...present,contract_instance_found:false,executable_wasm_hash:null,live_until_ledger:null},C),false);
  assert.equal(activePublicContractAtAddress({...present,live_until_ledger:present.observed_ledger_sequence-1},C),false);
  assert.equal(activePublicContractAtAddress({...present,smart_account_verified:true},C),false);
+ assert.equal(activePublicContractAtAddress({...present,contract_address:"C".repeat(56)},"C".repeat(56)),false);
  assert.equal(activePublicContractAtAddress(null,C),false);
 });
