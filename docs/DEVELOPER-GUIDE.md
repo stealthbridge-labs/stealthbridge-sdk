@@ -168,3 +168,15 @@ const snapshot=await readIntegrationSnapshot(client,{signal:controller.signal,ma
 The helper runs exactly five **GET** requests (network, persisted ledger, dependency readiness, capability flags, undeployed manifest), each through the SDK's existing runtime validator. It never masks invalid data as a successful record, never falls back to local fixture data, and never equates a recent *persisted* checkpoint with a fresh *live* RPC ledger. `ledger_freshness` is derived only from the live network response with a configurable threshold (default 180 seconds, max 3600). Failed requests expose only bounded status and reason labels; raw error content, wallet accounts and RPC payloads are not returned. The mandatory `payment_execution_enabled` output is always `false`.
 
 This is additive to SDK v0.2's API surface. It is not a published, executable transfer adapter or a cryptographic audit. The frontend may reuse the type mirrors and direct same-origin reads until the SDK is delivered as a reproducibly installed package.
+
+## Consent-only C-address recipient assessment
+
+`activePublicContractAtAddress(observation, address)` returns `true` only
+when the existing strict `ContractObservation` validator accepts the response
+for the **exact address** and finds a live public instance. It returns `false`
+for absence, mismatched addresses, malformed evidence, expired TTL or any
+unexpected positive financial/signer flags. Call
+`client.contractObservation(address)` only after visitor consent. This
+helper is suitable for local draft presence gating **only**: it does not
+establish owner identity, accepted assets, smart-account authorization,
+privacy, payability or payment readiness. Payment commands remain disabled.
