@@ -32,3 +32,11 @@ export function validContractObservation(data:unknown,address:string):data is Co
  return typeof v.executable_wasm_hash==="string"&&/^[a-f0-9]{64}$/.test(v.executable_wasm_hash)&&
    Number.isSafeInteger(v.live_until_ledger)&&Number(v.live_until_ledger)>=Number(v.observed_ledger_sequence);
 }
+
+/** Consent-only public C-address presence. This never verifies account ownership,
+ * custom __check_auth permissions, proof validity, or permission to transfer.
+ * Unknown, absent, stale/invalid or mismatched observations always return false.
+ */
+export function activePublicContractAtAddress(data:unknown,address:string):boolean {
+ return validContractObservation(data,address) && data.contract_instance_found;
+}
