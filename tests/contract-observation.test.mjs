@@ -1,6 +1,6 @@
 import {test} from "node:test";
 import assert from "node:assert/strict";
-import {StealthBridgeClient,validContractObservation} from "../dist/index.js";
+import {StealthBridgeClient,validContractObservation,activePublicContractAtAddress} from "../dist/index.js";
 
 const C="CDS6HBE6YJSZTRG3VR2HLCNHWJZMKB43BLFFEHEH3Z76WXAF46LW7JOB";
 const observation=()=>({
@@ -31,4 +31,14 @@ test("SDK contract inspection is a single validated GET only",async()=>{
  assert.equal((await client.contractObservation(C)).contract_instance_found,true);
  assert.deepEqual(calls,[["/api/bridge/v1/wallet/contracts/"+C,"GET"]]);
  assert.throws(()=>client.contractObservation("not-an-address"),TypeError);
+});
+
+test("contract recipient presence is address-bound and never grants transfer authority",()=>{
+ const present=observation();
+ assert.equal(activePublicContractAtAddress(present,C),true);
+ assert.equal(activePublicContractAtAddress({...present,contract_address:"C".repeat(56)},C),false);
+ assert.equal(activePublicContractAtAddress({...present,contract_instance_found:false,executable_wasm_hash:null,live_until_ledger:null},C),false);
+ assert.equal(activePublicContractAtAddress({...present,live_until_ledger:present.observed_ledger_sequence-1},C),false);
+ assert.equal(activePublicContractAtAddress({...present,smart_account_verified:true},C),false);
+ assert.equal(activePublicContractAtAddress(null,C),false);
 });
