@@ -55,7 +55,7 @@ export async function readAccountDirectory(
  if(!canonicalStellarAccountAddress(address))throw new TypeError("Invalid Stellar account.");
  const fetcher=options.fetchImpl??fetch;
  const response=await fetcher("/api/account/directory",{
-  method:"GET",cache:"no-store",credentials:"same-origin",signal:options.signal,
+  method:"GET",cache:"no-store",credentials:"same-origin",...(options.signal?{signal:options.signal}:{}),
   headers:{accept:"application/json"}
  });
  if(!response.ok)throw new Error("Private organization directory unavailable.");
