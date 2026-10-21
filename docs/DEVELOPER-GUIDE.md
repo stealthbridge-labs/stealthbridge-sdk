@@ -199,3 +199,20 @@ Unrecognized organizations and roles, mismatched account identity, forged
 financial capability flags, missing session, schema errors or unavailable
 Neon must cause a visible failed read, not an invented empty result.
 No organization is provisioned and no legal/KYC status is inferred.
+
+## Optional customer profile (non-financial, signed-in)
+
+Use `readCustomerProfile(expectedAddress)` and
+`saveCustomerPreferences(expectedAddress,preferences)` from a browser
+holding a valid StealthBridge session. Neither call submits a transaction,
+signs a wallet message, creates a business, validates identity, stores
+private keys, or makes payments. Every response is checked by
+`validAccountProfileEnvelope` against the expected authenticated G-address
+and literal `payment_execution_enabled:false` and
+`organization_payment_authorized:false`. Each saved preference is
+deliberately limited to display name, usage intent and optional self-declared
+residence code. POST/PUT financial capability does not exist.
+
+A production database migration is required before preferences can be
+persisted. SDK callers must handle 503 as not available, never substitute
+pretend profiles or success states.
