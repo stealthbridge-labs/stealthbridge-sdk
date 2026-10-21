@@ -81,7 +81,9 @@ const budgets = {
   // Reviewed observation-health .js and .d.ts add 2,841 bytes over v0.2.
   // Additional typed platform capability validators remain dependency-free.
   // Preserve a bounded size budget with reviewed headroom.
-  unpackedBytes: 170_000,
+  // CI measured 172,355 B after adding the strictly scoped customer
+  // membership .d.ts and .js. Keep under 176 KB (3.6 KB headroom).
+  unpackedBytes: 176_000,
   // Reviewed 22,718-byte full bundle after restoring read-only governance and platform clients.
   // Allow bounded headroom, not a blanket removal of browser-size limits.
   // 25,755 measured after adding strictly validated, dependency-free governance snapshot.
