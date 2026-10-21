@@ -87,3 +87,6 @@ export type {ObserverSchema} from "./observer-schema.js";
 
 export {classifyPublicStellarAddress,preparePrivateTransfer} from "./private-transfer.js";
 export type {PublicAddressIdentity,PrivacyRail as PreparedPrivacyRoute,PaymentPreparation} from "./private-transfer.js";
+
+export {validAccountDirectory,readAccountDirectory} from "./account-directory.js";
+export type {AccountDirectory,AccountOrganization,AccountMemberRole} from "./account-directory.js";
