@@ -90,3 +90,6 @@ export type {PublicAddressIdentity,PrivacyRail as PreparedPrivacyRoute,PaymentPr
 
 export {validAccountDirectory,readAccountDirectory} from "./account-directory.js";
 export type {AccountDirectory,AccountOrganization,AccountMemberRole} from "./account-directory.js";
+
+export {validProfilePreferences,validAccountProfileEnvelope,readCustomerProfile,saveCustomerPreferences} from "./account-profile.js";
+export type {ProfileUseCase,ProfilePreferences,CustomerProfile,AccountProfileEnvelope} from "./account-profile.js";
