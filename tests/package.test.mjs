@@ -14,6 +14,8 @@ const fixtures = path.join(root, "tests", "fixtures");
 const artifacts = path.join(root, "artifacts");
 const expectedPackageFiles = [
   "README.md",
+  "dist/account-directory.d.ts",
+  "dist/account-directory.js",
   "dist/amount.d.ts",
   "dist/amount.js",
   "dist/business-envelope.d.ts",
