@@ -180,3 +180,22 @@ unexpected positive financial/signer flags. Call
 helper is suitable for local draft presence gating **only**: it does not
 establish owner identity, accepted assets, smart-account authorization,
 privacy, payability or payment readiness. Payment commands remain disabled.
+
+## Authenticated account directory (Testnet, read-only)
+
+`readAccountDirectory(address)` reads only
+`GET /api/account/directory` with same-origin session credentials. The
+SDK never transmits an asserted account address in the request, an HMAC
+key, seed phrase or payment intent; it merely checks the signed-in response
+against the expected local public G-address using
+`validAccountDirectory(response,address)`. Its strict schema includes
+actual active organization memberships from the Rust/Neon backend with
+payment and authorization flags permanently `false`.
+
+The account directory is **not** a public endpoint suitable for anonymous
+SDK consumers: it requires a server-verified wallet login session, and the
+Next.js BFF signs a separate short-lived server-to-server proof.
+Unrecognized organizations and roles, mismatched account identity, forged
+financial capability flags, missing session, schema errors or unavailable
+Neon must cause a visible failed read, not an invented empty result.
+No organization is provisioned and no legal/KYC status is inferred.
