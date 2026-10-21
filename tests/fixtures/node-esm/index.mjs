@@ -84,6 +84,8 @@ assert.deepEqual(Object.keys(await import("@stealthbridge/sdk")).sort(), [
   "SettlementTransitionError",
   "StealthBridgeClient",
   "activePublicContractAtAddress",
+  "readAccountDirectory",
+  "validAccountDirectory",
   "allowedSettlementTransitions",
   "appendPublicEvidence",
   "assertActivityFilters",
