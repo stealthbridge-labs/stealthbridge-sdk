@@ -20,6 +20,8 @@ const expectedPackageFiles = [
   "dist/account-profile.js",
   "dist/amount.d.ts",
   "dist/amount.js",
+  "dist/business-onboarding.d.ts",
+  "dist/business-onboarding.js",
   "dist/business-envelope.d.ts",
   "dist/business-envelope.js",
   "dist/business-reader.d.ts",
@@ -86,7 +88,7 @@ const budgets = {
   // CI measured 172,355 B after adding the strictly scoped customer
   // membership .d.ts and .js. Keep under 176 KB (3.6 KB headroom).
   // Reviewed typed customer profile reader/write helper adds ~4 KB.
-  unpackedBytes: 182_000,
+  unpackedBytes: 191_000,
   // Reviewed 22,718-byte full bundle after restoring read-only governance and platform clients.
   // Allow bounded headroom, not a blanket removal of browser-size limits.
   // 25,755 measured after adding strictly validated, dependency-free governance snapshot.
