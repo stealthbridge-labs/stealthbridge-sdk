@@ -1,0 +1,86 @@
+import {canonicalStellarAccountAddress} from "./wallet.js";
+
+export type PendingBusinessApplication={
+ id:string;
+ display_name:string;
+ status:"pending";
+ role:"owner";
+};
+export interface BusinessOnboardingEnvelope{
+ schema_version:1;
+ network:"testnet";
+ source:"neon-pending-business-applications";
+ account_address:string;
+ applications:PendingBusinessApplication[];
+ has_more:boolean;
+ organization_verified:false;
+ payment_execution_enabled:false;
+ organization_payment_authorized:false;
+}
+const UUID=/^[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}$/i;
+function exact(obj:Record<string,unknown>,keys:string[]):boolean{
+ return Object.keys(obj).length===keys.length&&keys.every(k=>Object.hasOwn(obj,k));
+}
+export function validBusinessApplicationName(input:unknown):input is string{
+ return typeof input==="string"&&input.length>0&&input.length<=120&&
+  input.trim()===input&&!/[<>\u0000-\u001f\u007f]/.test(input);
+}
+/** Pending applications are not approved companies, memberships suitable
+ * for financial authorization, regulated identities, or payment accounts.
+ */
+export function validBusinessOnboarding(
+ value:unknown,expectedAddress:string
+):value is BusinessOnboardingEnvelope{
+ const account=canonicalStellarAccountAddress(expectedAddress);
+ if(!account||!value||typeof value!=="object"||Array.isArray(value))return false;
+ const data=value as Record<string,unknown>;
+ if(!exact(data,["schema_version","network","source","account_address",
+  "applications","has_more","organization_verified","payment_execution_enabled",
+  "organization_payment_authorized"])||
+  data.schema_version!==1||data.network!=="testnet"||
+  data.source!=="neon-pending-business-applications"||
+  data.account_address!==account||data.organization_verified!==false||
+  data.payment_execution_enabled!==false||data.organization_payment_authorized!==false||
+  typeof data.has_more!=="boolean"||!Array.isArray(data.applications)||
+  data.applications.length>10)return false;
+ const ids=new Set<string>();
+ for(const value of data.applications){
+  if(!value||typeof value!=="object"||Array.isArray(value))return false;
+  const item=value as Record<string,unknown>;
+  if(!exact(item,["id","display_name","status","role"])||
+   typeof item.id!=="string"||!UUID.test(item.id)||ids.has(item.id.toLowerCase())||
+   !validBusinessApplicationName(item.display_name)||
+   item.status!=="pending"||item.role!=="owner")return false;
+  ids.add(item.id.toLowerCase());
+ }
+ return true;
+}
+export async function listBusinessApplications(
+ address:string,options:{fetchImpl?:typeof fetch,signal?:AbortSignal}={}
+):Promise<BusinessOnboardingEnvelope>{
+ if(!canonicalStellarAccountAddress(address))throw new TypeError("Invalid Stellar account.");
+ const response=await (options.fetchImpl??fetch)("/api/account/business-onboarding",{
+  method:"GET",credentials:"same-origin",cache:"no-store",
+  ...(options.signal?{signal:options.signal}:{}),
+ });
+ if(!response.ok)throw Error("Business applications are unavailable.");
+ const value:unknown=await response.json();
+ if(!validBusinessOnboarding(value,address))throw Error("Unverified application data.");
+ return value;
+}
+export async function createBusinessApplication(
+ address:string,displayName:string,options:{fetchImpl?:typeof fetch}={}
+):Promise<BusinessOnboardingEnvelope>{
+ if(!canonicalStellarAccountAddress(address)||!validBusinessApplicationName(displayName))
+  throw new TypeError("Invalid business application.");
+ const response=await (options.fetchImpl??fetch)("/api/account/business-onboarding",{
+  method:"POST",cache:"no-store",credentials:"same-origin",
+  headers:{"content-type":"application/json"},
+  body:JSON.stringify({display_name:displayName})
+ });
+ if(!response.ok)throw Error("Business application was not registered.");
+ const value:unknown=await response.json();
+ if(!validBusinessOnboarding(value,address)||value.applications.length!==1)
+  throw Error("The registered business application could not be verified.");
+ return value;
+}
