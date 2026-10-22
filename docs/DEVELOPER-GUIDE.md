@@ -216,3 +216,23 @@ residence code. POST/PUT financial capability does not exist.
 A production database migration is required before preferences can be
 persisted. SDK callers must handle 503 as not available, never substitute
 pretend profiles or success states.
+
+
+## Private business onboarding: registered, not approved
+
+`listBusinessApplications(expectedGAddress)` and
+`createBusinessApplication(expectedGAddress,displayName)` communicate
+with the same-origin, cookie-authenticated account BFF. The server
+uses a one-time UUID and HMAC-signed request bound to the exact
+address, method, endpoint and body digest; the SDK does not sign
+wallet transactions or transmit an asserted subject in its body.
+The Rust service persists real `pending` organization/member
+records in Neon, capped per signer.
+
+`validBusinessOnboarding(response,address)` rejects mismatched
+identities, extra or unrecognized fields, duplicate application IDs,
+unknown roles or statuses, and any true organization/compliance or
+payment-authority flag. A `role:owner` on a **pending** application
+is administrative registration metadata, NOT permission to pay or
+approve. Do not merge pending-application records into the
+active-membership directory or claim KYC.

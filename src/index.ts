@@ -93,3 +93,6 @@ export type {AccountDirectory,AccountOrganization,AccountMemberRole} from "./acc
 
 export {validProfilePreferences,validAccountProfileEnvelope,readCustomerProfile,saveCustomerPreferences} from "./account-profile.js";
 export type {ProfileUseCase,ProfilePreferences,CustomerProfile,AccountProfileEnvelope} from "./account-profile.js";
+
+export {validBusinessApplicationName,validBusinessOnboarding,listBusinessApplications,createBusinessApplication} from "./business-onboarding.js";
+export type {BusinessOnboardingEnvelope,PendingBusinessApplication} from "./business-onboarding.js";
