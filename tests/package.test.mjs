@@ -58,6 +58,8 @@ const expectedPackageFiles = [
   "dist/observer-activity.js",
   "dist/observer-schema.d.ts",
   "dist/observer-schema.js",
+  "dist/organization-team.d.ts",
+  "dist/organization-team.js",
   "dist/platform-fees.d.ts",
   "dist/platform-fees.js",
   "dist/platform.d.ts",

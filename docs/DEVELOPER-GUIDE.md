@@ -236,3 +236,12 @@ payment-authority flag. A `role:owner` on a **pending** application
 is administrative registration metadata, NOT permission to pay or
 approve. Do not merge pending-application records into the
 active-membership directory or claim KYC.
+
+
+## Organization team snapshot (private)
+
+`readOrganizationTeam(expectedAccount, organizationId, {after, fetchImpl, signal})` reads the signed-in user's private same-origin `/api/account/organizations/{id}/team` endpoint. The TypeScript SDK never sends a wallet secret, claimed role, payment amount, or signature.
+
+`validOrganizationTeamSnapshot(response, organizationId, expectedAccount)` rejects unknown fields, identity/tenant mismatches, unsorted/duplicated member addresses, invalid roles, cursor drift, extra pending members, and any purported verified-company, invitations, or payment authority. `status: "active"` means database tenant status only—not verified legal identity or a live payment.
+
+The backend HMAC bridge performs tenant-scoped authorization. The client validator is defense-in-depth; it cannot substitute for verified sessions or the database guard.

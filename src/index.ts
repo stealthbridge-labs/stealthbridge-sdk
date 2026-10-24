@@ -96,3 +96,6 @@ export type {ProfileUseCase,ProfilePreferences,CustomerProfile,AccountProfileEnv
 
 export {validBusinessApplicationName,validBusinessOnboarding,listBusinessApplications,createBusinessApplication} from "./business-onboarding.js";
 export type {BusinessOnboardingEnvelope,PendingBusinessApplication} from "./business-onboarding.js";
+
+export {validOrganizationTeamSnapshot,readOrganizationTeam} from "./organization-team.js";
+export type {OrganizationTeamRole,OrganizationTeamMember,OrganizationTeamAccount,OrganizationTeamSnapshot} from "./organization-team.js";
