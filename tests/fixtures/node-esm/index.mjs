@@ -85,6 +85,7 @@ assert.deepEqual(Object.keys(await import("@stealthbridge/sdk")).sort(), [
   "StealthBridgeClient",
   "activePublicContractAtAddress",
   "allowedSettlementTransitions",
+  "amendBusinessApplication",
   "appendPublicEvidence",
   "assertActivityFilters",
   "assertAsset",
@@ -136,6 +137,7 @@ assert.deepEqual(Object.keys(await import("@stealthbridge/sdk")).sort(), [
   "validPlatformCatalog",
   "validProfilePreferences",
   "validateActivityPage",
+  "withdrawBusinessApplication",
 ]);
 
 assert.equal(canonicalStellarAccountAddress("GAAACAQDAQCQMBYIBEFAWDANBYHRAEISCMKBKFQXDAMRUGY4DUPB7JZX")?.startsWith("G"), true);

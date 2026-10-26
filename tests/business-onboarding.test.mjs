@@ -45,3 +45,35 @@ test("customer draft registration never submits wallet or money instructions",as
  await assert.rejects(()=>createBusinessApplication(account,"<script>",{fetchImpl}),TypeError);
  await assert.rejects(()=>listBusinessApplications("G".repeat(56),{fetchImpl}),TypeError);
 });
+
+test("pending application lifecycle validates write methods and backend receipts",async()=>{
+ const {amendBusinessApplication,withdrawBusinessApplication}=await import("../dist/index.js");
+ const calls=[];
+ const fetchImpl=async (url,options)=>{
+  calls.push([url,options.method,options.credentials,JSON.parse(options.body)]);
+  return new Response(JSON.stringify({...packet,applications:options.method==="PATCH"?
+   [{...item,display_name:"Corrected Importer Ltd"}]:[]}),{status:200});
+ };
+ const edited=await amendBusinessApplication(account,item.id,item.display_name,
+  "Corrected Importer Ltd",{fetchImpl});
+ assert.equal(edited.applications[0].display_name,"Corrected Importer Ltd");
+ const withdrawn=await withdrawBusinessApplication(account,item.id,
+  "Corrected Importer Ltd",{fetchImpl});
+ assert.equal(withdrawn.applications.length,0);
+ assert.deepEqual(calls,[
+  ["/api/account/business-onboarding","PATCH","same-origin",
+   {organization_id:item.id,expected_display_name:item.display_name,
+    display_name:"Corrected Importer Ltd"}],
+  ["/api/account/business-onboarding","DELETE","same-origin",
+   {organization_id:item.id,confirm_display_name:"Corrected Importer Ltd"}]
+ ]);
+ await assert.rejects(()=>amendBusinessApplication(account,item.id,"same","same",{fetchImpl}),TypeError);
+ await assert.rejects(()=>withdrawBusinessApplication(account,"../../bad","name",{fetchImpl}),TypeError);
+ const forgery=async()=>new Response(JSON.stringify({
+  ...packet,organization_payment_authorized:true
+ }),{status:200});
+ await assert.rejects(()=>amendBusinessApplication(account,item.id,
+  "Old","Corrected Importer Ltd",{fetchImpl:forgery}),/could not be verified/);
+ await assert.rejects(()=>withdrawBusinessApplication(account,item.id,
+  "Corrected Importer Ltd",{fetchImpl:forgery}),/could not be verified/);
+});

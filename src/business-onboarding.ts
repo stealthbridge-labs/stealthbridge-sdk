@@ -84,3 +84,55 @@ export async function createBusinessApplication(
   throw Error("The registered business application could not be verified.");
  return value;
 }
+
+/** Amend an unreviewed business application through the authenticated
+ * same-origin server. The backend compares the previous name atomically;
+ * this client never claims the caller is a verified organization.
+ */
+export async function amendBusinessApplication(
+ address:string,organizationId:string,expectedName:string,newName:string,
+ options:{fetchImpl?:typeof fetch}={}
+):Promise<BusinessOnboardingEnvelope>{
+ if(!canonicalStellarAccountAddress(address)||!UUID.test(organizationId)||
+    !validBusinessApplicationName(expectedName)||!validBusinessApplicationName(newName)||
+    newName===expectedName)throw new TypeError("Invalid business amendment.");
+ const response=await (options.fetchImpl??fetch)("/api/account/business-onboarding",{
+  method:"PATCH",cache:"no-store",credentials:"same-origin",
+  headers:{"content-type":"application/json"},
+  body:JSON.stringify({organization_id:organizationId,
+   expected_display_name:expectedName,display_name:newName})
+ });
+ if(!response.ok)throw Error(response.status===409?
+  "Business application changed or is protected; refresh it before retrying.":
+  response.status===404?"Application no longer available to this account.":
+  "Business application correction is unavailable.");
+ const data:unknown=await response.json();
+ if(!validBusinessOnboarding(data,address)||data.applications.length!==1||
+  data.applications[0].id.toLowerCase()!==organizationId.toLowerCase()||
+  data.applications[0].display_name!==newName)
+  throw Error("The updated application could not be verified.");
+ return data;
+}
+/** Remove only a pending, unused application after deliberate confirmation.
+ * Financial, reviewed and active organizations cannot be removed.
+ */
+export async function withdrawBusinessApplication(
+ address:string,organizationId:string,confirmationName:string,
+ options:{fetchImpl?:typeof fetch}={}
+):Promise<BusinessOnboardingEnvelope>{
+ if(!canonicalStellarAccountAddress(address)||!UUID.test(organizationId)||
+  !validBusinessApplicationName(confirmationName))throw new TypeError("Invalid withdrawal.");
+ const response=await (options.fetchImpl??fetch)("/api/account/business-onboarding",{
+  method:"DELETE",cache:"no-store",credentials:"same-origin",
+  headers:{"content-type":"application/json"},
+  body:JSON.stringify({organization_id:organizationId,confirm_display_name:confirmationName})
+ });
+ if(!response.ok)throw Error(response.status===409?
+  "This application has changed or contains protected records; it cannot be withdrawn.":
+  response.status===404?"Application no longer available to this account.":
+  "Business application withdrawal is unavailable.");
+ const data:unknown=await response.json();
+ if(!validBusinessOnboarding(data,address)||data.applications.length!==0)
+  throw Error("The withdrawal receipt could not be verified.");
+ return data;
+}

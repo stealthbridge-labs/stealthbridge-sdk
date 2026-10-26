@@ -245,3 +245,9 @@ active-membership directory or claim KYC.
 `validOrganizationTeamSnapshot(response, organizationId, expectedAccount)` rejects unknown fields, identity/tenant mismatches, unsorted/duplicated member addresses, invalid roles, cursor drift, extra pending members, and any purported verified-company, invitations, or payment authority. `status: "active"` means database tenant status only—not verified legal identity or a live payment.
 
 The backend HMAC bridge performs tenant-scoped authorization. The client validator is defense-in-depth; it cannot substitute for verified sessions or the database guard.
+
+## Pending business lifecycle
+
+`amendBusinessApplication(account, organizationId, oldName, newName)` and `withdrawBusinessApplication(account, organizationId, confirmationName)` use the same-origin authenticated account bridge with strict Testnet-only response validation. Correction is optimistic-concurrency checked against `expected_display_name`; withdrawal requires the exact current application name. All signatures and tenant ownership checks occur server-side. The SDK never signs wallet transactions, returns custody keys, or grants business/payment permissions.
+
+Withdrawal permanently removes only an unreviewed pending single-owner registration when PostgreSQL confirms no related protected records. Application-review and financial operators must use separate, audited workflows. The SDK rejects any server response that asserts legal verification, payment authorization or synthetic customer records.
