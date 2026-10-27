@@ -36,6 +36,7 @@ test("active owner/team roster must contain checked, sorted, unique member ident
  const active={...data,organization:{...data.organization,status:"active"},
   members:[member(other,"viewer"),member(owner,"owner")]};
  assert.equal(validOrganizationTeamSnapshot(active,org,owner),true);
+ assert.equal(validOrganizationTeamSnapshot({...active,invitation_issuance_enabled:true},org,owner),true);
  for(const items of [
   [member(owner,"owner"),member(other,"viewer")],
   [member(other,"viewer"),member(other,"viewer")],

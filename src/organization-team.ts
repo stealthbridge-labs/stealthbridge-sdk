@@ -11,7 +11,7 @@ export type OrganizationTeamSnapshot={
  schema_version:1;network:"testnet";source:"neon-organization-team";
  account_address:string;organization:OrganizationTeamAccount;
  members:OrganizationTeamMember[];next_cursor:string|null;
- business_verified:false;invitation_issuance_enabled:false;
+ business_verified:false;invitation_issuance_enabled:boolean;
  payment_execution_enabled:false;organization_payment_authorized:false
 };
 
@@ -34,7 +34,7 @@ export function validOrganizationTeamSnapshot(
   "payment_execution_enabled","organization_payment_authorized"])||
    value.schema_version!==1||value.network!=="testnet"||
    value.source!=="neon-organization-team"||value.account_address!==account||
-   value.business_verified!==false||value.invitation_issuance_enabled!==false||
+   value.business_verified!==false||typeof value.invitation_issuance_enabled!=="boolean"||
    value.payment_execution_enabled!==false||value.organization_payment_authorized!==false||
    !Array.isArray(value.members)||value.members.length>25||
    !value.organization||typeof value.organization!=="object"||
@@ -47,6 +47,7 @@ export function validOrganizationTeamSnapshot(
    !["pending","active"].includes(String(org.status))||
    !["owner","admin"].includes(String(org.your_role))||
    org.status==="pending"&&org.your_role!=="owner")return false;
+ if(org.status==="pending"&&value.invitation_issuance_enabled!==false)return false;
  const seen=new Set<string>();let last="";
  for(const candidate of value.members){
   if(!candidate||typeof candidate!=="object"||Array.isArray(candidate))return false;

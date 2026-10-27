@@ -251,3 +251,11 @@ The backend HMAC bridge performs tenant-scoped authorization. The client validat
 `amendBusinessApplication(account, organizationId, oldName, newName)` and `withdrawBusinessApplication(account, organizationId, confirmationName)` use the same-origin authenticated account bridge with strict Testnet-only response validation. Correction is optimistic-concurrency checked against `expected_display_name`; withdrawal requires the exact current application name. All signatures and tenant ownership checks occur server-side. The SDK never signs wallet transactions, returns custody keys, or grants business/payment permissions.
 
 Withdrawal permanently removes only an unreviewed pending single-owner registration when PostgreSQL confirms no related protected records. Application-review and financial operators must use separate, audited workflows. The SDK rejects any server response that asserts legal verification, payment authorization or synthetic customer records.
+
+## Gated same-origin viewer invitations
+
+`validTeamInvitationDirectory(value,expectedSigner)` and `validTeamInviteAction(action)` reject forged statuses, roles, addresses, organization IDs, business-verification claims and financial permissions. `loadTeamInvitations(account)` and `submitTeamInviteAction(action)` call the **same-origin session-protected** API; there is no subject assertion, raw invitation token, wallet transaction or private key in SDK requests.
+
+Invite actions: `{action:"create",organization_id,invited_account,role:"viewer"}`, `{action:"accept",invitation_id}` and `{action:"revoke",invitation_id}`. Accepted membership is viewer-only, consent-based and non-financial. The Rust backend verifies account ownership and active admin authorization under PostgreSQL transaction locks.
+
+The feature is release-gated pending protected SQLx migration `202610270001`, not a production capability until independently approved and enabled in both frontend and backend. Disabled requests fail closed.

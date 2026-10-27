@@ -70,6 +70,8 @@ const expectedPackageFiles = [
   "dist/product-capabilities.js",
   "dist/settlement.d.ts",
   "dist/settlement.js",
+  "dist/team-invites.d.ts",
+  "dist/team-invites.js",
   "dist/transfer-capability.d.ts",
   "dist/transfer-capability.js",
   "dist/types.d.ts",
@@ -90,8 +92,9 @@ const budgets = {
   // CI measured 172,355 B after adding the strictly scoped customer
   // membership .d.ts and .js. Keep under 176 KB (3.6 KB headroom).
   // Reviewed lifecycle amendment/withdrawal module grows the typed JS and declaration
-  // package to 193,236 B. Keep less than 4 KB of bounded headroom.
-  unpackedBytes: 197_000,
+  // package grew to a measured 200,089 B after adding the strict invitation client.
+  // Preserve 2,911 bytes headroom, not an unbounded budget.
+  unpackedBytes: 203_000,
   // Reviewed 22,718-byte full bundle after restoring read-only governance and platform clients.
   // Allow bounded headroom, not a blanket removal of browser-size limits.
   // 25,755 measured after adding strictly validated, dependency-free governance snapshot.
