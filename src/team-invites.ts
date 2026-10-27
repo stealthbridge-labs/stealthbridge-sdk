@@ -32,8 +32,8 @@ export function validTeamInvitationDirectory(value:unknown,address:string):value
   typeof directory.sent_more!=="boolean"||
   !Array.isArray(directory.received)||!Array.isArray(directory.sent)||
   directory.received.length>20||directory.sent.length>20)return false;
+ const ids=new Set<string>();
  for(const list of [directory.received,directory.sent] as unknown[][]){
-  const ids=new Set<string>();
   for(const value of list){
    if(!value||typeof value!=="object"||Array.isArray(value))return false;
    const row=value as Record<string,unknown>;
@@ -60,6 +60,7 @@ export function validTeamInvitationDirectory(value:unknown,address:string):value
  return true;
 }
 export async function loadTeamInvitations(address:string,signal?:AbortSignal):Promise<TeamInvitationDirectory>{
+ if(!canonicalStellarAccountAddress(address))throw new TypeError("Invalid account address.");
  const response=await fetch("/api/account/team-invites",{
   method:"GET",cache:"no-store",credentials:"same-origin",
   ...(signal?{signal}:{})

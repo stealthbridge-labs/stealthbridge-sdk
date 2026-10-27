@@ -28,7 +28,8 @@ test("strict organization invitation response never claims business or financial
   {...data,sent:[{...row,role:"owner"}]},
   {...data,sent:[{...row,invite_token:"raw-secret"}]},
   {...data,sent:[{...row,status:"verified"}]},
-  {...data,sent:[row,row]}
+  {...data,sent:[row,row]},
+  {...data,received:[{...row,peer_address:peer}],sent:[row]}
  ])assert.equal(validTeamInvitationDirectory(broken,signer),false);
 });
 test("invitation actions enforce viewer-only role and forbid extra authority fields",()=>{
@@ -49,6 +50,8 @@ test("SDK invitation read/accept is cookie-bound; no actor assertion or signing 
    if(options.method==="GET")return new Response(JSON.stringify(data),{status:200});
    return new Response(null,{status:204});
   };
+  await assert.rejects(()=>loadTeamInvitations("invalid-account"),TypeError);
+  assert.equal(calls.length,0,"invalid identities must not hit the account API");
   assert.equal((await loadTeamInvitations(signer)).sent[0].id,invitation);
   await submitTeamInviteAction({action:"revoke",invitation_id:invitation});
   assert.deepEqual(calls.map(v=>[v.url,v.method,v.credentials]),[
