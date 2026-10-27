@@ -63,3 +63,21 @@ test("SDK invitation read/accept is cookie-bound; no actor assertion or signing 
    invited_account:peer,role:"operator"}),TypeError);
  }finally{globalThis.fetch=actual;}
 });
+
+test("SDK scoped invitation reads reject unsolicited organization and account records",async()=>{
+ const actual=globalThis.fetch;const calls=[];let payload=data;
+ try{
+  globalThis.fetch=async(url,options)=>{
+   calls.push({url,credentials:options.credentials});
+   return new Response(JSON.stringify(payload),{status:200});
+  };
+  await assert.rejects(()=>loadTeamInvitations(signer,undefined,"not-a-uuid"),TypeError);
+  assert.equal(calls.length,0);
+  assert.equal((await loadTeamInvitations(signer,undefined,org)).sent[0].id,invitation);
+  assert.deepEqual(calls,[{url:"/api/account/team-invites?organization_id="+org,credentials:"same-origin"}]);
+  payload={...data,sent:[{...row,organization_id:invitation}]};
+  await assert.rejects(()=>loadTeamInvitations(signer,undefined,org),/could not be verified/);
+  payload={...data,received:[{...row}]};
+  await assert.rejects(()=>loadTeamInvitations(signer,undefined,org),/could not be verified/);
+ }finally{globalThis.fetch=actual;}
+});

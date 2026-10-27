@@ -59,15 +59,23 @@ export function validTeamInvitationDirectory(value:unknown,address:string):value
  }
  return true;
 }
-export async function loadTeamInvitations(address:string,signal?:AbortSignal):Promise<TeamInvitationDirectory>{
- if(!canonicalStellarAccountAddress(address))throw new TypeError("Invalid account address.");
- const response=await fetch("/api/account/team-invites",{
+/** Scoped reads bind the requested organization to the server proxy HMAC. */
+export async function loadTeamInvitations(address:string,signal?:AbortSignal,organizationId?:string):Promise<TeamInvitationDirectory>{
+ if(!canonicalStellarAccountAddress(address)||
+  (organizationId!==undefined&&(!UUID.test(organizationId)||organizationId==="00000000-0000-0000-0000-000000000000")))
+  throw new TypeError("Invalid invitation account or organization.");
+ const url="/api/account/team-invites"+(organizationId?"?organization_id="+organizationId:"");
+ const response=await fetch(url,{
   method:"GET",cache:"no-store",credentials:"same-origin",
   ...(signal?{signal}:{})
  });
  if(!response.ok)throw Error("Team invitations are not available.");
  const value:unknown=await response.json();
- if(!validTeamInvitationDirectory(value,address))throw Error("Team invitations could not be verified.");
+ if(!validTeamInvitationDirectory(value,address)||
+  (organizationId!==undefined&&(
+   value.received.length!==0||value.received_more||
+   value.sent.some(row=>row.organization_id!==organizationId))))
+  throw Error("Team invitations could not be verified.");
  return value;
 }
 export type TeamInviteAction=

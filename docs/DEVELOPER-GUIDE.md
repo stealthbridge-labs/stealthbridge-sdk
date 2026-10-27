@@ -254,7 +254,9 @@ Withdrawal permanently removes only an unreviewed pending single-owner registrat
 
 ## Gated same-origin viewer invitations
 
-`validTeamInvitationDirectory(value,expectedSigner)` and `validTeamInviteAction(action)` reject forged statuses, roles, addresses, organization IDs, business-verification claims and financial permissions. `loadTeamInvitations(account)` and `submitTeamInviteAction(action)` call the **same-origin session-protected** API; there is no subject assertion, raw invitation token, wallet transaction or private key in SDK requests.
+`validTeamInvitationDirectory(value,expectedSigner)` and `validTeamInviteAction(action)` reject forged statuses, roles, addresses, organization IDs, business-verification claims and financial permissions. `loadTeamInvitations(account, signal?, organizationId?)` and `submitTeamInviteAction(action)` call the **same-origin session-protected** API; there is no subject assertion, raw invitation token, wallet transaction or private key in SDK requests.
+
+A business UI may pass a canonical organization UUID as the third argument to scope sent invitations; the SDK rejects any unrelated organization or received records in the response. Omit the argument for an account's incoming invitations. This API returns at most twenty records per list; a `*_more` flag warns of incomplete pages.
 
 Invite actions: `{action:"create",organization_id,invited_account,role:"viewer"}`, `{action:"accept",invitation_id}` and `{action:"revoke",invitation_id}`. Accepted membership is viewer-only, consent-based and non-financial. The Rust backend verifies account ownership and active admin authorization under PostgreSQL transaction locks.
 
