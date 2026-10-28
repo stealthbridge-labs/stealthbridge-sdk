@@ -7,6 +7,7 @@ import type {Capabilities,Corridor,Network,NetworkStatus,TransactionObservation,
 import {assertActivityFilters,validateActivityPage,isContractStrKey} from "./observer-activity.js";
 import {validContractObservation,type ContractObservation} from "./contract-observation.js";
 import {validObserverSchema,type ObserverSchema} from "./observer-schema.js";
+import {validDependencyDiagnostics,type DependencyDiagnostics} from "./dependency-diagnostics.js";
 import type {ActivityFilters,PublicActivityPage} from "./observer-activity.js";
 
 export interface ClientConfig {
@@ -327,6 +328,11 @@ export class StealthBridgeClient {
  /** Single-ledger public governance observations. Never permits payment execution. */
  governanceSnapshot(options?:RequestOptions):Promise<GovernanceSnapshot>{
   return this.read("/v1/governance/snapshot",validGovernanceSnapshot,options);
+ }
+ /** Live, bounded Testnet dependency diagnostics; never financial readiness. */
+ dependencyDiagnostics(options?:RequestOptions):Promise<DependencyDiagnostics>{
+  return this.read("/v1/diagnostics",
+   (v):v is DependencyDiagnostics=>validDependencyDiagnostics(v,Math.floor(Date.now()/1000)),options);
  }
  /** Read-only SQLx schema diagnostic; never evidence of a running worker. */
  observerSchema(options?:RequestOptions):Promise<ObserverSchema>{

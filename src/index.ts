@@ -102,3 +102,6 @@ export type {OrganizationTeamRole,OrganizationTeamMember,OrganizationTeamAccount
 
 export {validTeamInvitationDirectory,validTeamInviteAction,loadTeamInvitations,submitTeamInviteAction} from "./team-invites.js";
 export type {TeamInviteRecord,TeamInvitationDirectory,TeamInviteAction} from "./team-invites.js";
+
+export {validDependencyDiagnostics} from "./dependency-diagnostics.js";
+export type {DependencyDiagnostics} from "./dependency-diagnostics.js";

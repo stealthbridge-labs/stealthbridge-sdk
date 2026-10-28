@@ -261,3 +261,13 @@ A business UI may pass a canonical organization UUID as the third argument to sc
 Invite actions: `{action:"create",organization_id,invited_account,role:"viewer"}`, `{action:"accept",invitation_id}` and `{action:"revoke",invitation_id}`. Accepted membership is viewer-only, consent-based and non-financial. The Rust backend verifies account ownership and active admin authorization under PostgreSQL transaction locks.
 
 The feature is release-gated pending protected SQLx migration `202610270001`, not a production capability until independently approved and enabled in both frontend and backend. Disabled requests fail closed.
+
+## Live dependency diagnostics (strict, read-only)
+
+`client.dependencyDiagnostics()` calls `GET /v1/diagnostics` using the SDK's existing bounded JSON transport, request timeout and safe-GET retry policy. Its strict validator `validDependencyDiagnostics(value, nowUnix)` requires the exact v1 Testnet shape, an observation no more than 120 seconds old or 30 seconds in the future, consistent database/RPC status, and **false** financial capability flags. `database: "schema-incomplete"` means PostgreSQL responded but the mandatory migration/schema checks did not pass (including access errors); `unreachable` means the connection probe failed. A `read_only_ready` result never authorizes settlement or disbursement.
+
+```ts
+const status = await client.dependencyDiagnostics();
+console.log(status.database, status.rpc, status.read_only_ready);
+// No payment signing or settlement method is enabled by this result.
+```
