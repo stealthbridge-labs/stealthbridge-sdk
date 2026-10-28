@@ -105,3 +105,6 @@ export type {TeamInviteRecord,TeamInvitationDirectory,TeamInviteAction} from "./
 
 export {validDependencyDiagnostics} from "./dependency-diagnostics.js";
 export type {DependencyDiagnostics} from "./dependency-diagnostics.js";
+
+export {validCorridorPreflight} from "./corridor-preflight.js";
+export type {CorridorPreflight} from "./corridor-preflight.js";

@@ -32,6 +32,8 @@ const expectedPackageFiles = [
   "dist/client.js",
   "dist/contract-observation.d.ts",
   "dist/contract-observation.js",
+  "dist/corridor-preflight.d.ts",
+  "dist/corridor-preflight.js",
   "dist/dependency-diagnostics.d.ts",
   "dist/dependency-diagnostics.js",
   "dist/developer-readiness.d.ts",
@@ -97,17 +99,20 @@ const budgets = {
   // package grew to a measured 200,089 B after adding the strict invitation client.
   // Preserve 2,911 bytes headroom, not an unbounded budget.
   // Verified after adding the 2,025 B dependency diagnostics module: 203,733 B.
-  unpackedBytes: 207_000,
+  // Actual tested unpacked package: 208,234 B after new validated route reader.
+  unpackedBytes: 210_000,
   // Reviewed 22,718-byte full bundle after restoring read-only governance and platform clients.
   // Allow bounded headroom, not a blanket removal of browser-size limits.
   // 25,755 measured after adding strictly validated, dependency-free governance snapshot.
   // Measured 28,891 B after adding the bounded diagnostic reader.
-  fullBrowserBytes: 30_000,
+  // Measured 31,006 B with bounded route preflight verification; ~3% headroom.
+  fullBrowserBytes: 32_000,
   treeShakenBrowserBytes: 1_600,
   // 26,458 measured for the pinned Next.js consumer; retain a narrow regression cap.
   // 28,001-byte measured consumer chunk with consent-based contract inspection.
   // Measured 29,556 B after adding the diagnostic reader.
-  nextClientSdkChunksBytes: 30_500
+  // Measured 31,641 B Next.js consumer after route validation; <3% headroom.
+  nextClientSdkChunksBytes: 32_600
 };
 const forbiddenModulePattern = /^(?:node:|fs(?:\/|$)|crypto(?:\/|$)|path(?:\/|$)|child_process(?:\/|$)|worker_threads(?:\/|$)|net(?:\/|$)|tls(?:\/|$))/;
 const secretMaterialPattern = /\b(?:privateKey|secretKey|mnemonic|seedPhrase|recoveryPhrase|walletSecret)\b/i;

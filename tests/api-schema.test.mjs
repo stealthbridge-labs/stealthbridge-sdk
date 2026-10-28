@@ -17,7 +17,7 @@ test("regeneration is byte-for-byte deterministic and source-pinned",async()=>{
  assert.equal(run("--stdout"),actual);
  assert.equal(run("--stdout"),actual);
  assert.match(run("--check"),/PASS: generated SDK types/);
- assert.match(actual,/Backend source commit: acad5777f2217917421469e9722fbfbf6222ff7a/);
+ assert.match(actual,/Backend source commit: 28de83d5881837949606dd2c206d3e6f1b85fd17/);
  assert.doesNotMatch(actual,/\bany\b/);
 });
 test("API 0.3 wire models preserve precise Testnet safety literals",async()=>{
@@ -37,4 +37,15 @@ test("generated SDK types are actually consumed by public runtime client interfa
  const yaml=await readFile(path.join(root,"specs/backend-openapi.v0.3.yaml"),"utf8");
  assert.match(yaml,/^  version: 0\.3\.0$/m);
  assert.equal((yaml.match(/^components:$/gm)||[]).length,1);
+});
+
+test("pinned additive corridor preflight contract is GET-only with denied financial flags",async()=>{
+ const yaml=await readFile(path.join(root,"specs/backend-openapi.v0.3.yaml"),"utf8");
+ const preflight=yaml.split("  /v1/corridors/{id}/preflight:\n")[1]?.split("\n  /v1/")[0]??"";
+ assert.match(preflight,/^    get:$/m);
+ assert.doesNotMatch(preflight,/^    post:$/m);
+ assert.match(preflight,/CorridorPreflight/);
+ for(const key of ["payment_execution_enabled","fee_quote_available","liquidity_verified",
+  "issuer_verified","privacy_verified","fiat_payouts_enabled"])
+  assert.match(yaml,new RegExp(key+": \\{type: boolean, const: false\\}"));
 });

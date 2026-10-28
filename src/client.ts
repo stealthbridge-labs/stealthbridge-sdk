@@ -8,6 +8,7 @@ import {assertActivityFilters,validateActivityPage,isContractStrKey} from "./obs
 import {validContractObservation,type ContractObservation} from "./contract-observation.js";
 import {validObserverSchema,type ObserverSchema} from "./observer-schema.js";
 import {validDependencyDiagnostics,type DependencyDiagnostics} from "./dependency-diagnostics.js";
+import {validCorridorPreflight,type CorridorPreflight} from "./corridor-preflight.js";
 import type {ActivityFilters,PublicActivityPage} from "./observer-activity.js";
 
 export interface ClientConfig {
@@ -456,6 +457,13 @@ export class StealthBridgeClient {
   if(!/^[a-f0-9]{8}-(?:[a-f0-9]{4}-){3}[a-f0-9]{12}$/i.test(id))
     throw new TypeError("Corridor ID must be a valid UUID");
   return this.read("/v1/corridors/"+id.toLowerCase(),corridor,options);
+ }
+ /** Live, route-specific read-only dependency preflight; not a fee quote or payment authorization. */
+ corridorPreflight(id:string,options?:RequestOptions):Promise<CorridorPreflight>{
+  if(!/^[a-f0-9]{8}-(?:[a-f0-9]{4}-){3}[a-f0-9]{12}$/i.test(id))
+   throw new TypeError("Corridor ID must be a valid UUID");
+  return this.read("/v1/corridors/"+id.toLowerCase()+"/preflight",
+   (value):value is CorridorPreflight=>validCorridorPreflight(value,id),options);
  }
  transaction(hash:string,options?:RequestOptions):Promise<TransactionObservation>{
   if(!/^[a-f0-9]{64}$/i.test(hash))
