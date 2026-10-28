@@ -20,6 +20,8 @@ const expectedPackageFiles = [
   "dist/account-profile.js",
   "dist/amount.d.ts",
   "dist/amount.js",
+  "dist/business-batch.d.ts",
+  "dist/business-batch.js",
   "dist/business-envelope.d.ts",
   "dist/business-envelope.js",
   "dist/business-onboarding.d.ts",
@@ -89,7 +91,8 @@ const expectedPackageFiles = [
 const budgets = {
   // Account for one bounded, dependency-free snapshot module. Still fail
   // changes adding large packages, Node-only builtins or hidden code.
-  packedBytes: 57_000,
+  // 57,298 B measured with isolated local batch parser and typed backend reader.
+  packedBytes: 58_500,
   // Reviewed observation-health .js and .d.ts add 2,841 bytes over v0.2.
   // Additional typed platform capability validators remain dependency-free.
   // Preserve a bounded size budget with reviewed headroom.
@@ -100,19 +103,22 @@ const budgets = {
   // Preserve 2,911 bytes headroom, not an unbounded budget.
   // Verified after adding the 2,025 B dependency diagnostics module: 203,733 B.
   // Actual tested unpacked package: 208,234 B after new validated route reader.
-  unpackedBytes: 210_000,
+  // 218,593 B measured across reviewed SDK declarations/JS after batch validator.
+  unpackedBytes: 222_000,
   // Reviewed 22,718-byte full bundle after restoring read-only governance and platform clients.
   // Allow bounded headroom, not a blanket removal of browser-size limits.
   // 25,755 measured after adding strictly validated, dependency-free governance snapshot.
   // Measured 28,891 B after adding the bounded diagnostic reader.
   // Measured 31,006 B with bounded route preflight verification; ~3% headroom.
-  fullBrowserBytes: 32_000,
+  // 33,134 B measured; keep a narrow reviewed limit after batch planning.
+  fullBrowserBytes: 34_300,
   treeShakenBrowserBytes: 1_600,
   // 26,458 measured for the pinned Next.js consumer; retain a narrow regression cap.
   // 28,001-byte measured consumer chunk with consent-based contract inspection.
   // Measured 29,556 B after adding the diagnostic reader.
   // Measured 31,641 B Next.js consumer after route validation; <3% headroom.
-  nextClientSdkChunksBytes: 32_600
+  // 33,718 B measured by isolated Next.js consumer; <3% headroom.
+  nextClientSdkChunksBytes: 34_600
 };
 const forbiddenModulePattern = /^(?:node:|fs(?:\/|$)|crypto(?:\/|$)|path(?:\/|$)|child_process(?:\/|$)|worker_threads(?:\/|$)|net(?:\/|$)|tls(?:\/|$))/;
 const secretMaterialPattern = /\b(?:privateKey|secretKey|mnemonic|seedPhrase|recoveryPhrase|walletSecret)\b/i;

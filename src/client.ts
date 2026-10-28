@@ -9,6 +9,7 @@ import {validContractObservation,type ContractObservation} from "./contract-obse
 import {validObserverSchema,type ObserverSchema} from "./observer-schema.js";
 import {validDependencyDiagnostics,type DependencyDiagnostics} from "./dependency-diagnostics.js";
 import {validCorridorPreflight,type CorridorPreflight} from "./corridor-preflight.js";
+import {assertBusinessRouteIds,validCorridorBatch,type CorridorBatch} from "./business-batch.js";
 import type {ActivityFilters,PublicActivityPage} from "./observer-activity.js";
 
 export interface ClientConfig {
@@ -457,6 +458,12 @@ export class StealthBridgeClient {
   if(!/^[a-f0-9]{8}-(?:[a-f0-9]{4}-){3}[a-f0-9]{12}$/i.test(id))
     throw new TypeError("Corridor ID must be a valid UUID");
   return this.read("/v1/corridors/"+id.toLowerCase(),corridor,options);
+ }
+ /** Fetch up to eight operator-configured public routes by ID; recipients and amounts NEVER leave the caller. */
+ corridorBatch(ids:readonly string[],options?:RequestOptions):Promise<CorridorBatch>{
+  const validated=assertBusinessRouteIds(ids);
+  return this.read("/v1/corridors/batch?ids="+validated.join(","),
+   (value):value is CorridorBatch=>validCorridorBatch(value,validated),options);
  }
  /** Live, route-specific read-only dependency preflight; not a fee quote or payment authorization. */
  corridorPreflight(id:string,options?:RequestOptions):Promise<CorridorPreflight>{

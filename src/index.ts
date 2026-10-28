@@ -108,3 +108,6 @@ export type {DependencyDiagnostics} from "./dependency-diagnostics.js";
 
 export {validCorridorPreflight} from "./corridor-preflight.js";
 export type {CorridorPreflight} from "./corridor-preflight.js";
+
+export {parseBusinessBatchCsv,assertBusinessRouteIds,validCorridorBatch,assessBusinessBatch} from "./business-batch.js";
+export type {BusinessBatchRow,BusinessBatchDraft,BusinessBatchAssessment,CorridorBatch} from "./business-batch.js";

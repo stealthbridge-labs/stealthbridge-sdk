@@ -17,7 +17,7 @@ test("regeneration is byte-for-byte deterministic and source-pinned",async()=>{
  assert.equal(run("--stdout"),actual);
  assert.equal(run("--stdout"),actual);
  assert.match(run("--check"),/PASS: generated SDK types/);
- assert.match(actual,/Backend source commit: 28de83d5881837949606dd2c206d3e6f1b85fd17/);
+ assert.match(actual,/Backend source commit: 82ea6953468b7acd2139ba2e0d026bfab5797791/);
  assert.doesNotMatch(actual,/\bany\b/);
 });
 test("API 0.3 wire models preserve precise Testnet safety literals",async()=>{
@@ -48,4 +48,13 @@ test("pinned additive corridor preflight contract is GET-only with denied financ
  for(const key of ["payment_execution_enabled","fee_quote_available","liquidity_verified",
   "issuer_verified","privacy_verified","fiat_payouts_enabled"])
   assert.match(yaml,new RegExp(key+": \\{type: boolean, const: false\\}"));
+});
+
+test("pinned business corridor batch is explicit public GET-only metadata",async()=>{
+ const yaml=await readFile(path.join(root,"specs/backend-openapi.v0.3.yaml"),"utf8");
+ const route=yaml.split("  /v1/corridors/batch:\n")[1]?.split("\n  /v1/")[0]??"";
+ assert.match(route,/^    get:$/m);
+ assert.doesNotMatch(route,/^    post:$/m);
+ assert.match(route,/CorridorBatch/);
+ assert.match(yaml,/source: \{type: string, const: operator-corridor-batch\}/);
 });
