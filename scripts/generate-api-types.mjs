@@ -12,7 +12,7 @@ import {fileURLToPath} from "node:url";
 const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),"..");
 const schemaPath=path.join(root,"specs/backend-openapi.v0.3.yaml");
 const outputPath=path.join(root,"src/generated/api-wire.ts");
-const PINNED_BACKEND_COMMIT="82ea6953468b7acd2139ba2e0d026bfab5797791";
+const PINNED_BACKEND_COMMIT="cec627830ce8b82d7c5e5676497d593027dfd56a";
 const NAMES=["Capabilities","ContractDiscovery","Corridor","CorridorPage",
  "ErrorDetail","ErrorEnvelope","LedgerCheckpoint","NetworkStatus","Readiness","TransactionObservation"];
 

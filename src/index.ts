@@ -111,3 +111,6 @@ export type {CorridorPreflight} from "./corridor-preflight.js";
 
 export {parseBusinessBatchCsv,assertBusinessRouteIds,validCorridorBatch,assessBusinessBatch} from "./business-batch.js";
 export type {BusinessBatchRow,BusinessBatchDraft,BusinessBatchAssessment,CorridorBatch} from "./business-batch.js";
+
+export {validCorridorBatchPreflight,matchingCorridorBatches} from "./business-batch-preflight.js";
+export type {CorridorBatchPreflight} from "./business-batch-preflight.js";

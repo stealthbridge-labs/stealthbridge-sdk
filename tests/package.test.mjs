@@ -20,6 +20,8 @@ const expectedPackageFiles = [
   "dist/account-profile.js",
   "dist/amount.d.ts",
   "dist/amount.js",
+  "dist/business-batch-preflight.d.ts",
+  "dist/business-batch-preflight.js",
   "dist/business-batch.d.ts",
   "dist/business-batch.js",
   "dist/business-envelope.d.ts",
@@ -104,21 +106,24 @@ const budgets = {
   // Verified after adding the 2,025 B dependency diagnostics module: 203,733 B.
   // Actual tested unpacked package: 208,234 B after new validated route reader.
   // 218,593 B measured across reviewed SDK declarations/JS after batch validator.
-  unpackedBytes: 222_000,
+  // Measured with dependency-free live batch preflight module: 223,097 B.
+  unpackedBytes: 225_500,
   // Reviewed 22,718-byte full bundle after restoring read-only governance and platform clients.
   // Allow bounded headroom, not a blanket removal of browser-size limits.
   // 25,755 measured after adding strictly validated, dependency-free governance snapshot.
   // Measured 28,891 B after adding the bounded diagnostic reader.
   // Measured 31,006 B with bounded route preflight verification; ~3% headroom.
   // 33,134 B measured; keep a narrow reviewed limit after batch planning.
-  fullBrowserBytes: 34_300,
+  // Isolated consumer measured 34,422 B after live readiness validation.
+  fullBrowserBytes: 35_400,
   treeShakenBrowserBytes: 1_600,
   // 26,458 measured for the pinned Next.js consumer; retain a narrow regression cap.
   // 28,001-byte measured consumer chunk with consent-based contract inspection.
   // Measured 29,556 B after adding the diagnostic reader.
   // Measured 31,641 B Next.js consumer after route validation; <3% headroom.
   // 33,718 B measured by isolated Next.js consumer; <3% headroom.
-  nextClientSdkChunksBytes: 34_600
+  // Isolated Next.js consumer measured 34,987 B; bounded 3% headroom.
+  nextClientSdkChunksBytes: 36_000
 };
 const forbiddenModulePattern = /^(?:node:|fs(?:\/|$)|crypto(?:\/|$)|path(?:\/|$)|child_process(?:\/|$)|worker_threads(?:\/|$)|net(?:\/|$)|tls(?:\/|$))/;
 const secretMaterialPattern = /\b(?:privateKey|secretKey|mnemonic|seedPhrase|recoveryPhrase|walletSecret)\b/i;
