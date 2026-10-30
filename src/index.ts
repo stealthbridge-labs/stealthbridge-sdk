@@ -117,3 +117,6 @@ export type {CorridorBatchPreflight} from "./business-batch-preflight.js";
 
 export {validRecipientPresence,currentRecipientContract} from "./recipient-presence.js";
 export type {RecipientPresence} from "./recipient-presence.js";
+
+export {validClassicRecipientPresence,currentClassicRecipient} from "./classic-recipient-presence.js";
+export type {ClassicRecipientPresence} from "./classic-recipient-presence.js";

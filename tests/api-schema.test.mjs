@@ -17,7 +17,7 @@ test("regeneration is byte-for-byte deterministic and source-pinned",async()=>{
  assert.equal(run("--stdout"),actual);
  assert.equal(run("--stdout"),actual);
  assert.match(run("--check"),/PASS: generated SDK types/);
- assert.match(actual,/Backend source commit: 6367c94550849b775034e551b81c1042efb07c72/);
+ assert.match(actual,/Backend source commit: ba0e579084750be1ad7b001f98830a342fa51b5c/);
  assert.doesNotMatch(actual,/\bany\b/);
 });
 test("API 0.3 wire models preserve precise Testnet safety literals",async()=>{
@@ -77,4 +77,15 @@ test("pinned customer recipient projection is GET-only and never exposes code ha
  const schema=yaml.split("    RecipientPresence:\n")[1]?.split("\n    CorridorBatch:")[0]??"";
  assert.match(schema,/contract_instance_found/);
  assert.doesNotMatch(schema,/executable_wasm_hash/);
+});
+
+test("classic Testnet account existence projection is GET-only with no payout or private data",async()=>{
+ const yaml=await readFile(path.join(root,"specs/backend-openapi.v0.3.yaml"),"utf8");
+ const route=yaml.split("  /v1/wallet/classic-recipient/{address}:\n")[1]?.split("\n  /v1/")[0]??"";
+ assert.match(route,/^    get:$/m);
+ assert.doesNotMatch(route,/^    post:$/m);
+ assert.match(route,/ClassicRecipientPresence/);
+ const schema=yaml.split("    ClassicRecipientPresence:\n")[1]?.split("\n    RecipientPresence:")[0]??"";
+ assert.match(schema,/classic_account_found/);
+ assert.doesNotMatch(schema,/balances|signers|trustlines/);
 });

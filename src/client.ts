@@ -7,6 +7,8 @@ import type {Capabilities,Corridor,Network,NetworkStatus,TransactionObservation,
 import {assertActivityFilters,validateActivityPage,isContractStrKey} from "./observer-activity.js";
 import {validContractObservation,type ContractObservation} from "./contract-observation.js";
 import {validRecipientPresence,type RecipientPresence} from "./recipient-presence.js";
+import {validClassicRecipientPresence,type ClassicRecipientPresence} from "./classic-recipient-presence.js";
+import {canonicalStellarAccountAddress} from "./wallet.js";
 import {validObserverSchema,type ObserverSchema} from "./observer-schema.js";
 import {validDependencyDiagnostics,type DependencyDiagnostics} from "./dependency-diagnostics.js";
 import {validCorridorPreflight,type CorridorPreflight} from "./corridor-preflight.js";
@@ -343,6 +345,13 @@ export class StealthBridgeClient {
   return this.read("/v1/observer/schema",validObserverSchema,options);
  }
  /** Consent-based Testnet C-address inspection. Contract presence is NOT smart-wallet custody. */
+ /** Consent-based public G-account presence on Stellar Testnet. */
+ classicRecipientPresence(address:string,options?:RequestOptions):Promise<ClassicRecipientPresence>{
+  if(canonicalStellarAccountAddress(address)!==address)
+   throw new TypeError("Invalid Stellar classic account address");
+  return this.read("/v1/wallet/classic-recipient/"+address,
+   (v):v is ClassicRecipientPresence=>validClassicRecipientPresence(v,address),options);
+ }
  /** Minimal recipient presence, never an executable hash or smart-account authority. */
  recipientPresence(address:string,options?:RequestOptions):Promise<RecipientPresence>{
   if(!isContractStrKey(address))throw new TypeError("Invalid Stellar contract address");

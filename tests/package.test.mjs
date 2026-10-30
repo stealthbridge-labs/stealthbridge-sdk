@@ -32,6 +32,8 @@ const expectedPackageFiles = [
   "dist/business-reader.js",
   "dist/business-review.d.ts",
   "dist/business-review.js",
+  "dist/classic-recipient-presence.d.ts",
+  "dist/classic-recipient-presence.js",
   "dist/client.d.ts",
   "dist/client.js",
   "dist/contract-observation.d.ts",
@@ -111,7 +113,8 @@ const budgets = {
   // 218,593 B measured across reviewed SDK declarations/JS after batch validator.
   // Measured with dependency-free live batch preflight module: 223,097 B.
   // Measured 226,388 bytes with recipient presence validators and declarations.
-  unpackedBytes: 229_000,
+  // Measured 229,442 B with read-only G-address presence; bounded headroom.
+  unpackedBytes: 232_000,
   // Reviewed 22,718-byte full bundle after restoring read-only governance and platform clients.
   // Allow bounded headroom, not a blanket removal of browser-size limits.
   // 25,755 measured after adding strictly validated, dependency-free governance snapshot.
