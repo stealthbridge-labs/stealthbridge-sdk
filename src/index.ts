@@ -114,3 +114,6 @@ export type {BusinessBatchRow,BusinessBatchDraft,BusinessBatchAssessment,Corrido
 
 export {validCorridorBatchPreflight,matchingCorridorBatches} from "./business-batch-preflight.js";
 export type {CorridorBatchPreflight} from "./business-batch-preflight.js";
+
+export {validRecipientPresence,currentRecipientContract} from "./recipient-presence.js";
+export type {RecipientPresence} from "./recipient-presence.js";

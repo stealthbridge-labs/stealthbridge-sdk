@@ -6,6 +6,7 @@ import {validGovernanceSnapshot,type GovernanceSnapshot} from "./governance-snap
 import type {Capabilities,Corridor,Network,NetworkStatus,TransactionObservation,CorridorPage,LedgerCheckpoint,Readiness,ContractDiscovery,PublicSorobanInterface} from "./types.js";
 import {assertActivityFilters,validateActivityPage,isContractStrKey} from "./observer-activity.js";
 import {validContractObservation,type ContractObservation} from "./contract-observation.js";
+import {validRecipientPresence,type RecipientPresence} from "./recipient-presence.js";
 import {validObserverSchema,type ObserverSchema} from "./observer-schema.js";
 import {validDependencyDiagnostics,type DependencyDiagnostics} from "./dependency-diagnostics.js";
 import {validCorridorPreflight,type CorridorPreflight} from "./corridor-preflight.js";
@@ -342,6 +343,12 @@ export class StealthBridgeClient {
   return this.read("/v1/observer/schema",validObserverSchema,options);
  }
  /** Consent-based Testnet C-address inspection. Contract presence is NOT smart-wallet custody. */
+ /** Minimal recipient presence, never an executable hash or smart-account authority. */
+ recipientPresence(address:string,options?:RequestOptions):Promise<RecipientPresence>{
+  if(!isContractStrKey(address))throw new TypeError("Invalid Stellar contract address");
+  return this.read("/v1/wallet/recipient/"+address,
+    (value):value is RecipientPresence=>validRecipientPresence(value,address),options);
+ }
  contractObservation(address:string,options?:RequestOptions):Promise<ContractObservation>{
   if(!isContractStrKey(address))throw new TypeError("Use a checksummed Stellar C-address.");
   return this.read("/v1/wallet/contracts/"+address,

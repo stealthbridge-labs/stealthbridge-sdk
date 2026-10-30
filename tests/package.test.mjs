@@ -76,6 +76,8 @@ const expectedPackageFiles = [
   "dist/private-transfer.js",
   "dist/product-capabilities.d.ts",
   "dist/product-capabilities.js",
+  "dist/recipient-presence.d.ts",
+  "dist/recipient-presence.js",
   "dist/settlement.d.ts",
   "dist/settlement.js",
   "dist/team-invites.d.ts",
@@ -94,7 +96,8 @@ const budgets = {
   // Account for one bounded, dependency-free snapshot module. Still fail
   // changes adding large packages, Node-only builtins or hidden code.
   // 57,298 B measured with isolated local batch parser and typed backend reader.
-  packedBytes: 58_500,
+  // Measured 58,913 bytes following minimal recipient projection.
+  packedBytes: 60_000,
   // Reviewed observation-health .js and .d.ts add 2,841 bytes over v0.2.
   // Additional typed platform capability validators remain dependency-free.
   // Preserve a bounded size budget with reviewed headroom.
@@ -107,7 +110,8 @@ const budgets = {
   // Actual tested unpacked package: 208,234 B after new validated route reader.
   // 218,593 B measured across reviewed SDK declarations/JS after batch validator.
   // Measured with dependency-free live batch preflight module: 223,097 B.
-  unpackedBytes: 225_500,
+  // Measured 226,388 bytes with recipient presence validators and declarations.
+  unpackedBytes: 229_000,
   // Reviewed 22,718-byte full bundle after restoring read-only governance and platform clients.
   // Allow bounded headroom, not a blanket removal of browser-size limits.
   // 25,755 measured after adding strictly validated, dependency-free governance snapshot.
@@ -115,7 +119,8 @@ const budgets = {
   // Measured 31,006 B with bounded route preflight verification; ~3% headroom.
   // 33,134 B measured; keep a narrow reviewed limit after batch planning.
   // Isolated consumer measured 34,422 B after live readiness validation.
-  fullBrowserBytes: 35_400,
+  // Isolated consumer 35,577 bytes; retain small bounded headroom.
+  fullBrowserBytes: 36_500,
   treeShakenBrowserBytes: 1_600,
   // 26,458 measured for the pinned Next.js consumer; retain a narrow regression cap.
   // 28,001-byte measured consumer chunk with consent-based contract inspection.
@@ -123,7 +128,8 @@ const budgets = {
   // Measured 31,641 B Next.js consumer after route validation; <3% headroom.
   // 33,718 B measured by isolated Next.js consumer; <3% headroom.
   // Isolated Next.js consumer measured 34,987 B; bounded 3% headroom.
-  nextClientSdkChunksBytes: 36_000
+  // Isolated Next.js consumer 36,115 bytes; retain bounded headroom.
+  nextClientSdkChunksBytes: 37_200
 };
 const forbiddenModulePattern = /^(?:node:|fs(?:\/|$)|crypto(?:\/|$)|path(?:\/|$)|child_process(?:\/|$)|worker_threads(?:\/|$)|net(?:\/|$)|tls(?:\/|$))/;
 const secretMaterialPattern = /\b(?:privateKey|secretKey|mnemonic|seedPhrase|recoveryPhrase|walletSecret)\b/i;
