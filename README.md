@@ -1,244 +1,107 @@
 <div align="center"><img src="assets/stealthbridge-logo.svg" alt="StealthBridge — Confidential payments. Without borders." width="760" /></div>
 
-# StealthBridge SDK
+# StealthBridge — TypeScript SDK
 
-## Cross-repository integration and governance status
+**Strict, testnet-only developer interfaces for publicly observable payment-route metadata and operational checks.**
 
-Three Rust/Soroban **public governance contracts are deployed on Stellar Testnet**, with real contract IDs, deployment transactions and executable hashes recorded in the [Contracts release report](https://github.com/stealthbridge-labs/stealthbridge-contracts/blob/main/deployments/testnet/VERIFIED-GOVERNANCE-RELEASE-2026-10-17.md). The backend observes the network, deployment receipts, current code and administrator state through read-only public ledger operations; the frontend uses the server-side same-origin proxy for those reads. The SDK publishes **typed validation for the backend's governance release, code and administrator observations** and a fail-closed cross-observation assessment, alongside network, corridor and historical public activity readers. See the [organization integration topology](https://github.com/stealthbridge-labs/.github/blob/main/docs/INTEGRATION-TOPOLOGY.md).
+[Product](https://stealthbridge.vercel.app) · [Backend OpenAPI](https://github.com/stealthbridge-labs/stealthbridge-backend/blob/main/api/openapi.yaml) · [Compatibility](specs/COMPATIBILITY.md) · [Architecture](docs/ARCHITECTURE-AND-DELIVERY.md)
 
-The SDK's validators check shape/consistency; they do **not** authenticate an independently signed canonical manifest or enable wallet-controlled on-chain invocations. The legacy canonical manifest v1 is `not-deployed` despite actual governance deployment and still needs a reviewed three-contract replacement. Signing, confidential asset transfers, fee collection and payout methods are unavailable. The package is **not** itself the deployed API service.
+## What exists
 
-**Engineering roadmap:** [View the repository-specific plan](ROADMAP.md).
+`@stealthbridge/sdk` is a native ESM TypeScript library that validates bounded HTTP data from the **Rust/Axum backend** and provides safe, exact-value local utilities. It is intentionally a **private, not-yet-published package** (`package.json` has `private: true`). Client-side payment signing, custody, private notes, ZK witness handling, issuer attestation, fee collection, fiat payout and money movement **are not implemented**.
 
-## New: opt-in Testnet platform fee quotes (no fee collection)
+It supports real Testnet network readings, corridor paging/filtering and single/batch metadata, fresh live preflights, public recipient presence, public observer data, governance/source inventory snapshots and checked asset math. Malformed, stale, wrong-network or falsely payment-enabled responses fail closed.
 
-`quotePlatformFee` computes an **illustrative transparent fee** using
-`AssetAmount`'s exact bigint minor-unit arithmetic, not floating-point
-currency rounding. The default proposed rate is **10 bps (0.10%)**, with
-a **50 bps (0.50%) maximum**. Fees are included in the gross amount,
-rounded *down*, and may be zero for dust amounts. This quote is **not**
-a transfer, deduction, settlement, or approved Mainnet business rate.
-
-```ts
-import { AssetAmount, quotePlatformFee } from "@stealthbridge/sdk";
-
-const gross = AssetAmount.parse({
-  network: "testnet", kind: "stellar-classic", identifier: "XLM", decimals: 7,
-}, "100");
-
-const quote = quotePlatformFee(gross);
-// quote.platformFee.format()  -> "0.1"
-// quote.recipientAmount.format() -> "99.9"
-// quote.collectionEnabled -> false (always)
-```
-
-Read the [fee quote boundaries and future collector proposal](docs/PLATFORM-FEE-QUOTES.md).
-
-## Stellar Testnet governance deployments
-
-Three reviewed governance contracts were **deployed on Stellar Testnet on
-17 October 2026**. Their [verified C-addresses and on-chain receipts are published
-in the Contracts repository](https://github.com/stealthbridge-labs/stealthbridge-contracts/blob/main/deployments/testnet/VERIFIED-GOVERNANCE-RELEASE-2026-10-17.md).
-**The SDK's existing canonical v1 manifest is still a fail-closed legacy
-integration record**, and the SDK does **not** yet treat a static C-address as
-authorized for on-chain contract calls. A reviewed three-contract canonical v2
-migration and RPC-backed verification are required before enabling new read
-adapters. No payment, fee charge or privacy capability is implied.
-
-
-## Platform architecture and SDK expansion
-
-**Full engineering guide:** [SDK architecture, versioning, compatibility and release gates](docs/ARCHITECTURE-AND-DELIVERY.md).
+### Where the SDK fits
 
 ```text
-Next.js / browser ──┐
-Node ESM services ──┼──► @stealthbridge/sdk (typed Testnet reads)
-                    │       ├─ validated Rust API responses
-                    │       ├─ real corridor paging / network freshness
-                    │       ├─ source-only Soroban three-contract ABI
-                    │       ├─ exact-value asset utilities
-                    │       └─ local Stellar public-account validation
-                    └─ no signer / no payment send / no private witness handling
-Future: attested contract reads → reviewed wallet adapter → audited proof adapter
+Web / Node.js / service consumers
+          |
+          v
+@stealthbridge/sdk (validated public read models)
+          |
+          v
+Rust/Axum API ───► Stellar Testnet RPC
+       |
+       └────────► Neon PostgreSQL (operator-configured public route records)
+
+Customer sign-in, profile changes and organization roles:
+  Next.js same-origin authenticated bridge → Rust backend
+  (not an unauthenticated SDK consumer operation)
 ```
 
-**Current source of truth:** the backend OpenAPI defines HTTP operations, the Soroban repository defines the **corridor, policy, and governance-gate** source interface, and the SDK protects consumers from incompatible responses and falsely enabled capabilities. A signed contract manifest is **not** available yet; no SDK method performs an on-chain contract invocation, private transfer, or fiat payout.
+The customer app is organized into Home, Personal Send, Business onboarding/team management, a separate business payment planner and a local CSV batch planner. These are product workflows, **not** SDK-enabled execution. [Product architecture](https://github.com/stealthbridge-labs/stealthbridge-frontend/blob/main/docs/PRODUCT-ARCHITECTURE-AND-JOURNEYS.md).
 
-**What comes next:** publish a versioned package only after license/maintainer approval, generate types from a reviewed OpenAPI revision, enforce backend/API and Soroban contract compatibility across CI, and make browser/Node adapter boundaries explicit. Add independently attested Testnet contract reads before considering any wallet-signing interface.
+## Local usage
 
-**Later SDK direction:** separate opt-in signer sessions from watching a public wallet address; require human confirmation of network, function, assets, fees and authorization footprint; integrate only independently audited and version-pinned confidential token/private-payment primitives; protect note encryption and recovery without uploading private witnesses to the API. Build real examples that **fail closed** when a partner, issuer, pool or rail is unverified.
+Requires Node.js **22+** and ESM. No npm registry publication is needed when consuming the package locally.
 
-**Release test:** `npm run verify` exercises packed tarball integrity, declaration exports, Node ESM and browser/Next.js consumers. Package compatibility tests are not evidence of live payment capability. The SDK is a library, not a Vercel website deployment target.
-
-An initial **read-only TypeScript SDK** for live StealthBridge network and corridor metadata.
-
-```ts
-import { StealthBridgeClient } from "@stealthbridge/sdk";
-const client = new StealthBridgeClient({ apiBaseUrl: "https://your-api.example", network: "testnet" });
-const chain = await client.network();    // real observed Stellar ledger from backend
-const corridors = await client.corridors(); // real PostgreSQL records or explicit 503
-```
-
-The public functions return network metadata, capability flags and actual configured corridors. A data-unavailable response is an error, **never replaced with demo values**. The API rejects non-HTTPS remote URLs.
-
-## Security and status
-
-No payment submission, signing, wallet custody, encrypted note management, ZK proof generation, mainnet, or fiat integration. This SDK is not a confidential transfer implementation.
-
-See [compatibility matrix](specs/COMPATIBILITY.md), the [backend API](https://github.com/stealthbridge-labs/stealthbridge-backend/blob/main/api/openapi.yaml), [frontend](https://github.com/stealthbridge-labs/stealthbridge-frontend), and [contracts](https://github.com/stealthbridge-labs/stealthbridge-contracts).
-
-## Require a recent real Testnet ledger
-
-The SDK has a separate strict network method when consumers need a **live**
-network observation rather than any syntactically valid RPC response:
-
-```ts
-const network = await client.liveNetwork({ maxAgeSeconds: 180 });
-console.log(network.ledger_sequence);
-```
-
-`liveNetwork` validates the Testnet passphrase, protocol and hash through the
-standard read-only client, then checks that the ledger close time is within
-the requested age threshold (with at most 30 seconds of future clock skew).
-It throws `ApiError` (HTTP-equivalent 503, code `STALE_LEDGER`) when the
-observation is stale. This is network freshness only, **not evidence of
-confidential transfers, provider liquidity, or fiat payout**. Default API
-reads remain backward compatible.
-
-## Runtime and package compatibility
-
-The only public package entry point is `@stealthbridge/sdk`. It is native ESM and exports the runtime values `StealthBridgeClient` and `ApiError`, plus the TypeScript types `ClientConfig`, `Network`, `PrivacyRail`, `SettlementState`, `Capabilities`, `NetworkStatus`, `Corridor`, `SettlementSummary`, and `TransactionObservation`. Internal `dist/*` paths are not public exports.
-
-- Node.js: 22 or newer, ESM only. CommonJS `require()` is not supported.
-- Browsers: ES2022 with built-in `fetch`, `Response`, and `URL`, using a bundler that understands package `exports`. CI verifies this with esbuild and a pinned Next.js 16.4 App Router production build.
-- TypeScript: declarations are generated beside the ESM output and resolved through the `types` export condition.
-- Network: Stellar Testnet only. Browser calls are still subject to the backend's CORS policy.
-
-The package remains private and unpublished while licensing and release approval are pending. To inspect the exact local package consumers without publishing:
-
-```sh
+```bash
 npm ci
 npm run verify
 ```
 
-`npm run verify` type-checks and builds the source, creates `artifacts/stealthbridge-sdk-0.2.0.tgz`, validates SHA-256 plus npm's SHA-1/SHA-512 integrity metadata and contents, then installs that tarball into isolated Node.js, TypeScript, esbuild, and Next.js fixtures. The Next.js fixture proves the installed `dist/index.js` entry resolves in both a Server Component and a `"use client"` Client Component. It does not need a backend, wallet, credentials, or deployment. The fixture's pinned dependencies require registry access on a cold cache.
+`npm run verify` builds and type-checks, checks exact backend OpenAPI wire types, tests rejection cases, packages a local tarball and exercises isolated Node/Next.js consumers. It performs **no Testnet transactions** and requires no keys.
 
-Package size and browser chunk ceilings are enforced by `tests/package.test.mjs`; see CI for **current measured output** rather than relying on a historic size snapshot. Changes beyond the checked-in budgets require explicit review and measurements.
-
-## Consumer errors
-
-- The constructor throws `Error` for a network other than `"testnet"`, a non-HTTP(S) URL, or non-local plaintext HTTP.
-- `transaction(hash)` throws `TypeError` before any request unless the hash is exactly 64 hexadecimal characters.
-- A completed non-2xx response throws `ApiError`; inspect its numeric `status`, requested `path`, stable `code` and optional `traceId`. Its message never copies raw upstream error details. A transaction 404 can also mean the RPC node no longer retains that transaction.
-- Native URL, fetch, CORS, DNS, and connection failures pass through unchanged. The client does not retry or replace unavailable data with examples.
-
-## On-chain observation, without leaking contract events
+### Read-only example
 
 ```ts
-const observed = await client.transaction(realTransactionHash); // exact 64-hex hash
-console.log(observed.status, observed.ledger);
-```
+import { StealthBridgeClient } from "@stealthbridge/sdk";
 
-The result verifies **chain inclusion only**. It does not prove private-payment anonymity, bank payout or token redemption; older hashes may be unavailable from RPC retention. The SDK has offline tests for URL restrictions, malformed hashes, missing transactions and safe read-only behavior. See [the engineering roadmap](ROADMAP.md).
-
-## Exact-value asset operations
-
-```ts
-import { AssetAmount } from "@stealthbridge/sdk";
-const verifiedAsset = {
-  network: "testnet", kind: "soroban-token",
-  identifier: assetIdFromYourVerifiedConfiguration,
-  decimals: decimalsFromYourVerifiedContract
-} as const;
-const amount = AssetAmount.parse(verifiedAsset, valueEnteredAsDecimalString);
-const total = amount.add(otherAmountOfSameAsset);
-console.log(total.format(), total.minorUnits.toString());
-```
-
-This is a *pure amount utility*, not a conversion rate or transfer feature. It rejects floating-point inputs, ambiguous decimal strings, unsupported precision, negative values and cross-asset operations. Asset identity/decimals **must be verified from real chain/issuer metadata**; never assume precision or trusted issuer from this helper. Bigints serialize explicitly to minor-unit strings.
-
-## Verified contract manifest parsing
-
-Use `parseDeploymentManifest(input)` and `getVerifiedContract(manifest,name,{sourceRevision})` to prevent accidental use of unconfirmed or non-Testnet contract identifiers. The canonical contracts manifest is still schema v1 and explicitly `not-deployed`; it must **not** be represented as a functioning protocol. The parser accepts that empty manifest and a strict forward schema-v2 fixture requiring the Testnet passphrase, supported protocol/API versions, a pinned source revision, contract IDs, matching ABI/WASM digests and transaction evidence. `getVerifiedContract` can compare the manifest to a consumer-pinned source revision and versions. `contracts()` separately validates the canonical undeployed API response and exact public method inventory. These checks do **not** independently prove an on-chain deployment or attest to a token issuer. See `src/manifest.ts` and `specs/COMPATIBILITY.md`.
-
-## Resilient read-only client
-
-The SDK validates actual response schemas for network identity, corridors, capabilities, health and transaction observations before returning them. Responses that are malformed, oversized (> 64 KB), missing JSON Content-Type headers, or incompatible with Stellar Testnet fail closed with `ApiError(502,path)`; no synthetic results are returned.
-
-Set `timeoutMs` between 100 and 60000 milliseconds (10 seconds by default) and pass `{signal:AbortSignal}` to any read. Requests use `AbortSignal.any()` for cancellation and timeout. Opt-in bounded retries (`maxRetries` up to 5, default 0) with exponential backoff (`retryBackoffMs`, default 100ms) can be configured globally or per-request for GET reads encountering 429, 502, 503, 504, or network timeouts. Client 400 and 404 errors are non-retryable. **No money-moving method is exposed, and no implicit retries exist for non-GET operations.**
-
-### Single corridor detail
-
-`client.corridor(corridorId)` retrieves the actual enabled corridor record by UUID. Invalid identifiers fail before fetching; unknown, disabled or unavailable corridors raise HTTP errors. A database record is **not** evidence of active provider support, licensed payouts or a verified contract deployment.
-
-## Detailed developer guide
-
-[Read the implementation and integration guide](docs/DEVELOPER-GUIDE.md) for current API boundaries, usage, verification and security requirements.
-
-## Bounded client responses and opt-in retries
-
-Every GET has a total configurable timeout, optional AbortSignal, and a 64 KiB **streamed byte limit**. Oversized responses are rejected as upstream errors before the full body is accumulated, and malformed or unexpected response types are not transformed into fictional data. Retries are **off by default**; to explicitly retry only 429/502/503 GET failures, pass \`{retries: 1}\` or \`{retries: 2}\`. A single overall timeout/AbortSignal covers retries and exponential backoff. Client-side financial mutation methods do not exist and will never inherit this retry policy implicitly.
-
-## Bounded corridor discovery
-
-\`client.corridorsPage({limit:25})\` calls the backend's **read-only** keyset endpoint. Use \`page.next_cursor\` as \`after\` for the next request. Page sizes are restricted to 1–100 and both incoming cursors and returned records are validated. An empty page is a genuine empty database result, not an invented corridor. Concurrent operator changes may affect subsequent pages; pagination is not a transactionally frozen snapshot.
-
-\`\`\`ts
-const first = await client.corridorsPage({limit:25});
-if(first.next_cursor){
-  const second = await client.corridorsPage({after:first.next_cursor,limit:25});
-}
-\`\`\`
-
-Optional **server-side catalog filters** are available without fetching every
-page into the browser:
-
-```ts
-const page = await client.corridorsPage({
-  limit: 25,
-  originCountry: "NG",
-  destinationCountry: "GH",
-  privacyRail: "confidential-token",
+const client = new StealthBridgeClient({
+  apiBaseUrl: "https://stealthbridge-backend.vercel.app",
+  network: "testnet",
 });
+const ledger = await client.liveNetwork({ maxAgeSeconds: 180 });
+const first = await client.corridorsPage({ limit: 25 });
+console.log(ledger.ledger_sequence, first.items.length);
 
-for await (const corridor of client.scanCorridors({
-  maxPages: 5, originCountry: "NG", destinationCountry: "GH",
-  privacyRail: "confidential-token",
-})) {
-  console.log(corridor.id); // Public operator configuration only
+// Public UUIDs only: no recipient, amount, or business reference is sent.
+const publicIds = first.items.slice(0, 8).map(row => row.id);
+if (publicIds.length) {
+  const preflight = await client.corridorBatchPreflight(publicIds);
+  console.log(preflight.read_only_dependencies_ready);
+  // Never treat this as permission to submit funds.
 }
 ```
 
-The SDK validates uppercase ISO-style country metadata and both supported
-privacy-rail labels **before networking**, forwards exact URL query keys
-through the read-only backend endpoint, and rejects returned records that
-do not match the requested filters. A filter is not a compliance decision,
-FX quote, proof of issuer authority, or payout confirmation.
+Configured corridor records, even when returned successfully, **are not FX quotes or enabled partner settlement**. The SDK requires real backend responses, validates strict schema and network identity, and does not substitute example records for unavailable database state.
 
-This method is separate from the backwards-compatible \`corridors()\` listing; it never creates quote, payment or partner relationships.
+### Available capabilities
 
-## Opt-in ledger observer support
+| API helper | Data returned | Does not establish |
+| --- | --- | --- |
+| `network()`, `liveNetwork()`, `readiness()` | Testnet RPC and infrastructure freshness | Privacy or payment availability |
+| `corridorsPage()`, `scanCorridors()`, `corridor(id)` | Enabled operator route metadata and paging | FX pricing or liquidity |
+| `corridorBatch(ids)`, `corridorBatchPreflight(ids)` | Bounded public UUID batch and live dependency checks | Batch transfer permission |
+| `corridorPreflight(id)` | Route snapshot and independently checked dependency state | Issuer, recipient or bank approval |
+| `observerHead()`, `transaction(hash)` | Public ledger observations | Final settlement or payout |
+| `contracts()`, governance observation reads | Source ABI and historical/current public governance observations | Canonical deploy authority or cryptographic proof |
+| `AssetAmount` and local settlement transition helpers | Checked integer/minor-unit arithmetic and domain state rules | User balance, transaction or signed receipt |
 
-The backend can persist a monotonic **public Testnet ledger head** after independently checking RPC network identity. With an operator-managed database and explicit observer activation, \`client.observerHead()\` reads that last stored checkpoint. An absent checkpoint returns HTTP 404, unavailable storage 503, and malformed schema a rejected protocol response. This **does not prove a payment occurred** and does not contain transaction XDR, a settlement receipt, account data or a fiat payout. The field may be stale if the observer is stopped.
+The SDK's bundled OpenAPI snapshot and generated wire model must track the reviewed backend revision. Release CI enforces source parity; see [schema compatibility](specs/COMPATIBILITY.md) and [developer guide](docs/DEVELOPER-GUIDE.md).
 
-## Pure settlement lifecycle interpretation
+## Security and error handling
 
-The SDK exports \`allowedSettlementTransitions\`, \`canTransitionSettlement(from,to)\`, \`assertSettlementTransition(from,to)\`, \`isSettlementState(value)\` and \`isTerminalSettlementState(state)\`. These mirror the backend's explicit **domain state machine**; they are for rendering and validating lifecycle information, not creating/approving/executing financial operations.
+- Testnet network passphrase is fixed; unsupported networks and untrusted plaintext remote API URLs are rejected.
+- Bounded request timeout, cancellation and streamed 64 KiB response ceiling.
+- Opt-in retries are limited to idempotent GET reads; no implicit money-moving retries or fabricated fallback data.
+- Errors expose stable HTTP/code/path information, not raw upstream secrets.
+- Asset amounts use `bigint` minor units, not floating-point currency calculations. Caller must validate real asset identity, issuer and decimals.
+- Canonical Soroban v1 manifest is still an **outdated integration record** that says `not-deployed`, even though three public governance contracts were actually deployed October 17, 2026. A new approved manifest and fresh independent attestation are separate release gates.
+- An optional **illustrative** `quotePlatformFee` helper has `collectionEnabled = false`; it does not transfer or accrue fees.
 
-In particular, \`chain_finalized\` **cannot** advance directly to \`payout_completed\`; external payout confirmation and reconciliation are distinct. Terminal state is not synonymous with successful payment (e.g. \`expired\` and \`rejected\` are terminal). Versions must remain aligned across backend/SDK; CI tests fail on invalid transitions. No client-side transition is proof of actual chain or payout evidence.
+See [fee quote boundaries](docs/PLATFORM-FEE-QUOTES.md), [source interface specification](specs/COMPATIBILITY.md), and [Security](SECURITY.md).
 
-## Service dependency readiness
+## Developer integration roadmap
 
-\`client.readiness()\` reads the backend's \`GET /ready\` route, and validates the relationship between \`status\`, \`stellar_rpc\`, \`database\`, and an explicitly **disabled payments** capability. Database status distinguishes \`not-configured\` from a configured but \`unavailable\` dependency. A fully connected process can report \`ready\` for its observation dependencies while **payments remain disabled**. Absent/unavailable dependencies cause the backend's HTTP 503 and are not rewritten to success by the SDK.
+1. Pin and validate backend wire contracts across CI, plus isolated package-consumer checks.
+2. Introduce reviewed customer/organization access models **without** exposing server-only account bridge credentials to browser SDK code.
+3. Verify independent Soroban privacy mechanisms, smart-account recovery, signer policies and legitimate issuers.
+4. Expose financial mutations only after separately audited contracts, licensing/compliance checks, payout providers and reconciliation.
 
-## Bounded streaming corridor scans
+### Other repositories
 
-The SDK now offers `scanCorridors({pageSize:25,maxPages:20,signal})`, an asynchronous iterator over **real** configured records. It limits the number of HTTP requests, supports caller cancellation and bounded GET retry settings, checks UUID cursor progress, ordering and duplicate records, and terminates when the backend returns a null cursor. The default cap is at most 20 requests, not an exhaustive scan guarantee; use `corridorsPage` with explicit cursors for larger catalogs. No data is fabricated, and no transfer or payout operation is performed.
+[Frontend](https://github.com/stealthbridge-labs/stealthbridge-frontend) · [Backend](https://github.com/stealthbridge-labs/stealthbridge-backend) · [Soroban contracts](https://github.com/stealthbridge-labs/stealthbridge-contracts) · [Roadmap](ROADMAP.md)
 
-## Canonical cross-repository contract discovery
-
-`client.contracts()` retrieves `GET /v1/contracts` from the Rust backend. The backend embeds the **real**, currently `not-deployed` Testnet manifest from the Soroban contracts repository. An automated backend CI check compares its snapshot with the canonical contracts repo so source drift fails early. The SDK validates schema, network, record emptiness and explicit `on_chain_verified=false` / `payment_execution_enabled=false`. It rejects any premature deployed/verified claim; no contract ID or payment capability is conjured. After an independently verified Soroban deployment, this interface must be extended with actual chain attestation before enabling contract operations. The SDK does not sign or simulate fund movement.
-
-### Source-level registry ABI inventory
-
-`contracts().public_interface` contains the read method names, argument shapes and explicitly separated administrator writes for all three current Soroban governance contract sources. The authoritative snapshot lives at `stealthbridge-contracts/integrations/public-soroban-interface.v1.json`; the backend compares its mirrored copy in CI and serves it to SDK clients. The SDK validates the read names against the pinned source interface and rejects unknown read capabilities. This is a method inventory only: without a real deployed Contract ID and independent chain attestation, no Soroban invocation can run. No wallet seed or private proof is accepted here.
+**Read-only tooling. Testnet only. No real customer payments.**
