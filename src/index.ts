@@ -123,3 +123,6 @@ export type {ClassicRecipientPresence} from "./classic-recipient-presence.js";
 
 export {canonicalPrivateReviewDraft,digestPrivateReviewDraft,createPrivateReviewReceipt,verifyPrivateReviewReceipt} from "./private-review-commitment.js";
 export type {PrivateReviewDraft,PrivateReviewReceipt} from "./private-review-commitment.js";
+
+export {encryptCustomerDraft,decryptCustomerDraft,validCustomerDraft,validEncryptedCustomerDraft,validEncryptedDraftDirectory,PRIVATE_DRAFT_LIMIT} from "./private-draft-vault.js";
+export type {CustomerDraft,EncryptedCustomerDraft,CustomerEncryptedDraftDirectory,CustomerEncryptedDraftRecord} from "./private-draft-vault.js";

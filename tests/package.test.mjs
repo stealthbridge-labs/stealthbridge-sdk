@@ -74,6 +74,8 @@ const expectedPackageFiles = [
   "dist/platform-fees.js",
   "dist/platform.d.ts",
   "dist/platform.js",
+  "dist/private-draft-vault.d.ts",
+  "dist/private-draft-vault.js",
   "dist/private-review-commitment.d.ts",
   "dist/private-review-commitment.js",
   "dist/private-transfer.d.ts",
@@ -101,7 +103,8 @@ const budgets = {
   // changes adding large packages, Node-only builtins or hidden code.
   // 57,298 B measured with isolated local batch parser and typed backend reader.
   // Measured 58,913 bytes following minimal recipient projection.
-  packedBytes: 60_000,
+  // Reviewed Web Crypto vault adds under 3 KB of packed code.
+  packedBytes: 65_000,
   // Reviewed observation-health .js and .d.ts add 2,841 bytes over v0.2.
   // Additional typed platform capability validators remain dependency-free.
   // Preserve a bounded size budget with reviewed headroom.
@@ -116,7 +119,8 @@ const budgets = {
   // Measured with dependency-free live batch preflight module: 223,097 B.
   // Measured 226,388 bytes with recipient presence validators and declarations.
   // Measured 229,442 B with read-only G-address presence; bounded headroom.
-  unpackedBytes: 232_000,
+  // Reviewed browser-only vault adds under 10 KB unpacked.
+  unpackedBytes: 248_000,
   // Reviewed 22,718-byte full bundle after restoring read-only governance and platform clients.
   // Allow bounded headroom, not a blanket removal of browser-size limits.
   // 25,755 measured after adding strictly validated, dependency-free governance snapshot.
@@ -126,7 +130,7 @@ const budgets = {
   // Isolated consumer measured 34,422 B after live readiness validation.
   // Isolated consumer 35,577 bytes; retain small bounded headroom.
   // Reviewed consumer with locally generated privacy integrity receipts: ~39KB.
-  fullBrowserBytes: 41_000,
+  fullBrowserBytes: 48_000,
   treeShakenBrowserBytes: 1_600,
   // 26,458 measured for the pinned Next.js consumer; retain a narrow regression cap.
   // 28,001-byte measured consumer chunk with consent-based contract inspection.
@@ -136,7 +140,7 @@ const budgets = {
   // Isolated Next.js consumer measured 34,987 B; bounded 3% headroom.
   // Isolated Next.js consumer 36,115 bytes; retain bounded headroom.
   // Reviewed Next.js consumer measured 39,533 B with new local review helper.
-  nextClientSdkChunksBytes: 42_000
+  nextClientSdkChunksBytes: 49_000
 };
 const forbiddenModulePattern = /^(?:node:|fs(?:\/|$)|crypto(?:\/|$)|path(?:\/|$)|child_process(?:\/|$)|worker_threads(?:\/|$)|net(?:\/|$)|tls(?:\/|$))/;
 const secretMaterialPattern = /\b(?:privateKey|secretKey|mnemonic|seedPhrase|recoveryPhrase|walletSecret)\b/i;
