@@ -120,3 +120,6 @@ export type {RecipientPresence} from "./recipient-presence.js";
 
 export {validClassicRecipientPresence,currentClassicRecipient} from "./classic-recipient-presence.js";
 export type {ClassicRecipientPresence} from "./classic-recipient-presence.js";
+
+export {canonicalPrivateReviewDraft,digestPrivateReviewDraft,createPrivateReviewReceipt,verifyPrivateReviewReceipt} from "./private-review-commitment.js";
+export type {PrivateReviewDraft,PrivateReviewReceipt} from "./private-review-commitment.js";

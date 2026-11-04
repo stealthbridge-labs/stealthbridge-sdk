@@ -74,6 +74,8 @@ const expectedPackageFiles = [
   "dist/platform-fees.js",
   "dist/platform.d.ts",
   "dist/platform.js",
+  "dist/private-review-commitment.d.ts",
+  "dist/private-review-commitment.js",
   "dist/private-transfer.d.ts",
   "dist/private-transfer.js",
   "dist/product-capabilities.d.ts",
@@ -123,7 +125,8 @@ const budgets = {
   // 33,134 B measured; keep a narrow reviewed limit after batch planning.
   // Isolated consumer measured 34,422 B after live readiness validation.
   // Isolated consumer 35,577 bytes; retain small bounded headroom.
-  fullBrowserBytes: 36_500,
+  // Reviewed consumer with locally generated privacy integrity receipts: ~39KB.
+  fullBrowserBytes: 41_000,
   treeShakenBrowserBytes: 1_600,
   // 26,458 measured for the pinned Next.js consumer; retain a narrow regression cap.
   // 28,001-byte measured consumer chunk with consent-based contract inspection.
@@ -132,7 +135,8 @@ const budgets = {
   // 33,718 B measured by isolated Next.js consumer; <3% headroom.
   // Isolated Next.js consumer measured 34,987 B; bounded 3% headroom.
   // Isolated Next.js consumer 36,115 bytes; retain bounded headroom.
-  nextClientSdkChunksBytes: 37_200
+  // Reviewed Next.js consumer measured 39,533 B with new local review helper.
+  nextClientSdkChunksBytes: 42_000
 };
 const forbiddenModulePattern = /^(?:node:|fs(?:\/|$)|crypto(?:\/|$)|path(?:\/|$)|child_process(?:\/|$)|worker_threads(?:\/|$)|net(?:\/|$)|tls(?:\/|$))/;
 const secretMaterialPattern = /\b(?:privateKey|secretKey|mnemonic|seedPhrase|recoveryPhrase|walletSecret)\b/i;
