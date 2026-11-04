@@ -1,6 +1,6 @@
 import {test} from "node:test";
 import assert from "node:assert/strict";
-import {encryptCustomerDraft,decryptCustomerDraft,validCustomerDraft,validEncryptedCustomerDraft,validEncryptedDraftDirectory} from "../dist/index.js";
+import {encryptCustomerDraft,decryptCustomerDraft,reencryptCustomerDraft,validCustomerDraft,validEncryptedCustomerDraft,validEncryptedDraftDirectory} from "../dist/index.js";
 const account="GAAACAQDAQCQMBYIBEFAWDANBYHRAEISCMKBKFQXDAMRUGY4DUPB7JZX";
 const recipient="GC3YRVLB7IN7SNUYVWFUC6OD3QWJXCUZ4HOBNIPVGY7BZDVOYMDNX5TN";
 const id="a12ef783-d60b-4427-aa62-d2562acd4cef", other="b12ef783-d60b-4427-aa62-d2562acd4cef";
@@ -34,4 +34,24 @@ test("strict draft and ciphertext schema refuse financial activation claims",asy
  assert.equal(validEncryptedDraftDirectory(directory,account),true);
  assert.equal(validEncryptedDraftDirectory({...directory,payment_execution_enabled:true},account),false);
  assert.equal(validEncryptedDraftDirectory({...directory,drafts:[...directory.drafts,...directory.drafts]},account),false);
+});
+
+test("customer rotates passphrase with independently fresh ciphertext; old secret stops working",async()=>{
+ const old=await encryptCustomerDraft(account,id,password,draft);
+ const next="new-long-unique-recovery-secret-2026";
+ const rotated=await reencryptCustomerDraft(account,id,password,old,id,next);
+ assert.notEqual(rotated.salt,old.salt);
+ assert.notEqual(rotated.iv,old.iv);
+ assert.notEqual(rotated.ciphertext,old.ciphertext);
+ assert.deepEqual(await decryptCustomerDraft(account,id,next,rotated),draft);
+ await assert.rejects(decryptCustomerDraft(account,id,password,rotated));
+ await assert.rejects(reencryptCustomerDraft(account,id,"incorrect-previous-secret",old,id,next));
+ await assert.rejects(reencryptCustomerDraft(recipient,id,password,old,id,next));
+});
+test("encrypted backup recovery rewraps for a new account-scoped slot without server plaintext",async()=>{
+ const original=await encryptCustomerDraft(account,id,password,draft);
+ const restored=await reencryptCustomerDraft(account,id,password,original,other,password);
+ assert.deepEqual(await decryptCustomerDraft(account,other,password,restored),draft);
+ await assert.rejects(decryptCustomerDraft(account,id,password,restored));
+ await assert.rejects(reencryptCustomerDraft(account,other,password,{...restored,iv:original.iv},other,password));
 });

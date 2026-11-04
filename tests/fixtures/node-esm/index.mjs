@@ -134,6 +134,7 @@ assert.deepEqual(Object.keys(await import("@stealthbridge/sdk")).sort(), [
   "readCustomerProfile",
   "readIntegrationSnapshot",
   "readOrganizationTeam",
+  "reencryptCustomerDraft",
   "saveCustomerPreferences",
   "submitTeamInviteAction",
   "validAccountDirectory",

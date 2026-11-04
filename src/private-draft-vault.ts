@@ -95,6 +95,15 @@ export async function decryptCustomerDraft(account:string,id:string,password:str
   return draft;
  }catch{throw new Error("Unable to unlock the draft. Check your passphrase or encrypted data.");}
 }
+/** Rewrap authenticated ciphertext locally under a new passphrase and
+ * optionally a distinct random slot UUID. Never sends payment plaintext. */
+export async function reencryptCustomerDraft(
+ account:string,sourceId:string,previousPassword:string,encrypted:EncryptedCustomerDraft,
+ destinationId:string,newPassword:string
+):Promise<EncryptedCustomerDraft>{
+ const recovered=await decryptCustomerDraft(account,sourceId,previousPassword,encrypted);
+ return encryptCustomerDraft(account,destinationId,newPassword,recovered);
+}
 export function validEncryptedDraftDirectory(input:unknown,account:string):input is CustomerEncryptedDraftDirectory{
  if(!input||typeof input!=="object"||Array.isArray(input)||canonicalStellarAccountAddress(account)!==account)return false;
  const v=input as Record<string,unknown>;

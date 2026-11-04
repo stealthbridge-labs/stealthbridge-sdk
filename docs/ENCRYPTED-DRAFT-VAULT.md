@@ -28,3 +28,23 @@ may still permit offline dictionary attacks. Do not confuse authenticated
 file encryption with a ZK proof or smart-account authorization.
 
 Run `npm run build && node --test tests/private-draft-vault.test.mjs`.
+
+## Update, rotation and cross-device backup recovery
+
+The browser-only `reencryptCustomerDraft(account, sourceId, previousPassword,
+sourceEncrypted, destinationId, newPassword)` authenticates the old AES-GCM
+record before deriving a new PBKDF2 key and randomly re-encrypting the draft.
+Pass the same draft ID to rotate the secret on an existing record, or a new
+random UUID to create an independent encrypted copy of an imported backup.
+The old passphrase is not sent to the server, and an attacker cannot swap in a
+record from another account, UUID or network.
+
+The application, not the crypto helper, must enforce atomic `expected_revision`
+compare-and-swap and recheck the account identity. Never send decrypted
+payment fields (recipient, amount, reference) to the storage API.
+Passphrase rotation does not rotate a smart-account signer, a passphrase for
+another saved draft or an independently exported old backup. Old offline files
+still decrypt with the old secret; communicate this to customers.
+
+Regression cases cover incorrect old secrets, changed account/AAD, wrong slot,
+altered IV, ciphertext rotation and freshly encrypted new slots.
