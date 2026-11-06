@@ -26,7 +26,7 @@ test("rejects forged separators, ambiguous numbers, bad addresses and weak nonce
  for(const patch of [{reference:"X\namount:1"},{amount:"1e6"},{amount:"00.1"},{amount:"0"},
    {recipient:"C"+"A".repeat(55)},{originCountry:"ZZ\n"},{corridorId:"../../bad"}])
   assert.throws(()=>canonicalPrivateReviewDraft({...draft(),...patch}),TypeError);
- for(const nonce of ["00","A1".repeat(32),"g".repeat(64)])
+ for(const nonce of ["00","A1".repeat(32),"g".repeat(64),"0".repeat(64)])
   await assert.rejects(()=>digestPrivateReviewDraft(draft(),nonce),TypeError);
 });
 test("random nonces vary and any draft edit invalidates local review receipt",async()=>{
@@ -39,4 +39,6 @@ test("random nonces vary and any draft edit invalidates local review receipt",as
  assert.equal(await verifyPrivateReviewReceipt({...draft(),amount:"120.51"},first),false);
  assert.equal(await verifyPrivateReviewReceipt(draft(),{...first,paymentAuthorized:true}),false);
  assert.equal(first.zkProofVerified,false);
+ assert.equal(await verifyPrivateReviewReceipt(draft(),null),false);
+ assert.equal(await verifyPrivateReviewReceipt(draft(),{...first,nonceHex:"0".repeat(64)}),false);
 });
