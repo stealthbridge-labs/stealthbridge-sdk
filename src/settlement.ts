@@ -43,3 +43,9 @@ export function assertSettlementTransition(from:SettlementState,to:SettlementSta
 export function isTerminalSettlementState(state:SettlementState):boolean {
  return allowedSettlementTransitions[state].length===0;
 }
+
+/** Mirrors the Rust backend's delivery-evidence boundary. This read-only
+ * classification never certifies a bank payout or initiates settlement. */
+export function awaitsExternalDeliveryEvidence(state:SettlementState):boolean{
+ return state==="chain_finalized"||state==="payout_pending"||state==="payout_failed";
+}

@@ -21,7 +21,7 @@ export { AssetAmount, AmountError, assertAsset } from "./amount.js";
 export type { AssetIdentity } from "./amount.js";
 export { ManifestError, parseDeploymentManifest, getVerifiedContract } from "./manifest.js";
 export type { DeploymentManifest,ManifestCompatibility } from "./manifest.js";
-export { allowedSettlementTransitions, SettlementTransitionError, isSettlementState, canTransitionSettlement, assertSettlementTransition, isTerminalSettlementState } from "./settlement.js";
+export { allowedSettlementTransitions, SettlementTransitionError, isSettlementState, canTransitionSettlement, assertSettlementTransition, isTerminalSettlementState, awaitsExternalDeliveryEvidence } from "./settlement.js";
 export { canonicalStellarAccountAddress } from "./wallet.js";
 
 export type { ApiNetworkStatus, ApiCapabilities, ApiCorridor, ApiCorridorPage, ApiReadiness, ApiContractDiscovery, ApiErrorEnvelope } from "./generated/api-wire.js";

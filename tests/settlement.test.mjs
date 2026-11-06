@@ -2,7 +2,7 @@ import {test} from "node:test";
 import assert from "node:assert/strict";
 import {
  allowedSettlementTransitions,canTransitionSettlement,assertSettlementTransition,
- isSettlementState,isTerminalSettlementState,SettlementTransitionError
+ isSettlementState,isTerminalSettlementState,awaitsExternalDeliveryEvidence,SettlementTransitionError
 } from "../dist/index.js";
 test("backend-defined states and transitions are explicit",()=>{
  const states=["draft","quoted","authorized","submitted","chain_finalized","payout_pending",
@@ -29,4 +29,15 @@ test("failure paths and terminal states are not fabricated successes",()=>{
  assert.equal(isTerminalSettlementState("manual_review"),false);
  assert.equal(isTerminalSettlementState("chain_finalized"),false);
  assert.equal(isTerminalSettlementState("chain_failed"),false);
+});
+
+test("chain finality never establishes external payout evidence",()=>{
+ for(const state of ["chain_finalized","payout_pending","payout_failed"]){
+  assert.equal(awaitsExternalDeliveryEvidence(state),true);
+  assert.equal(isTerminalSettlementState(state),false);
+ }
+ for(const state of ["payout_completed","refunded","expired","rejected","draft","manual_review"]){
+  assert.equal(awaitsExternalDeliveryEvidence(state),false);
+ }
+ assert.equal(canTransitionSettlement("chain_finalized","payout_completed"),false);
 });
