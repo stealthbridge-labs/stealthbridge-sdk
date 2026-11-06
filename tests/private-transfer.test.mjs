@@ -28,3 +28,12 @@ test("validated local private-payment plans never unlock proof or settlement",()
  assert.equal(unsafe.submissionAvailable,false);
  assert.ok(unsafe.blockReasons.includes("private-pool-unverified"));
 });
+
+test("unexpected runtime privacy rails cannot become valid payment drafts",()=>{
+ const parsed=preparePrivateTransfer({sender:G,recipient:C,amount:"25.25",
+  rail:"unknown-third-rail",backendTestnetFresh:true});
+ assert.equal(parsed.validLocalDraft,false);
+ assert.equal(parsed.submissionAvailable,false);
+ assert.ok(parsed.blockReasons.includes("unsupported-rail"));
+ assert.ok(parsed.blockReasons.includes("payment-execution-disabled"));
+});

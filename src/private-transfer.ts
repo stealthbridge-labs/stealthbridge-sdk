@@ -25,7 +25,7 @@ export type PaymentPreparation={
  submissionAvailable:false;
  blockReasons:(
   "invalid-sender"|"invalid-recipient"|"self-payment"|"invalid-amount"|
-  "network-unverified"|"confidential-proof-unverified"|
+  "network-unverified"|"unsupported-rail"|"confidential-proof-unverified"|
   "private-pool-unverified"|"payment-execution-disabled"
  )[];
 };
@@ -41,15 +41,18 @@ export function preparePrivateTransfer(input:{
  const amount=typeof input.amount==="string"&&
   /^(?:0|[1-9][0-9]{0,11})(?:\.[0-9]{1,7})?$/.test(input.amount)&&Number(input.amount)>0;
  const reasons:PaymentPreparation["blockReasons"]=[];
+ // TypeScript users and external JSON may supply an unsupported runtime rail.
+ const supportedRail=input.rail==="confidential-token"||input.rail==="private-payments";
+ if(!supportedRail)reasons.push("unsupported-rail");
  if(!sender||sender.kind!=="classic")reasons.push("invalid-sender");
  if(!recipient)reasons.push("invalid-recipient");
  if(sender&&recipient&&sender.address===recipient.address)reasons.push("self-payment");
  if(!amount)reasons.push("invalid-amount");
  if(!input.backendTestnetFresh)reasons.push("network-unverified");
- reasons.push(input.rail==="confidential-token"?
+ if(supportedRail)reasons.push(input.rail==="confidential-token"?
   "confidential-proof-unverified":"private-pool-unverified");
  reasons.push("payment-execution-disabled");
  return {validLocalDraft:!!sender&&sender.kind==="classic"&&!!recipient&&
-  !reasons.includes("self-payment")&&!!amount&&input.backendTestnetFresh,
+  !reasons.includes("self-payment")&&supportedRail&&!!amount&&input.backendTestnetFresh,
   submissionAvailable:false,blockReasons:reasons};
 }
