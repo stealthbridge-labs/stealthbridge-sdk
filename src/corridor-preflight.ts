@@ -42,10 +42,11 @@ export function validCorridorPreflight(
  if(!plain(value)||Object.keys(value).sort().join(",")!==keys||
   value.schema_version!==1||value.network!=="testnet"||
   value.source!=="live-corridor-metadata-preflight"||
+  !Number.isSafeInteger(now)||now<=0||
   !Number.isSafeInteger(value.observed_at_unix)||typeof value.observed_at_unix!=="number"||
   value.observed_at_unix>now+30||value.observed_at_unix<now-120||
   !corridorValid(value.corridor)||
-  (expectedId!==undefined&&value.corridor.id.toLowerCase()!==expectedId.toLowerCase())||
+  (expectedId!==undefined&&(!uuid.test(expectedId)||value.corridor.id.toLowerCase()!==expectedId.toLowerCase()))||
   typeof value.network_fresh!=="boolean"||
   typeof value.database_schema_ready!=="boolean"||
   value.read_only_dependencies_ready!==

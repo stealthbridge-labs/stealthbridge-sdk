@@ -12,6 +12,9 @@ const safe={schema_version:1,network:"testnet",source:"live-corridor-metadata-pr
  issuer_verified:false,privacy_verified:false,fiat_payouts_enabled:false};
 test("preflight rejects forged readiness, stale observations and substitute routes",()=>{
  assert.equal(validCorridorPreflight(safe,id,now),true);
+ assert.equal(validCorridorPreflight(safe,"../../preflight",now),false);
+ assert.equal(validCorridorPreflight(safe,id,NaN),false);
+ assert.equal(validCorridorPreflight(safe,id,-1),false);
  for(const unsafe of [{...safe,payment_execution_enabled:true},
   {...safe,fee_quote_available:true},{...safe,issuer_verified:true},
   {...safe,privacy_verified:true},{...safe,liquidity_verified:true},
