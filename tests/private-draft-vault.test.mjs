@@ -34,6 +34,8 @@ test("strict draft and ciphertext schema refuse financial activation claims",asy
  assert.equal(validEncryptedDraftDirectory(directory,account),true);
  assert.equal(validEncryptedDraftDirectory({...directory,payment_execution_enabled:true},account),false);
  assert.equal(validEncryptedDraftDirectory({...directory,drafts:[...directory.drafts,...directory.drafts]},account),false);
+ assert.equal(validEncryptedDraftDirectory({...directory,drafts:[{...directory.drafts[0],revision:1000001}]},account),false);
+ assert.equal(validEncryptedDraftDirectory({...directory,drafts:[{...directory.drafts[0],updated_at_unix:Math.floor(Date.now()/1000)+1000}]},account),false);
 });
 
 test("customer rotates passphrase with independently fresh ciphertext; old secret stops working",async()=>{
