@@ -105,3 +105,26 @@ See [fee quote boundaries](docs/PLATFORM-FEE-QUOTES.md), [source interface speci
 [Frontend](https://github.com/stealthbridge-labs/stealthbridge-frontend) · [Backend](https://github.com/stealthbridge-labs/stealthbridge-backend) · [Soroban contracts](https://github.com/stealthbridge-labs/stealthbridge-contracts) · [Roadmap](ROADMAP.md)
 
 **Read-only tooling. Testnet only. No real customer payments.**
+
+## Settlement journal notifications
+
+`parseSettlementNotification(value)` validates metadata emitted by the backend's
+transactional PostgreSQL outbox. It accepts an initial `draft` at version `"0"`
+and permitted state transitions thereafter. Versions remain decimal strings to
+preserve PostgreSQL BIGINT precision. Extra fields, financial authority claims,
+and a direct `chain_finalized` → `payout_completed` transition are rejected.
+
+```ts
+import { parseSettlementNotification } from "@stealthbridge/sdk";
+const notification = parseSettlementNotification(untrustedPayload);
+// Route to an authenticated internal reconciliation reader, not a payment executor.
+console.log(notification.next_state, notification.version);
+```
+
+This is a format parser for an implemented internal outbox, not a public event
+subscription API. It does not authenticate delivery, establish tenant access,
+prove a transfer, or authorize funds movement. Consumers must authenticate the
+transport, obtain the tenant from trusted context, deduplicate delivery, and
+re-read authoritative state. No outbox dispatcher or money-moving worker is
+introduced in this release. The package remains private; tarball consumer checks
+are not evidence of registry publication.

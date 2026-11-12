@@ -24,6 +24,14 @@ test("rejects malformed transaction hash without a network request", async () =>
     fetchImpl:async()=>{throw new Error("MUST NOT FETCH");}});
   assert.throws(()=>api.transaction("not a hash"),/64 hexadecimal/);
 });
+test("rejects a valid observation substituted for a different transaction", async () => {
+  for (const status of ["SUCCESS", "FAILED"]) {
+    const api=new StealthBridgeClient({apiBaseUrl:"https://api.example",network:"testnet",
+      fetchImpl:async()=>Response.json({hash:"b".repeat(64),status,ledger:123,
+        latest_ledger:124,closed_at_unix:"1760000000",source:"stellar-rpc"})});
+    await assert.rejects(api.transaction(HASH), error=>error instanceof ApiError && error.status===502);
+  }
+});
 test("surfaces missing transaction as 404, not a fabricated pending payment", async () => {
   const api=new StealthBridgeClient({apiBaseUrl:"https://api.example",network:"testnet",
     fetchImpl:async()=>new Response("",{status:404})});

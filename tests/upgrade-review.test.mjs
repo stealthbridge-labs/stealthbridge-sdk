@@ -26,6 +26,7 @@ test("pause, timelock and expiry cannot be bypassed",()=>{
  assert.equal(assessRegistryUpgrade({...obs(),currentLedger:199}).state,"waiting");
  assert.equal(assessRegistryUpgrade({...obs(),currentLedger:10_200}).state,"window-open-unverified");
  assert.equal(assessRegistryUpgrade({...obs(),currentLedger:10_201}).state,"expired");
+ assert.equal(assessRegistryUpgrade({...obs(),paused:false,currentLedger:10_201}).state,"expired");
 });
 test("unknown network, gate upgrade and fabricated expiry windows are invalid",()=>{
  for(const change of [

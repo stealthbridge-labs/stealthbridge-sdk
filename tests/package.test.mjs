@@ -84,6 +84,8 @@ const expectedPackageFiles = [
   "dist/product-capabilities.js",
   "dist/recipient-presence.d.ts",
   "dist/recipient-presence.js",
+  "dist/settlement-notification.d.ts",
+  "dist/settlement-notification.js",
   "dist/settlement.d.ts",
   "dist/settlement.js",
   "dist/team-invites.d.ts",

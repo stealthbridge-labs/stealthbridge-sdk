@@ -498,7 +498,9 @@ export class StealthBridgeClient {
  transaction(hash:string,options?:RequestOptions):Promise<TransactionObservation>{
   if(!/^[a-f0-9]{64}$/i.test(hash))
     throw new TypeError("Transaction hash must be exactly 64 hexadecimal characters");
-  return this.read("/v1/transactions/"+hash.toLowerCase(),observation,options);
+  return this.read("/v1/transactions/"+hash.toLowerCase(),
+   (value):value is TransactionObservation=>observation(value)&&
+    value.hash.toLowerCase()===hash.toLowerCase(),options);
  }
 }
 

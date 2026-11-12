@@ -127,6 +127,7 @@ assert.deepEqual(Object.keys(await import("@stealthbridge/sdk")).sort(), [
   "matchingCorridorBatches",
   "parseBusinessBatchCsv",
   "parseDeploymentManifest",
+  "parseSettlementNotification",
   "preparePrivateTransfer",
   "publicEvidenceReceipt",
   "quotePlatformFee",
