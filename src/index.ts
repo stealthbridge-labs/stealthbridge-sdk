@@ -127,3 +127,4 @@ export type {PrivateReviewDraft,PrivateReviewReceipt} from "./private-review-com
 export {encryptCustomerDraft,decryptCustomerDraft,reencryptCustomerDraft,validCustomerDraft,validEncryptedCustomerDraft,validEncryptedDraftDirectory,PRIVATE_DRAFT_LIMIT} from "./private-draft-vault.js";
 export type {CustomerDraft,EncryptedCustomerDraft,CustomerEncryptedDraftDirectory,CustomerEncryptedDraftRecord} from "./private-draft-vault.js";
 export {parseSettlementNotification,type SettlementNotification} from "./settlement-notification.js";
+export {fingerprintInstructionRoute,validPaymentInstructionInput,validPaymentInstructionDirectory,listPaymentInstructions,savePaymentInstruction,cancelPaymentInstruction,PaymentInstructionError,type PaymentInstruction,type PaymentInstructionInput,type PaymentInstructionDirectory,type InstructionState} from "./payment-instructions.js";

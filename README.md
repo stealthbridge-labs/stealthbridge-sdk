@@ -128,3 +128,43 @@ transport, obtain the tenant from trusted context, deduplicate delivery, and
 re-read authoritative state. No outbox dispatcher or money-moving worker is
 introduced in this release. The package remains private; tarball consumer checks
 are not evidence of registry publication.
+
+## Open source
+
+StealthBridge is available under the [MIT license](LICENSE). Third-party dependencies retain their own licenses. Contributions should include meaningful tests and preserve customer privacy and disabled financial execution gates.
+
+## Account-owned encrypted payment instructions
+
+The new instruction methods use the signed-in customer's **same-origin cookie
+session** through `/api/account/instructions`. They are not API-key access for
+external organizations and never create a quote or transfer authorization.
+
+```ts
+import {
+  encryptCustomerDraft, fingerprintInstructionRoute, savePaymentInstruction,
+  listPaymentInstructions, cancelPaymentInstruction,
+} from "@stealthbridge/sdk";
+
+// account and corridor must come from your authenticated workspace and real catalog.
+// draft contains locally reviewed kind, corridor_id, recipient, amount and reference.
+const id = crypto.randomUUID();
+const encrypted = await encryptCustomerDraft(account, id, passphrase, draft);
+const input = { id, corridor_id: corridor.id,
+  route_fingerprint: await fingerprintInstructionRoute(corridor),
+  expires_in_seconds: 3600, encrypted };
+await savePaymentInstruction(input); // retry with this SAME input after uncertainty
+const records = await listPaymentInstructions(account);
+await cancelPaymentInstruction(id, 1); // explicit customer action only
+```
+
+Instructions are immutable, account-owned planning records, capped at 50 per
+account for this Testnet release. They expire in 5 minutes to one day. `saved`,
+`expired` and `cancelled` never mean submitted, paid or approved by a business.
+Recipient, amount, reference and passphrase are never sent in plaintext. Account,
+route, timing and ciphertext size remain visible to the service. The backend
+checks current public route metadata and rejects stale configurations; a route
+fingerprint is public integrity metadata, not a private payment proof.
+
+This feature is gated until the reviewed database migration and server-side
+release flags are applied. A successful unit/package test is not evidence that
+customer storage or financial execution is enabled on a deployment.

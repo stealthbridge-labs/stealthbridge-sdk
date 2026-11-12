@@ -13,6 +13,7 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const fixtures = path.join(root, "tests", "fixtures");
 const artifacts = path.join(root, "artifacts");
 const expectedPackageFiles = [
+  "LICENSE",
   "README.md",
   "dist/account-directory.d.ts",
   "dist/account-directory.js",
@@ -70,6 +71,8 @@ const expectedPackageFiles = [
   "dist/observer-schema.js",
   "dist/organization-team.d.ts",
   "dist/organization-team.js",
+  "dist/payment-instructions.d.ts",
+  "dist/payment-instructions.js",
   "dist/platform-fees.d.ts",
   "dist/platform-fees.js",
   "dist/platform.d.ts",
@@ -122,7 +125,8 @@ const budgets = {
   // Measured 226,388 bytes with recipient presence validators and declarations.
   // Measured 229,442 B with read-only G-address presence; bounded headroom.
   // Reviewed browser-only vault adds under 10 KB unpacked.
-  unpackedBytes: 248_000,
+  // Bounded instruction HTTP parsing adds to the reviewed 247,029-byte package.
+  unpackedBytes: 255_000,
   // Reviewed 22,718-byte full bundle after restoring read-only governance and platform clients.
   // Allow bounded headroom, not a blanket removal of browser-size limits.
   // 25,755 measured after adding strictly validated, dependency-free governance snapshot.
