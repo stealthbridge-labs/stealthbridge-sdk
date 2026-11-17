@@ -91,6 +91,8 @@ const expectedPackageFiles = [
   "dist/settlement-notification.js",
   "dist/settlement.d.ts",
   "dist/settlement.js",
+  "dist/smart-account-kit.d.ts",
+  "dist/smart-account-kit.js",
   "dist/team-invites.d.ts",
   "dist/team-invites.js",
   "dist/transfer-capability.d.ts",
@@ -109,7 +111,8 @@ const budgets = {
   // 57,298 B measured with isolated local batch parser and typed backend reader.
   // Measured 58,913 bytes following minimal recipient projection.
   // Reviewed Web Crypto vault adds under 3 KB of packed code.
-  packedBytes: 65_000,
+  // Measured 66,804 B after adding payment-instructions and smart-account-kit validators.
+  packedBytes: 70_000,
   // Reviewed observation-health .js and .d.ts add 2,841 bytes over v0.2.
   // Additional typed platform capability validators remain dependency-free.
   // Preserve a bounded size budget with reviewed headroom.
@@ -126,7 +129,8 @@ const budgets = {
   // Measured 229,442 B with read-only G-address presence; bounded headroom.
   // Reviewed browser-only vault adds under 10 KB unpacked.
   // Bounded instruction HTTP parsing adds to the reviewed 247,029-byte package.
-  unpackedBytes: 255_000,
+  // Measured 259,934 B after adding smart-account-kit validator and declarations.
+  unpackedBytes: 268_000,
   // Reviewed 22,718-byte full bundle after restoring read-only governance and platform clients.
   // Allow bounded headroom, not a blanket removal of browser-size limits.
   // 25,755 measured after adding strictly validated, dependency-free governance snapshot.

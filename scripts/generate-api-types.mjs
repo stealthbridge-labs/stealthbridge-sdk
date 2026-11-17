@@ -14,23 +14,35 @@ const schemaPath=path.join(root,"specs/backend-openapi.v0.3.yaml");
 const outputPath=path.join(root,"src/generated/api-wire.ts");
 const PINNED_BACKEND_COMMIT="ba0e579084750be1ad7b001f98830a342fa51b5c";
 const NAMES=["Capabilities","ContractDiscovery","Corridor","CorridorPage",
- "ErrorDetail","ErrorEnvelope","LedgerCheckpoint","NetworkStatus","Readiness","TransactionObservation"];
+ "ErrorDetail","ErrorEnvelope","LedgerCheckpoint","NetworkStatus","Readiness","TransactionObservation","SmartAccountKitEntry","SmartAccountKitObservation"];
 
 function wireType(lines) {
  const description=lines.join(" ");
  const typeIs=(name)=>new RegExp("\\btype: "+name+"(?:[,}\\s]|$)").test(description);
  const reference=description.match(/\$ref:\s*["']?#\/components\/schemas\/([A-Za-z0-9_]+)/);
  if(typeIs("array")) {
+  if(/\bprefixItems:/.test(description)){
+   const entries=[...description.matchAll(/\$ref:\s*["']?#\/components\/schemas\/([A-Za-z0-9_]+)["']?\s*- properties:\s*name: \{const: ([A-Za-z0-9_]+)\}\s*kind: \{const: (code|instance)\}/g)];
+   if(!/items: false/.test(description)||!entries.length||entries.length!==(description.match(/\$ref:/g)||[]).length)
+    throw new Error("Unsupported prefixItems tuple: "+description);
+   return "["+entries.map(([,ref,name,kind])=>"Api"+ref+" & {name: "+JSON.stringify(name)+"; kind: "+JSON.stringify(kind)+"}").join(", ")+"]";
+  }
   if(!reference)throw new Error("Array without reviewed item $ref: "+description);
   return "Api"+reference[1]+"[]";
  }
  if(reference)return "Api"+reference[1];
+ const nullableNumber=/type:\s*\[\s*(?:integer|number)\s*,\s*["']?null["']?\s*\]/.test(description);
+ if(nullableNumber)return "number | null";
  const array=description.match(/type:\s*\[\s*string\s*,\s*["']?null["']?\s*\]/);
  if(array)return "string | null";
  const enumeration=description.match(/enum:\s*\[([^\]]+)\]/);
  if(enumeration)return enumeration[1].split(",").map(x=>JSON.stringify(x.trim().replace(/^["']|["']$/g,""))).join(" | ");
  const literal=description.match(/const:\s*([^,}\s]+)/);
- if(literal)return /^(?:true|false)$/.test(literal[1])?literal[1]:JSON.stringify(literal[1]);
+ if(literal){
+  const token=literal[1];
+  if(/^(?:true|false|-?(?:0|[1-9]\d*))$/.test(token))return token;
+  return JSON.stringify(token.replace(/^["']|["']$/g,""));
+ }
  if(typeIs("integer")||typeIs("number"))return "number";
  if(typeIs("boolean"))return "boolean";
  if(typeIs("string"))return "string";
@@ -64,10 +76,13 @@ function generate(yaml) {
   const block=chunks.get(name);
   const requiredLine=block.find(s=>/^      required: \[/.test(s));
   if(!requiredLine)throw new Error("Schema missing required inventory: "+name);
-  const required=new Set(requiredLine.match(/\[([^\]]*)\]/)[1].split(",").map(s=>s.trim()));
+  const requiredText=block.slice(block.indexOf(requiredLine)).join(" ").match(/required:\s*\[([^\]]*)\]/);
+  if(!requiredText)throw new Error("Unterminated required inventory: "+name);
+  const required=new Set(requiredText[1].split(",").map(s=>s.trim()));
   const props=new Map();
   let property=null;
   for(const line of block){
+   if(/^      allOf:/.test(line))break;
    const match=line.match(/^        ([a-z][a-z0-9_]*):(?:\s+(.*))?$/);
    if(match){property=match[1];if(props.has(property))throw new Error("Duplicate property "+name+"."+property);props.set(property,[match[2]||""]);}
    else if(property)props.get(property).push(line);

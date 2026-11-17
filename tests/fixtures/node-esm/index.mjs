@@ -169,6 +169,7 @@ assert.deepEqual(Object.keys(await import("@stealthbridge/sdk")).sort(), [
   "validPlatformCatalog",
   "validProfilePreferences",
   "validRecipientPresence",
+  "validSmartAccountKitSnapshot",
   "validTeamInvitationDirectory",
   "validTeamInviteAction",
   "validateActivityPage",

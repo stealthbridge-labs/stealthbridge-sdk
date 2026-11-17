@@ -1,3 +1,4 @@
+import {validSmartAccountKitSnapshot,type SmartAccountKitSnapshot} from "./smart-account-kit.js";
 import {validPlatformCatalog, type PlatformCatalog} from "./platform.js";
 import {validGovernanceRelease, type GovernanceRelease} from "./governance-release.js";
 import {validGovernanceCode, type GovernanceCodeObservation} from "./governance-code.js";
@@ -344,7 +345,11 @@ export class StealthBridgeClient {
  observerSchema(options?:RequestOptions):Promise<ObserverSchema>{
   return this.read("/v1/observer/schema",validObserverSchema,options);
  }
- /** Consent-based Testnet C-address inspection. Contract presence is NOT smart-wallet custody. */
+ /** Public upstream artifact health; never customer deployment or payment authority. */
+ smartAccountKit(options?:RequestOptions):Promise<SmartAccountKitSnapshot>{
+  return this.read("/v1/wallet/smart-account-kit",validSmartAccountKitSnapshot,options);
+ }
+
  /** Consent-based public G-account presence on Stellar Testnet. */
  classicRecipientPresence(address:string,options?:RequestOptions):Promise<ClassicRecipientPresence>{
   if(canonicalStellarAccountAddress(address)!==address)

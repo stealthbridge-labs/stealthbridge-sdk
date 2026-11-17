@@ -49,3 +49,22 @@ Every SDK read has a bounded timeout (`timeoutMs`), optional caller `AbortSignal
 Opt-in, bounded retry logic (`maxRetries` between 0 and 5, default 0) with exponential backoff (`retryBackoffMs`) applies strictly to read-only GET requests encountering retryable errors (429, 502, 503, 504, or network/timeout failures). Client status codes 400 and 404 are non-retryable. Caller `AbortSignal` cancellations are honored immediately during network fetches and backoff sleep delays. No implicit retries or fallback states are used.
 
 The backend additionally provides `GET /v1/corridors/{id}`, with 400 for malformed UUIDs, 404 for disabled/missing records, and 503 for unavailable PostgreSQL. The SDK `corridor(id)` mirrors these checks and never synthesizes missing asset metadata.
+
+### Smart Account Kit contract review
+
+The additive `GET /v1/wallet/smart-account-kit` snapshot includes the exact
+backend endpoint and schema blocks reviewed during implementation. Compare only
+this endpoint and its two schemas without replacing this entire file:
+
+```bash
+node scripts/check-smart-account-kit-schema.mjs /path/to/stealthbridge-backend/api/openapi.yaml
+npm run generate:api-types
+npm run verify
+```
+
+The comparison requires exact text parity for the route, `SmartAccountKitEntry`
+and `SmartAccountKitObservation`. Missing backend blocks or any drift fail explicitly.
+The SDK additionally enforces the seven ordered upstream v0.10.0 artifact pins,
+freshness (90 seconds old / 30 seconds future skew), ledger TTL arithmetic and
+derived health. Public artifact health never establishes customer account
+creation, custody, authorization, recovery, privacy or financial release.

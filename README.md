@@ -52,6 +52,8 @@ const client = new StealthBridgeClient({
   apiBaseUrl: "https://stealthbridge-backend.vercel.app",
   network: "testnet",
 });
+const kit = await client.smartAccountKit();
+console.log(kit.all_entries_healthy); // Upstream artifact health only.
 const ledger = await client.liveNetwork({ maxAgeSeconds: 180 });
 const first = await client.corridorsPage({ limit: 25 });
 console.log(ledger.ledger_sequence, first.items.length);
@@ -66,6 +68,15 @@ if (publicIds.length) {
 ```
 
 Configured corridor records, even when returned successfully, **are not FX quotes or enabled partner settlement**. The SDK requires real backend responses, validates strict schema and network identity, and does not substitute example records for unavailable database state.
+
+`smartAccountKit(options?: RequestOptions)` reads `GET /v1/wallet/smart-account-kit`.
+It validates the exact seven ordered Smart Account Kit 0.10.0 public Testnet pins,
+code hashes, status and ledger TTL arithmetic. Observations older than 90 seconds
+(or more than 30 seconds ahead) fail validation. Healthy means every upstream
+artifact is live with more than 120960 ledgers remaining. This does not verify
+customer custody, ownership, authorization, recovery, privacy proofs or payments.
+No customer smart-account factory or account is deployed by this method; all
+customer deployment and financial release flags remain false, even when healthy.
 
 ### Available capabilities
 
