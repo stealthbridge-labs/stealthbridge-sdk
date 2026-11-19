@@ -179,3 +179,9 @@ fingerprint is public integrity metadata, not a private payment proof.
 This feature is gated until the reviewed database migration and server-side
 release flags are applied. A successful unit/package test is not evidence that
 customer storage or financial execution is enabled on a deployment.
+
+## Protocol 30, privacy rail descriptors, and controlled Testnet lifecycle
+
+- **StrKey & Protocol 30 compatibility (`@stellar/stellar-sdk`):** Strict client validators support `G...`, `M...`, `C...`, and CAP-84 `W...` muxed contract addresses.
+- **Privacy rail helpers (`src/privacy-rails.ts`):** Typed disclosures distinguishing local encrypted drafts, *Stellar Private Payments*, and *Confidential Tokens* while preserving explicit `productionReady: false` and `executionEnabled: false` invariants.
+- **Controlled Testnet settlement lifecycle client (`src/settlement-lifecycle.ts`):** Canonical SHA-256 intent & authorization digests, bounded response decoders, and state-transition helpers targeting same-origin authenticated proxies (`mainnet_enabled: false`, `live_fx_enabled: false`, `fiat_payouts_enabled: false`).
