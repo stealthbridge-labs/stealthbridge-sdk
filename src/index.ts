@@ -22,7 +22,8 @@ export type { AssetIdentity } from "./amount.js";
 export { ManifestError, parseDeploymentManifest, getVerifiedContract } from "./manifest.js";
 export type { DeploymentManifest,ManifestCompatibility } from "./manifest.js";
 export { allowedSettlementTransitions, SettlementTransitionError, isSettlementState, canTransitionSettlement, assertSettlementTransition, isTerminalSettlementState, awaitsExternalDeliveryEvidence } from "./settlement.js";
-export { canonicalStellarAccountAddress } from "./wallet.js";
+export { canonicalStellarAccountAddress, canonicalMuxedAccountAddress, canonicalMuxedContractAddress, parseStellarAddress } from "./wallet.js";
+export type { StellarAddressKind, ParsedStellarAddress } from "./wallet.js";
 
 export type { ApiNetworkStatus, ApiCapabilities, ApiCorridor, ApiCorridorPage, ApiReadiness, ApiContractDiscovery, ApiErrorEnvelope } from "./generated/api-wire.js";
 
@@ -132,3 +133,7 @@ export type {ApiSmartAccountKitObservation,ApiSmartAccountKitEntry} from "./gene
 
 export {parseSettlementNotification,type SettlementNotification} from "./settlement-notification.js";
 export {fingerprintInstructionRoute,validPaymentInstructionInput,validPaymentInstructionDirectory,listPaymentInstructions,savePaymentInstruction,cancelPaymentInstruction,PaymentInstructionError,type PaymentInstruction,type PaymentInstructionInput,type PaymentInstructionDirectory,type InstructionState} from "./payment-instructions.js";
+export {describePrivacyRailArchitecture,assessPrivacyRailReadiness} from "./privacy-rails.js";
+export type {PrivacyArchitectureKind,ProductExperience,AssetSemantics,RailObserverDisclosure,PrivacyRailAdapterSpec,PrivacyRailReadinessInput,PrivacyRailAssessment,RailBlockReason} from "./privacy-rails.js";
+export {allowedSettlementLifecycleTransitions,canTransitionSettlementLifecycle,canonicalSettlementIntentDigest,canonicalCustomerAuthorizationDigest,validSettlementLifecycleDirectory,listSettlementLifecycles,createSettlementLifecycle,advanceSettlementLifecycle,SettlementLifecycleError} from "./settlement-lifecycle.js";
+export type {LifecycleState,CreateSettlementLifecycleInput,SettlementLifecycleEvent,SettlementLifecycleRecord,SettlementLifecycleDirectory,SettlementLifecycleAction} from "./settlement-lifecycle.js";

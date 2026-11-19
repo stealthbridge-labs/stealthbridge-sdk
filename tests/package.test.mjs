@@ -77,6 +77,8 @@ const expectedPackageFiles = [
   "dist/platform-fees.js",
   "dist/platform.d.ts",
   "dist/platform.js",
+  "dist/privacy-rails.d.ts",
+  "dist/privacy-rails.js",
   "dist/private-draft-vault.d.ts",
   "dist/private-draft-vault.js",
   "dist/private-review-commitment.d.ts",
@@ -87,6 +89,8 @@ const expectedPackageFiles = [
   "dist/product-capabilities.js",
   "dist/recipient-presence.d.ts",
   "dist/recipient-presence.js",
+  "dist/settlement-lifecycle.d.ts",
+  "dist/settlement-lifecycle.js",
   "dist/settlement-notification.d.ts",
   "dist/settlement-notification.js",
   "dist/settlement.d.ts",
@@ -112,7 +116,8 @@ const budgets = {
   // Measured 58,913 bytes following minimal recipient projection.
   // Reviewed Web Crypto vault adds under 3 KB of packed code.
   // Measured 66,804 B after adding payment-instructions and smart-account-kit validators.
-  packedBytes: 70_000,
+  // Measured 70,463 B after adding Milestone 4 isolated privacy-rail evaluators and declarations.
+  packedBytes: 74_000,
   // Reviewed observation-health .js and .d.ts add 2,841 bytes over v0.2.
   // Additional typed platform capability validators remain dependency-free.
   // Preserve a bounded size budget with reviewed headroom.
@@ -130,7 +135,9 @@ const budgets = {
   // Reviewed browser-only vault adds under 10 KB unpacked.
   // Bounded instruction HTTP parsing adds to the reviewed 247,029-byte package.
   // Measured 259,934 B after adding smart-account-kit validator and declarations.
-  unpackedBytes: 268_000,
+  // Measured 274,505 B after adding Milestone 4 isolated privacy-rail evaluators and declarations.
+  // Measured 287,594 B after adding Milestone 5 typed settlement lifecycle client and declarations.
+  unpackedBytes: 292_000,
   // Reviewed 22,718-byte full bundle after restoring read-only governance and platform clients.
   // Allow bounded headroom, not a blanket removal of browser-size limits.
   // 25,755 measured after adding strictly validated, dependency-free governance snapshot.
