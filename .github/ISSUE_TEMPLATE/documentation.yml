@@ -1,0 +1,11 @@
+name: SDK Documentation / Example Request
+description: Request or propose compilable TypeScript examples, API guides, or troubleshooting docs.
+title: "[Docs] "
+labels: ["documentation", "sdk"]
+body:
+  - type: textarea
+    id: scope
+    attributes:
+      label: Target guide or example
+    validations:
+      required: true

@@ -1,0 +1,18 @@
+name: Bug report (SDK / Validators / Types)
+description: Report a TypeScript, OpenAPI codegen, packaging, or validation bug in @stealthbridge/sdk.
+title: "[SDK Bug] "
+labels: ["bug", "sdk"]
+body:
+  - type: input
+    id: env
+    attributes:
+      label: Runtime, Node version, and @stealthbridge/sdk commit
+      placeholder: "Node 22.x / Next.js 16 / browser ESM"
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Minimal TypeScript reproduction & `npm run verify` output
+    validations:
+      required: true

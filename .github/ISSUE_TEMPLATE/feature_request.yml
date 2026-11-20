@@ -1,0 +1,17 @@
+name: SDK Enhancement Proposal
+description: Propose new typed clients, Soroban/Smart-Account builders, examples, or packaging improvements.
+title: "[SDK Proposal] "
+labels: ["enhancement", "sdk"]
+body:
+  - type: textarea
+    id: api_shape
+    attributes:
+      label: Proposed typed API & backend/contract parity
+    validations:
+      required: true
+  - type: textarea
+    id: verification
+    attributes:
+      label: Adversarial tests, consumer fixture & bundle budget plan
+    validations:
+      required: true
