@@ -186,3 +186,12 @@ customer storage or financial execution is enabled on a deployment.
 - **Privacy rail helpers (`src/privacy-rails.ts`):** Typed disclosures distinguishing local encrypted drafts, *Stellar Private Payments*, and *Confidential Tokens* while preserving explicit `productionReady: false` and `executionEnabled: false` invariants.
 - **Account beneficiaries (`src/account-beneficiaries.ts`):** Typed validators and same-origin client helpers (`listAccountBeneficiaries`, `saveAccountBeneficiary`, `removeAccountBeneficiary`) backed by `/api/account/beneficiaries` and PostgreSQL, supporting Protocol 30 `G...`/`M...`/`C...`/`W...` recipients without claiming identity verification (`identity_verified: false`).
 - **Controlled Testnet settlement lifecycle client (`src/settlement-lifecycle.ts`):** Canonical SHA-256 intent & authorization digests, bounded response decoders, and state-transition helpers targeting same-origin authenticated proxies (`mainnet_enabled: false`, `live_fx_enabled: false`, `fiat_payouts_enabled: false`).
+
+## Open source & community
+
+StealthBridge is available under the [MIT license](LICENSE). Third-party dependencies retain their own licenses.
+
+- [Code of Conduct](CODE_OF_CONDUCT.md)
+- [Contributing Guidelines](CONTRIBUTING.md)
+- [Security Policy](SECURITY.md)
+- [MIT License](LICENSE)
