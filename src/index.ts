@@ -1,4 +1,4 @@
-export const SDK_VERSION = "0.2.0";
+export const SDK_VERSION = "0.3.0";
 export {
   StealthBridgeClient,
   ApiError,
@@ -139,3 +139,6 @@ export {allowedSettlementLifecycleTransitions,canTransitionSettlementLifecycle,c
 export type {LifecycleState,CreateSettlementLifecycleInput,SettlementLifecycleEvent,SettlementLifecycleRecord,SettlementLifecycleDirectory,SettlementLifecycleAction} from "./settlement-lifecycle.js";
 export {validBeneficiaryLabel,validUpsertBeneficiaryInput,validBeneficiaryRecord,validBeneficiaryDirectory,listAccountBeneficiaries,saveAccountBeneficiary,removeAccountBeneficiary} from "./account-beneficiaries.js";
 export type {BeneficiaryFlow,BeneficiaryRecipientKind,UpsertBeneficiaryInput,AccountBeneficiary,BeneficiaryDirectory} from "./account-beneficiaries.js";
+export {validDeployRequest,validDeploymentDirectory,validLabel as validSmartAccountLabel,p256PointFromSpki,base64url} from "./smart-accounts.js";
+export type {DeployRequest as SmartAccountDeployRequest,DeploymentDirectory as SmartAccountDeploymentDirectory,SmartAccountDeployment,DeploymentStatus as SmartAccountDeploymentStatus} from "./smart-accounts.js";
+export {TESTNET_CONTRACTS,TESTNET_NETWORK_PASSPHRASE} from "./testnet.js";

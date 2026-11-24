@@ -1,8 +1,26 @@
 {
   "name": "@stealthbridge/sdk",
-  "version": "0.2.0",
-  "private": true,
-  "description": "StealthBridge read-only client and contracts spec for early testnet integration",
+  "version": "0.3.0",
+  "description": "Typed, validated TypeScript client for StealthBridge: Stellar Testnet payment routes, passkey smart accounts and settlement lifecycle contracts",
+  "keywords": [
+    "stellar",
+    "soroban",
+    "smart-account",
+    "passkey",
+    "webauthn",
+    "payments",
+    "privacy",
+    "testnet"
+  ],
+  "homepage": "https://github.com/stealthbridge-labs/stealthbridge-sdk#readme",
+  "bugs": {
+    "url": "https://github.com/stealthbridge-labs/stealthbridge-sdk/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/stealthbridge-labs/stealthbridge-sdk.git"
+  },
+  "license": "MIT",
   "type": "module",
   "engines": {
     "node": ">=22"
@@ -18,6 +36,10 @@
   "files": [
     "dist"
   ],
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "typecheck": "tsc -p tsconfig.json --noEmit",
@@ -31,6 +53,5 @@
   "devDependencies": {
     "esbuild": "0.28.2",
     "typescript": "^7.0.0"
-  },
-  "license": "MIT"
+  }
 }
