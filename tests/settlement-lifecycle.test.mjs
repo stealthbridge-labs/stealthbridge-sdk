@@ -71,3 +71,10 @@ test("validSettlementLifecycleDirectory enforces strict testnet and disabled-fia
     false,
   );
 });
+
+test("422 explains that chain evidence did not match the intent", async () => {
+  const { SettlementLifecycleError } = await import("../dist/index.js");
+  const err = new SettlementLifecycleError(422);
+  assert.equal(err.status, 422);
+  assert.match(err.message, /not this settlement's payment/);
+});
