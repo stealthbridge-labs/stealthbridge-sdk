@@ -226,7 +226,9 @@ export class SettlementLifecycleError extends Error {
           ? "Sign in again to access controlled Testnet settlement lifecycles."
           : status === 502
             ? "Stellar Testnet RPC observation could not verify this transaction yet."
-            : "Settlement lifecycle service is unavailable.",
+            : status === 422
+              ? "That transaction is not this settlement's payment: the payer, recipient, asset and amount must all match."
+              : "Settlement lifecycle service is unavailable.",
     );
     this.name = "SettlementLifecycleError";
   }
