@@ -17,12 +17,12 @@ const packageJson = JSON.parse(
   await readFile(path.join(installedPackageRoot, "package.json"), "utf8")
 );
 assert.equal(packageJson.name, "@stealthbridge/sdk");
-assert.match(packageJson.version, /^0\.2\.0(?:-[0-9A-Za-z.-]+)?$/);
+assert.match(packageJson.version, /^0\.3\.0(?:-[0-9A-Za-z.-]+)?$/);
 assert.equal(packageJson.exports["."].import, "./dist/index.js");
 assert.equal(packageJson.dependencies, undefined);
 
 const sdk = await import(resolvedEntry);
-assert.match(sdk.SDK_VERSION, /^0\.2\.0(?:-[0-9A-Za-z.-]+)?$/);
+assert.match(sdk.SDK_VERSION, /^0\.3\.0(?:-[0-9A-Za-z.-]+)?$/);
 const browserClient = sdk.createBrowserBridgeClient();
 assert.ok(browserClient instanceof sdk.StealthBridgeClient);
 assert.equal(typeof browserClient.capabilities, "function");

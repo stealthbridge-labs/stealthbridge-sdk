@@ -6,9 +6,31 @@
 
 [Product](https://stealthbridge.vercel.app) · [Backend OpenAPI](https://github.com/stealthbridge-labs/stealthbridge-backend/blob/main/api/openapi.yaml) · [Compatibility](specs/COMPATIBILITY.md) · [Architecture](docs/ARCHITECTURE-AND-DELIVERY.md)
 
+## Install
+
+```bash
+npm install @stealthbridge/sdk
+```
+
+## Passkey smart accounts (Testnet)
+
+```ts
+import { p256PointFromSpki, validDeploymentDirectory, TESTNET_CONTRACTS } from "@stealthbridge/sdk";
+
+// In the browser, after navigator.credentials.create(...):
+const response = credential.response as AuthenticatorAttestationResponse;
+const publicKeyHex = p256PointFromSpki(response.getPublicKey()!); // "04…" or null for non-P-256 keys
+
+// Every account is created by this factory and is verifiable on-chain:
+console.log(TESTNET_CONTRACTS.smartAccountFactory);
+```
+
+The private key never leaves the authenticator. StealthBridge's relayer only pays the network fee for the factory's
+`create_account`, which binds your passkey as owner in the account constructor.
+
 ## What exists
 
-`@stealthbridge/sdk` is a native ESM TypeScript library that validates bounded HTTP data from the **Rust/Axum backend** and provides safe, exact-value local utilities. It is intentionally a **private, not-yet-published package** (`package.json` has `private: true`). Client-side payment signing, custody, private notes, ZK witness handling, issuer attestation, fee collection, fiat payout and money movement **are not implemented**.
+`@stealthbridge/sdk` is a native ESM TypeScript library that validates bounded HTTP data from the **Rust/Axum backend** and provides safe, exact-value local utilities. It is published as `@stealthbridge/sdk` from version 0.3.0 (Testnet only). Client-side payment signing, custody, private notes, ZK witness handling, issuer attestation, fee collection, fiat payout and money movement **are not implemented**.
 
 It supports real Testnet network readings, corridor paging/filtering and single/batch metadata, fresh live preflights, public recipient presence, public observer data, governance/source inventory snapshots and checked asset math. Malformed, stale, wrong-network or falsely payment-enabled responses fail closed.
 

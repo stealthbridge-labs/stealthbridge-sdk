@@ -2,7 +2,28 @@
 
 Notable user-visible SDK changes are recorded here. Versions follow [Semantic Versioning](https://semver.org/) once release publication is authorized.
 
-## Unreleased
+## 0.3.0 (2026-11-24)
+
+First release intended for public npm publication.
+
+### Added
+
+- `validDeployRequest`, `validDeploymentDirectory`, `validSmartAccountLabel`: canonical contracts for
+  `/v1/account/smart-accounts/deployments` (relayed passkey smart-account creation on Stellar Testnet). A deployment
+  is only valid as `deployed` when it carries the ledger in which the backend observed it.
+- `p256PointFromSpki`, `base64url`: extract the uncompressed P-256 public key from a WebAuthn `getPublicKey()` SPKI
+  with a strict prefix check (non-P-256 keys are rejected).
+- `TESTNET_CONTRACTS`, `TESTNET_NETWORK_PASSPHRASE`: verified 2026-11-24 Testnet contract ids (smart-account factory,
+  governance gate, settlement adapter, registries, fee vault, paused privacy verifier).
+- `SettlementLifecycleError` explains HTTP 422 (chain evidence did not match the settlement intent).
+- npm metadata (`repository`, `homepage`, `bugs`, `keywords`), `publishConfig` with provenance, and a tag-driven
+  release workflow.
+
+### Changed
+
+- The package is no longer `private`.
+
+## Unreleased (pre-0.3.0 history)
 
 ### Added
 
