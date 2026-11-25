@@ -99,6 +99,8 @@ const expectedPackageFiles = [
   "dist/settlement.js",
   "dist/smart-account-kit.d.ts",
   "dist/smart-account-kit.js",
+  "dist/smart-account-payments.d.ts",
+  "dist/smart-account-payments.js",
   "dist/smart-accounts.d.ts",
   "dist/smart-accounts.js",
   "dist/team-invites.d.ts",
@@ -125,7 +127,8 @@ const budgets = {
   // Measured 70,463 B after adding Milestone 4 isolated privacy-rail evaluators and declarations.
   // Measured 74,665 B after adding typed PostgreSQL-backed account-beneficiaries client and declarations.
   // Measured 78,491 B after adding passkey smart-account contracts and verified Testnet contract ids (v0.3.0).
-  packedBytes: 82_000,
+  // Measured 82,108 B after adding the dependency-free passkey payment verifier (v0.3.0).
+  packedBytes: 86_000,
   // Reviewed observation-health .js and .d.ts add 2,841 bytes over v0.2.
   // Additional typed platform capability validators remain dependency-free.
   // Preserve a bounded size budget with reviewed headroom.
@@ -147,7 +150,8 @@ const budgets = {
   // Measured 287,594 B after adding Milestone 5 typed settlement lifecycle client and declarations.
   // Measured 296,035 B after adding typed PostgreSQL-backed account-beneficiaries client and declarations.
   // Measured 305,970 B unpacked after adding smart-account contracts and Testnet ids (v0.3.0).
-  unpackedBytes: 312_000,
+  // Measured 319,3xx B unpacked after adding the passkey payment verifier (v0.3.0).
+  unpackedBytes: 326_000,
   // Reviewed 22,718-byte full bundle after restoring read-only governance and platform clients.
   // Allow bounded headroom, not a blanket removal of browser-size limits.
   // 25,755 measured after adding strictly validated, dependency-free governance snapshot.

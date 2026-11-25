@@ -142,3 +142,5 @@ export type {BeneficiaryFlow,BeneficiaryRecipientKind,UpsertBeneficiaryInput,Acc
 export {validDeployRequest,validDeploymentDirectory,validLabel as validSmartAccountLabel,p256PointFromSpki,base64url} from "./smart-accounts.js";
 export type {DeployRequest as SmartAccountDeployRequest,DeploymentDirectory as SmartAccountDeploymentDirectory,SmartAccountDeployment,DeploymentStatus as SmartAccountDeploymentStatus} from "./smart-accounts.js";
 export {TESTNET_CONTRACTS,TESTNET_NETWORK_PASSPHRASE} from "./testnet.js";
+export {validPreparedPayment,validPaymentDirectory,verifyPreparedPayment,sacContractId,strkeyPayload,base64urlBytes} from "./smart-account-payments.js";
+export type {PreparedPayment,PaymentRecord,PaymentDirectory,PaymentAssertion,PaymentStatus,ExpectedPayment} from "./smart-account-payments.js";

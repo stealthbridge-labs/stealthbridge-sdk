@@ -19,6 +19,13 @@ First release intended for public npm publication.
 - npm metadata (`repository`, `homepage`, `bugs`, `keywords`), `publishConfig` with provenance, and a tag-driven
   release workflow.
 
+- **Passkey payments:** `validPreparedPayment`, `validPaymentDirectory` and `verifyPreparedPayment`. The last one
+  rebuilds the exact Soroban authorization invocation (`asset.transfer(account, destination, amount)`) from the
+  customer's own inputs, checks the network id and expiry against the server-provided preimage, and recomputes the
+  WebAuthn challenge, so a wallet never signs a payment the customer did not review. Byte parity with the Rust backend
+  is enforced by a shared fixture.
+- `sacContractId`, `strkeyPayload`, `base64urlBytes`: dependency-free helpers (WebCrypto only).
+
 ### Changed
 
 - The package is no longer `private`.
