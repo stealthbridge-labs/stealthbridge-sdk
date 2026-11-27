@@ -81,6 +81,8 @@ const expectedPackageFiles = [
   "dist/platform-fees.js",
   "dist/platform.d.ts",
   "dist/platform.js",
+  "dist/privacy-rails-v2.d.ts",
+  "dist/privacy-rails-v2.js",
   "dist/privacy-rails.d.ts",
   "dist/privacy-rails.js",
   "dist/private-draft-vault.d.ts",
@@ -131,7 +133,8 @@ const budgets = {
   // Measured 78,491 B after adding passkey smart-account contracts and verified Testnet contract ids (v0.3.0).
   // Measured 82,108 B after adding the dependency-free passkey payment verifier (v0.3.0).
   // Measured 86,084 B after re-pinning privacy rails to the canonical v2 lock (longer, accurate blockers).
-  packedBytes: 87_000,
+  // Measured 89,685 B after adding the typed two-rail privacy module (privacy-rails-v2).
+  packedBytes: 91_000,
   // Reviewed observation-health .js and .d.ts add 2,841 bytes over v0.2.
   // Additional typed platform capability validators remain dependency-free.
   // Preserve a bounded size budget with reviewed headroom.
@@ -156,7 +159,8 @@ const budgets = {
   // Measured 319,3xx B unpacked after adding the passkey payment verifier (v0.3.0).
   // Measured 328,703 B after adding the dependency-free OpenZeppelin smart-account
   // module (verified Testnet artifacts, wallet-address derivation, relay validators).
-  unpackedBytes: 334_000,
+  // Measured 339,303 B after adding the typed two-rail privacy module (privacy-rails-v2).
+  unpackedBytes: 344_000,
   // Reviewed 22,718-byte full bundle after restoring read-only governance and platform clients.
   // Allow bounded headroom, not a blanket removal of browser-size limits.
   // 25,755 measured after adding strictly validated, dependency-free governance snapshot.

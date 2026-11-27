@@ -147,3 +147,6 @@ export type {PreparedPayment,PaymentRecord,PaymentDirectory,PaymentAssertion,Pay
 export {OZ_SMART_ACCOUNTS_TESTNET,passkeyKeyData,passkeyDeploySalt,walletAddressFromSalt,predictPasskeyWallet,validRelaySubmission,validRelayResponse} from "./oz-smart-accounts.js";
 export type {RelaySubmission,RelayResponse} from "./oz-smart-accounts.js";
 export {encodeContractAddress} from "./wallet.js";
+
+export {PERSONAL_SHIELDED_POOL,BUSINESS_CONFIDENTIAL_TOKEN,assertRailEnabled,PrivacyRailUnavailableError,personalPool,disclosureFor} from "./privacy-rails-v2.js";
+export type {PrivacyRailId,Visibility,DisclosureModel,PersonalPool,PersonalOperationState} from "./privacy-rails-v2.js";
