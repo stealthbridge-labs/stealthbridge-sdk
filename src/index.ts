@@ -144,3 +144,6 @@ export type {DeployRequest as SmartAccountDeployRequest,DeploymentDirectory as S
 export {TESTNET_CONTRACTS,TESTNET_NETWORK_PASSPHRASE} from "./testnet.js";
 export {validPreparedPayment,validPaymentDirectory,verifyPreparedPayment,sacContractId,strkeyPayload,base64urlBytes} from "./smart-account-payments.js";
 export type {PreparedPayment,PaymentRecord,PaymentDirectory,PaymentAssertion,PaymentStatus,ExpectedPayment} from "./smart-account-payments.js";
+export {OZ_SMART_ACCOUNTS_TESTNET,passkeyKeyData,passkeyDeploySalt,walletAddressFromSalt,predictPasskeyWallet,validRelaySubmission,validRelayResponse} from "./oz-smart-accounts.js";
+export type {RelaySubmission,RelayResponse} from "./oz-smart-accounts.js";
+export {encodeContractAddress} from "./wallet.js";

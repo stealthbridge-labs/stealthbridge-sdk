@@ -73,6 +73,8 @@ const expectedPackageFiles = [
   "dist/observer-schema.js",
   "dist/organization-team.d.ts",
   "dist/organization-team.js",
+  "dist/oz-smart-accounts.d.ts",
+  "dist/oz-smart-accounts.js",
   "dist/payment-instructions.d.ts",
   "dist/payment-instructions.js",
   "dist/platform-fees.d.ts",
@@ -115,7 +117,7 @@ const expectedPackageFiles = [
   "dist/upgrade-review.js",
   "dist/wallet.d.ts",
   "dist/wallet.js",
-  "package.json"
+  "package.json",
 ];
 const budgets = {
   // Account for one bounded, dependency-free snapshot module. Still fail
@@ -151,7 +153,9 @@ const budgets = {
   // Measured 296,035 B after adding typed PostgreSQL-backed account-beneficiaries client and declarations.
   // Measured 305,970 B unpacked after adding smart-account contracts and Testnet ids (v0.3.0).
   // Measured 319,3xx B unpacked after adding the passkey payment verifier (v0.3.0).
-  unpackedBytes: 326_000,
+  // Measured 328,703 B after adding the dependency-free OpenZeppelin smart-account
+  // module (verified Testnet artifacts, wallet-address derivation, relay validators).
+  unpackedBytes: 334_000,
   // Reviewed 22,718-byte full bundle after restoring read-only governance and platform clients.
   // Allow bounded headroom, not a blanket removal of browser-size limits.
   // 25,755 measured after adding strictly validated, dependency-free governance snapshot.

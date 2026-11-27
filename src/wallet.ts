@@ -87,6 +87,11 @@ function encodeStrKey32(version: number, payload32: Uint8Array): string {
   return out;
 }
 
+/** C… contract StrKey for a 32-byte contract id. */
+export function encodeContractAddress(id32: Uint8Array): string | null {
+  return id32.length === 32 ? encodeStrKey32(2 << 3, id32) : null;
+}
+
 function readUint64Be(bytes: Uint8Array): string {
   let id = 0n;
   for (let i = 0; i < 8; i++) {
