@@ -8,7 +8,7 @@
 
 The [SDK architecture and delivery plan](docs/ARCHITECTURE-AND-DELIVERY.md) records current exports, consumption rules, failure states, contract source pinning and future signer boundaries.
 
-**Verified code/CI baseline:** a private, unpublished ESM package with typed read-only Testnet client, freshness checks, exact asset value operations, validated public G-addresses, corridor paging, transaction observation, strict capability checks and three-contract source-interface validation. The packed package passes Node/browser/Next.js consumer tests, not a live transfer test.
+**Verified code/CI baseline:** a published ESM package (npm `@stealthbridge/sdk@0.3.0`, `latest`) with typed read-only Testnet client, freshness checks, exact asset value operations, validated public G-addresses, corridor paging, transaction observation, strict capability checks and three-contract source-interface validation. The packed package passes Node/browser/Next.js consumer tests, not a live transfer test.
 
 | Order | SDK workstream | Done only when |
 | --- | --- | --- |

@@ -26,3 +26,5 @@ jobs:
       - name: Verify package version compatibility
         run: npm run check:version
       - run: npm run verify
+      - name: Reject privacy pin drift from the canonical contracts lock
+        run: node scripts/check-privacy-lock.mjs

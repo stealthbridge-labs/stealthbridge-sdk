@@ -102,7 +102,9 @@ export function describePrivacyRailArchitecture(
       rail,
       evaluatedFor: "personal",
       upstreamRepo: "https://github.com/NethermindEth/stellar-private-payments",
-      pinnedRef: "cebb972b5872cba3a1cc40bcdfab297168ccc1d7",
+      // Canonical: stealthbridge-contracts/integrations/privacy-dependency-lock.v2.json
+      // (deployment commit of the live Testnet pools; pool WASM reproduced byte-for-byte).
+      pinnedRef: "25f64658e5c26e0f7aac4b35e68f0fed1507cb83",
       licenseModel: "Apache-2.0 workspace; circomlib LGPL-3.0 + circuit-compiler GPL-3.0 artifacts",
       requiredSorobanSdk: "28.x (BN254 pairing host precompile)",
       productionReady: false,
@@ -119,6 +121,7 @@ export function describePrivacyRailArchitecture(
           "Shields in-pool UTXO counterparties and internal amounts via BN254 Groth16, while deposit/withdrawal edges, fees, ASP proofs, and fee-payer remain public.",
       },
       blockers: [
+        "Single-party (setup=local) Groth16 trusted setup for every circuit: its operator could forge proofs.",
         "Unaudited developer preview; cannot compose directly with soroban-sdk 27.0.6 contracts.",
         "Requires local note state/backup + durable event indexing beyond RPC ~7-day retention.",
         "Bundled circuit artifacts carry LGPL-3.0 / GPL-3.0 licensing obligations.",
@@ -146,7 +149,9 @@ export function describePrivacyRailArchitecture(
         "Hides internal balances and transfer amounts with Grumpkin Pedersen commitments + UltraHonk, while sender, recipient, counterparty graph, and auditor keys remain visible.",
     },
     blockers: [
-      "Unaudited developer preview; cannot compose directly with soroban-sdk 27.0.6 contracts.",
+      "No reviewed client implementation: v0.8.0 ships a client specification and conformance vectors, not a package.",
+      "Contracts and circuits audited at snapshot 2128f11; the release delta and the client layer are unaudited.",
+      "Cannot compose directly with soroban-sdk 27.0.6 contracts.",
       "Requires exact-transfer SEP-41 assets, durable event checkpoints, and external nargo/bb prover artifacts.",
       "SAC passthrough freeze or direct underlying clawback can stall or undercollateralize the pool.",
     ],

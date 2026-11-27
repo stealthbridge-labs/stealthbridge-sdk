@@ -130,7 +130,8 @@ const budgets = {
   // Measured 74,665 B after adding typed PostgreSQL-backed account-beneficiaries client and declarations.
   // Measured 78,491 B after adding passkey smart-account contracts and verified Testnet contract ids (v0.3.0).
   // Measured 82,108 B after adding the dependency-free passkey payment verifier (v0.3.0).
-  packedBytes: 86_000,
+  // Measured 86,084 B after re-pinning privacy rails to the canonical v2 lock (longer, accurate blockers).
+  packedBytes: 87_000,
   // Reviewed observation-health .js and .d.ts add 2,841 bytes over v0.2.
   // Additional typed platform capability validators remain dependency-free.
   // Preserve a bounded size budget with reviewed headroom.

@@ -1,6 +1,6 @@
 # SDK Architecture and Delivery Plan
 
-> `@stealthbridge/sdk` is a **private, unpublished, Testnet-only, read-oriented TypeScript package**. It does not sign transactions, generate cryptographic proofs, control custody, or settle payments. GitHub CI/published tarball fixtures validate package compatibility, not financial readiness.
+> `@stealthbridge/sdk` is a **published (npm `0.3.0`, dist-tag `latest`), Testnet-only TypeScript package**. It does not sign transactions, generate cryptographic proofs, control custody, or settle payments. GitHub CI/published tarball fixtures validate package compatibility, not financial readiness.
 
 ## Mission
 
